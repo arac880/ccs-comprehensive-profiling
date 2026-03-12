@@ -20,12 +20,12 @@
   cursor: pointer;
   outline: none;
   transition:
-    background-color 0.2s ease,
-    border-color 0.2s ease,
-    color 0.2s ease,
-    box-shadow 0.2s ease,
-    transform 0.15s ease,
-    opacity 0.2s ease;
+  background-color 0.2s ease,
+  border-color 0.2s ease,
+  color 0.2s ease,
+  box-shadow 0.2s ease,
+  transform 0.15s ease,
+  opacity 0.2s ease;
   user-select: none;
   white-space: nowrap;
   overflow: hidden;
@@ -47,14 +47,14 @@
 
 /* --- Variants --- */
 .btn--primary {
-  background-color: #c94e0a;
-  border-color: #c94e0a;
+  background-color: #E65100;
+  border-color: #E65100;
   color: #ffffff;
 }
 
 .btn--primary:hover:not(:disabled) {
-  background-color: #a83e07;
-  border-color: #a83e07;
+  background-color: #ca4700;
+  border-color: #ca4700;
   box-shadow: 0 4px 14px rgba(201, 78, 10, 0.45);
 }
 

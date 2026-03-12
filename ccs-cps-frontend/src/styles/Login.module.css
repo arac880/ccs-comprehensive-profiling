@@ -22,7 +22,7 @@
   min-height: 480px;
   border-radius: 12px;
   overflow: hidden;
-  border: none;
+  border: 2px solid #E65100;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
 }
 
@@ -45,7 +45,7 @@
 
 .brandImg {
   width: 100%;
-  max-width: 280px;
+  max-width: 420px;
   height: auto;
   object-fit: contain;
   display: block;
@@ -56,7 +56,7 @@
   text-align: center;
   font-size: 1.5rem;
   font-weight: 700;
-  color: #c94e0a;
+  color: #E65100;
   margin-bottom: 1.75rem;
   line-height: 1.4;
   font-family: 'Segoe UI', system-ui, sans-serif;
@@ -79,14 +79,14 @@
 
 .forgotLink {
   font-size: 0.82rem;
-  color: #c94e0a;
+  color: #E65100;
   text-decoration: none;
   font-weight: 500;
   transition: color 0.2s ease;
 }
 
 .forgotLink:hover {
-  color: #a83e07;
+  color: #E65100;
   text-decoration: underline;
 }
 
@@ -116,7 +116,6 @@
 .heroPanel {
   flex: 1 1 50%;
   position: relative;
-  background: linear-gradient(135deg, #e8640a 0%, #f09030 40%, #e05010 100%);
   overflow: hidden;
   min-height: 480px;
 }
