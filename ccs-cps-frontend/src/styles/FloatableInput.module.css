@@ -69,6 +69,16 @@
   padding: 0 3px;
 }
 
+.input:-webkit-autofill,
+.input:-webkit-autofill:hover,
+.input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0px 1000px #ffffff inset;
+  box-shadow: 0 0 0px 1000px #ffffff inset;
+  -webkit-text-fill-color: #E65100;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+
 /* error label color */
 .fieldError .label {
   color: #dc3545;

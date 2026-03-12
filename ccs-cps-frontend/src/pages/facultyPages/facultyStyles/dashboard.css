@@ -1,0 +1,172 @@
+.faculty-dashboard {
+  min-height: 100vh;
+  background-color: #fdf5ef;
+  display: flex;
+}
+
+.dashboard-main {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  overflow: hidden;
+}
+
+.dashboard-content {
+  display: flex;
+  flex-grow: 1;
+  padding: 16px;
+  gap: 16px;
+  background-color: #fdf5ef;
+  overflow-y: auto;
+}
+
+.dashboard-left {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  gap: 16px;
+}
+
+/* Welcome Banner */
+.welcome-banner {
+  background: linear-gradient(135deg, #7b1a00, #c0390a);
+  border-radius: 8px;
+  min-height: 140px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  text-align: center;
+  padding: 2rem;
+}
+
+.welcome-title {
+  font-size: 1.2rem;
+  margin: 0;
+}
+
+.welcome-ccs {
+  font-size: 2.2rem;
+  font-family: Gabarito, sans-serif;
+  font-weight: 900;
+}
+
+.welcome-sub {
+  font-size: 12px;
+  opacity: 0.9;
+  font-weight: 600;
+  margin-top: 4px;
+  margin-bottom: 0;
+}
+
+/* Cards */
+.dashboard-card {
+  background: white;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+.dashboard-card .card-title {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #1a1a1a;
+}
+
+.dashboard-card .card-title i {
+  color: #E65100;
+  font-size: 16px;
+}
+
+.empty-notice {
+  background-color: #fdf0e8;
+  color: #E65100;
+  text-align: center;
+  font-size: 13px;
+  padding: 12px;
+  border-radius: 6px;
+}
+
+.event-block {
+  height: 100px;
+  background-color: #fdf0e8;
+  border-radius: 6px;
+  margin-bottom: 10px;
+}
+
+.event-block:last-child {
+  margin-bottom: 0;
+}
+
+/* Right Calendar */
+.dashboard-right {
+  width: 160px;
+  flex-shrink: 0;
+}
+
+.calendar-card {
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+.calendar-header {
+  background-color: #E65100;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+}
+
+.calendar-day-num {
+  color: white;
+  font-size: 2rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.calendar-day-info {
+  display: flex;
+  flex-direction: column;
+  font-size: 10px;
+  color: white;
+}
+
+.calendar-day-info .dow {
+  font-weight: 700;
+}
+
+.calendar-day-info .moy {
+  opacity: 0.85;
+}
+
+.calendar-expand {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 0;
+}
+
+.calendar-lines {
+  padding: 8px;
+}
+
+.calendar-line {
+  height: 12px;
+  background-color: #f0f0f0;
+  border-radius: 4px;
+  margin-bottom: 8px;
+}
+
+.calendar-line:last-child {
+  margin-bottom: 0;
+}

@@ -41,8 +41,6 @@ export default function Login({ onLoginSuccess, onForgotPassword }) {
   async function handleLogin(e) {
     e.preventDefault();
     setServerError("");
-    if (!validate()) return;
-
     setIsLoading(true);
     try {
       await new Promise((r) => setTimeout(r, 1500));
@@ -59,7 +57,7 @@ export default function Login({ onLoginSuccess, onForgotPassword }) {
     <div className={styles.page}>
       <div className={styles.card}>
 
-        {/* ── Left panel ── */}
+        {/* Left panel */}
         <div className={styles.formPanel}>
 
           {/* Branding */}
@@ -78,22 +76,22 @@ export default function Login({ onLoginSuccess, onForgotPassword }) {
           <form className={styles.form} noValidate onSubmit={handleLogin}>
             <FloatableInput
               id="email"
+              type="email"
+              label="Email address"
+              autoComplete="email"
               value={form.email}
               onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
-              label="Email address"
-              type="email"
-              autoComplete="email"
               error={errors.email}
               disabled={isLoading}
             />
 
             <FloatableInput
               id="password"
+              type="password"
+              label="Password"
+              autoComplete="current-password"
               value={form.password}
               onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
-              label="Password"
-              type="password"
-              autoComplete="current-password"
               error={errors.password}
               disabled={isLoading}
             />
@@ -119,7 +117,7 @@ export default function Login({ onLoginSuccess, onForgotPassword }) {
               </a>
             </div>
 
-            {/* Login button — type="submit" triggers handleLogin via onSubmit */}
+            {/* Submit — triggers handleLogin via form onSubmit */}
             <AppButton
               type="submit"
               variant="primary"
@@ -132,7 +130,7 @@ export default function Login({ onLoginSuccess, onForgotPassword }) {
           </form>
         </div>
 
-        {/* ── Right panel ── */}
+        {/* Right panel */}
         <div className={styles.heroPanel}>
           <img
             src={ccsHero}
