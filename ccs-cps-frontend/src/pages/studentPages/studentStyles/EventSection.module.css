@@ -1,0 +1,137 @@
+
+@import url("https://fonts.googleapis.com/css2?family=Afacad:wght@400;500;600;700&family=Freeman&display=swap");
+
+/* ── Section header ── */
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.sectionIcon {
+  font-size: 1rem;
+  color: #e65100;
+}
+
+.sectionTitle {
+  font-family: "Afacad", sans-serif;
+  font-size: clamp(0.95rem, 1.5vw, 1.1rem);
+  font-weight: 700;
+  color: #444444;
+  margin: 0;
+}
+
+/* ── Outer card wrapping all events ── */
+.eventsCard {
+  background-color: #ffffff;
+  border-radius: 14px;
+  padding: 20px;
+  box-shadow: 0 2px 12px rgba(230, 81, 0, 0.05);
+}
+
+/* ── Individual event item ── */
+.eventItem {
+  background-color: #fff8f5;
+  border: 1.5px solid #f0d8cc;
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 14px;
+  position: relative;
+}
+
+.eventItem:last-child {
+  margin-bottom: 0;
+}
+
+/* ── Event top row: title left, meta right ── */
+.eventTopRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.eventTitle {
+  font-family: "Afacad", sans-serif;
+  font-size: clamp(0.9rem, 1.4vw, 1.02rem);
+  font-weight: 700;
+  color: #2a1a0a;
+  margin: 0;
+  line-height: 1.3;
+}
+
+.eventMeta {
+  font-family: "Afacad", sans-serif;
+  font-size: clamp(0.6rem, 0.9vw, 0.7rem);
+  color: #e65100;
+  white-space: nowrap;
+  opacity: 0.8;
+  flex-shrink: 0;
+}
+
+/* ── Event body text ── */
+.eventBody {
+  font-family: "Afacad", sans-serif;
+  font-size: clamp(0.75rem, 1.1vw, 0.85rem);
+  color: #666666;
+  line-height: 1.65;
+  margin: 0 0 14px;
+}
+
+/* ── PDF attachment pill ── */
+.attachmentPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #fff3ee;
+  border: 1.5px solid #f5c4aa;
+  border-radius: 8px;
+  padding: 5px 14px;
+  font-family: "Afacad", sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #e65100;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color 0.15s;
+}
+
+.attachmentPill:hover {
+  background-color: #ffe0cc;
+  color: #e65100;
+}
+
+.attachmentIcon {
+  font-size: 0.85rem;
+}
+
+/* ── Show More button ── */
+.showMoreWrap {
+  display: flex;
+  justify-content: center;
+  margin-top: 18px;
+}
+
+.showMoreBtn {
+  font-family: "Afacad", sans-serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: #e65100;
+  background-color: transparent;
+  border: 2px solid #e65100;
+  border-radius: 999px;
+  padding: 7px 32px;
+  cursor: pointer;
+  transition:
+    background-color 0.15s,
+    color 0.15s;
+}
+
+.showMoreBtn:hover {
+  background-color: #e65100;
+  color: #ffffff;
+}

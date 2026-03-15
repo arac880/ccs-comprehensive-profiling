@@ -1,0 +1,41 @@
+@import url("https://fonts.googleapis.com/css2?family=Afacad:wght@400;600;700&family=Freeman&family=ADLaM+Display&display=swap");
+
+.card {
+  background-color: #ffffff;
+  border-radius: 16px;
+  padding: clamp(28px, 4vw, 48px) clamp(20px, 4vw, 40px);
+  text-align: center;
+  box-shadow: 0 2px 16px rgba(230, 81, 0, 0.06);
+  width: 100%;
+}
+
+/* "Welcome to the" part */
+.heading {
+  font-family: "Afacad", sans-serif;
+  font-size: clamp(1.6rem, 3.2vw, 2.5rem);
+  font-weight: bold;
+  color: #3a2a1a;
+  margin: 0 0 4px;
+  letter-spacing: 0.01em;
+  line-height: 1.2;
+}
+
+/* "CCS" in Freeman bold italic */
+.accentCCS {
+  font-family: "Freeman", sans-serif;
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  color: #e65100;
+  font-style: italic;
+  letter-spacing: -0.01em;
+  vertical-align: baseline;
+}
+
+/* "Comprehensive Profiling System" subtitle */
+.sub {
+  font-family: "Afacad", sans-serif;
+  font-size: clamp(0.88rem, 1.6vw, 1.1rem);
+  font-weight: 700;
+  color: #e65100;
+  letter-spacing: 0.04em;
+  margin: 6px 0 0;
+}

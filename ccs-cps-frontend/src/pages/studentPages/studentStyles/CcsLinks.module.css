@@ -1,0 +1,79 @@
+
+@import url("https://fonts.googleapis.com/css2?family=Afacad:wght@400;600;700&display=swap");
+
+.sectionTitle {
+  font-family: "Afacad", sans-serif;
+  font-size: clamp(0.88rem, 1.4vw, 1rem);
+  font-weight: 700;
+  color: #444444;
+  margin: 0 0 12px;
+}
+
+/* ── Each link row ── */
+.linkItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 14px;
+  background-color: #ffffff;
+  border-radius: 10px;
+  border: 1.5px solid #f0d8cc;
+  margin-bottom: 10px;
+  text-decoration: none;
+  transition:
+    border-color 0.15s,
+    background-color 0.15s;
+  cursor: pointer;
+}
+
+.linkItem:last-child {
+  margin-bottom: 0;
+}
+
+.linkItem:hover {
+  border-color: #e65100;
+  background-color: #fff3ee;
+}
+
+/* ── Platform icon circle ── */
+.iconCircle {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.platformIcon {
+  font-size: 1.05rem;
+  color: #ffffff;
+}
+
+/* ── Link name + sub label ── */
+.linkText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.linkName {
+  font-family: "Afacad", sans-serif;
+  font-size: clamp(0.78rem, 1.2vw, 0.9rem);
+  font-weight: 700;
+  color: #e65100;
+  margin: 0;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.linkSub {
+  font-family: "Afacad", sans-serif;
+  font-size: 0.65rem;
+  color: #bbbbbb;
+  margin: 0;
+  line-height: 1.3;
+}

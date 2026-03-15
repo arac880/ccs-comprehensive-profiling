@@ -1,0 +1,62 @@
+
+/* ── Top bar shell ── */
+.topNav {
+  background-color: #e65100;
+  min-height: clamp(54px, 7vw, 68px);
+  flex-shrink: 0;
+}
+
+/* ── Brand title ── */
+.brandTitle {
+  font-family: "Gabarito", sans-serif;
+  font-size: clamp(1.5rem, 2.8vw, 2.2rem);
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 0.02em;
+  line-height: 1.1;
+  margin: 0;
+}
+
+/* ── Brand subtitle ── */
+.brandSub {
+  font-family: "Gabarito", sans-serif;
+  font-size: clamp(0.55rem, 0.9vw, 0.72rem);
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.88);
+  letter-spacing: 0.01em;
+  line-height: 1.2;
+  margin: 0;
+}
+
+/* ── Action icons ── */
+.actionIcon {
+  font-size: clamp(1.15rem, 2vw, 1.5rem);
+  color: #ffffff;
+  cursor: pointer;
+  transition: opacity 0.16s ease;
+}
+
+.actionIcon:hover {
+  opacity: 0.72;
+}
+
+/* ── Notification bell wrapper ── */
+.notifWrap {
+  position: relative;
+  display: inline-flex;
+}
+
+/* ── Notification count badge ── */
+.notifBadge {
+  font-family: "Gabarito", sans-serif;
+  font-size: 0.5rem;
+  font-weight: 700;
+  color: #e65100;
+  background-color: #ffffff;
+  border-radius: 999px;
+  padding: 1px 5px;
+  line-height: 1.4;
+  position: absolute;
+  top: -5px;
+  right: -8px;
+}

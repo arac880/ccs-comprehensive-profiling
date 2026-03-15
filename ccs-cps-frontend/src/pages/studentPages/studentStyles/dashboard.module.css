@@ -1,0 +1,78 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Afacad:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Freeman&family=ADLaM+Display&display=swap');
+
+/* ── Full page shell ── */
+.dashboardWrapper {
+  min-height: 100vh;
+  background-color: #f5ece6;
+  display: flex;
+  flex-direction: row;
+  font-family: "Afacad", sans-serif;
+}
+
+/* ── Right column (topnav + content) ── */
+.rightColumn {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* ── Scrollable main area ── */
+.mainContent {
+  background-color: #f5ece6;
+  flex: 1;
+  overflow-y: auto;
+  padding: 22px 24px;
+}
+
+/* ── Mobile offsets ── */
+.mobileMain {
+  padding-top: 70px;
+  padding-bottom: 68px;
+  padding-left: 14px;
+  padding-right: 14px;
+  min-height: 100vh;
+  background-color: #f5ece6;
+  font-family: "Afacad", sans-serif;
+}
+
+/* ── Page title ── */
+.pageTitle {
+  font-family: "Afacad", sans-serif;
+  font-size: clamp(0.72rem, 1.2vw, 0.88rem);
+  font-weight: 700;
+  color: #999999;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin: 0 0 16px;
+}
+
+/* ── Two-column grid ── */
+/* Left col fills remaining space, right col fixed ~280px */
+.dashGrid {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 18px;
+  align-items: start;
+}
+
+@media (max-width: 1080px) {
+  .dashGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.dashLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-width: 0;
+}
+
+.dashRight {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
