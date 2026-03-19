@@ -5,8 +5,9 @@ import SideBarNav from "../../components/studentComponents/SideBarNav";
 import TopBarNav from "../../components/studentComponents/TopBarNav";
 import WelcomeBanner from "../../components/studentComponents/WelcomeBanner";
 import EventsSection from "../../components/studentComponents/EventSection";
-import CalendarWidget from "../../components/studentComponents/CalendarWidget";
+import CalendarWidget from "../../components/ui/CalendarWidget";
 import CCSLinks from "../../components/studentComponents/CcsLinks";
+import TitlePages from "../../components/ui/TitlePages";
 import styles from "./studentStyles/dashboard.module.css";
 
 const MOBILE_BREAKPOINT = 992;
@@ -28,21 +29,27 @@ export default function StudentDashboard() {
 
   // ── Shared dashboard content grid ────────────────────────
   const DashboardContent = () => (
-    <>
-      <div className={styles.dashGrid}>
-        {/* Left column: welcome hero + events list */}
-        <div className={styles.dashLeft}>
-          <WelcomeBanner />
-          <EventsSection />
-        </div>
+    <div className={styles.dashGrid}>
+      {/* Left column: welcome hero + events list */}
+      <div className={styles.dashLeft}>
+        <WelcomeBanner />
 
-        {/* Right column: today's date + CCS links */}
-        <div className={styles.dashRight}>
-          <CalendarWidget />
-          <CCSLinks />
-        </div>
+        <TitlePages
+          icon="bi-calendar-event-fill"
+          title="Events"
+          iconBg="#E65100"
+          iconColor="#ffffff"
+          textColor="#E65100"
+        />
+        <EventsSection />
       </div>
-    </>
+
+      {/* Right column: today's date + CCS links */}
+      <div className={styles.dashRight}>
+        <CalendarWidget />
+        <CCSLinks />
+      </div>
+    </div>
   );
 
   // ── Mobile layout ─────────────────────────────────────────

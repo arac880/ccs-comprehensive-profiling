@@ -1,41 +1,73 @@
 @import url("https://fonts.googleapis.com/css2?family=Afacad:wght@400;600;700&family=Freeman&family=ADLaM+Display&display=swap");
 
+/* ── Outer card ──────────────────────────────────────────────────────────── */
 .card {
   background-color: #ffffff;
   border-radius: 16px;
-  padding: clamp(28px, 4vw, 48px) clamp(20px, 4vw, 40px);
+  padding: clamp(32px, 5vw, 56px) clamp(20px, 5vw, 48px);
   text-align: center;
   box-shadow: 0 2px 16px rgba(230, 81, 0, 0.06);
   width: 100%;
+  box-sizing: border-box;
+  margin-bottom: clamp(14px, 2.5vw, 24px);
 }
 
-/* "Welcome to the" part */
-.heading {
+/* ── Heading row: "Welcome  to  the  CCS" all on one line ───────────────── */
+.headingRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0 clamp(6px, 1vw, 12px);
+  margin: 0 0 clamp(4px, 0.8vw, 8px);
+  line-height: 1.15;
+}
+
+/* "Welcome to the" — muted warm brown, lighter weight */
+.headingText {
   font-family: "Afacad", sans-serif;
-  font-size: clamp(1.6rem, 3.2vw, 2.5rem);
-  font-weight: bold;
-  color: #3a2a1a;
-  margin: 0 0 4px;
+  font-size: clamp(1.80rem, 3vw, 2.80rem);
+  font-weight: 600;
+  color: #b07050;
   letter-spacing: 0.01em;
-  line-height: 1.2;
+  white-space: nowrap;
 }
 
-/* "CCS" in Freeman bold italic */
+/* "CCS" — large, bold, orange, Freeman italic */
 .accentCCS {
   font-family: "Freeman", sans-serif;
-  font-size: clamp(2rem, 4vw, 3.2rem);
+  font-size: clamp(2rem, 4.5vw, 3.5rem);
   color: #e65100;
   font-style: italic;
+  font-weight: 400;
   letter-spacing: -0.01em;
-  vertical-align: baseline;
+  line-height: 1;
 }
 
-/* "Comprehensive Profiling System" subtitle */
+/* ── Subtitle ─────────────────────────────────────────────────────────────── */
 .sub {
   font-family: "Afacad", sans-serif;
-  font-size: clamp(0.88rem, 1.6vw, 1.1rem);
+  font-size: clamp(1rem, 1.5vw, 1.5rem);
   font-weight: 700;
   color: #e65100;
-  letter-spacing: 0.04em;
-  margin: 6px 0 0;
+  letter-spacing: 0.06em;
+  margin: 0;
+  text-transform: none;
+}
+
+/* ── Responsive tweaks ───────────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .headingRow {
+    gap: 0 6px;
+  }
+  .headingText {
+    font-size: clamp(1.2rem, 6vw, 1.6rem);
+  }
+  .accentCCS {
+    font-size: clamp(1.6rem, 8vw, 2.2rem);
+  }
+  .sub {
+    font-size: clamp(0.75rem, 3.5vw, 0.9rem);
+    letter-spacing: 0.04em;
+  }
 }

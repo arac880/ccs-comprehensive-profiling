@@ -1,5 +1,4 @@
 import styles from "../../pages/studentPages/studentStyles/EventSection.module.css";
-
 const SAMPLE_EVENTS = [
   {
     id: 1,
@@ -10,31 +9,32 @@ const SAMPLE_EVENTS = [
   },
 ];
 
-export default function EventsSection({ events = SAMPLE_EVENTS }) {
+export default function EventsSection({ events = SAMPLE_EVENTS, onShowMore }) {
   return (
-    <div>
-      {/* Section header row */}
-      <div className={styles.sectionHeader}>
-        <i className={`bi bi-calendar-event-fill ${styles.sectionIcon}`} />
-        <h6 className={styles.sectionTitle}>Events</h6>
-      </div>
-
-      {/* White card wrapping all events */}
-      <div className={styles.eventsCard}>
-        {events.map((event) => (
+    <div className={styles.eventsCard}>
+      {events.length === 0 ? (
+        <div className={styles.emptyState}>
+          <i
+            className="bi bi-calendar-x"
+            style={{
+              fontSize: 28,
+              opacity: 0.3,
+              display: "block",
+              marginBottom: 8,
+            }}
+          />
+          No events available at the moment.
+        </div>
+      ) : (
+        events.map((event) => (
           <div key={event.id} className={styles.eventItem}>
-            {/* Title + timestamp row */}
             <div className={styles.eventTopRow}>
               <p className={styles.eventTitle}>{event.title}</p>
               <span className={styles.eventMeta}>
                 Created at: {event.createdAt}
               </span>
             </div>
-
-            {/* Body text */}
             <p className={styles.eventBody}>{event.body}</p>
-
-            {/* PDF attachment pill */}
             {event.attachment && (
               <a
                 href={event.attachment.url}
@@ -49,12 +49,17 @@ export default function EventsSection({ events = SAMPLE_EVENTS }) {
               </a>
             )}
           </div>
-        ))}
+        ))
+      )}
 
-        {/* Show More */}
-        <div className={styles.showMoreWrap}>
-          <button className={styles.showMoreBtn}>SHOW MORE</button>
-        </div>
+      <div className={styles.showMoreWrap}>
+        <button
+          className={styles.showMoreBtn}
+          onClick={onShowMore}
+          type="button"
+        >
+          SHOW MORE
+        </button>
       </div>
     </div>
   );
