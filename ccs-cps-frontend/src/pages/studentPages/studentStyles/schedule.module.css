@@ -1,0 +1,203 @@
+/* ============================================
+   schedule.module.css (With Visible Gridlines)
+   ============================================ */
+
+.scheduleContainer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 10px 20px;
+  background-color: white;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* ── Title Header ── */
+.pageHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.titleWrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.iconBox {
+  background-color: #d86422;
+  border-radius: 6px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.titleWrapper h2 {
+  color: #a34100;
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+.classSection {
+  margin: 0;
+  font-size: 1.4rem;
+  color: #a34100;
+  font-weight: 700;
+}
+
+/* ── PEACH OUTER CONTAINER ── */
+.calendarOuterLayer {
+  background-color: #fcf1eb; 
+  border: 2px solid #ebccba; 
+  border-radius: 8px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* ── INNER CALENDAR GRID ── */
+.calendarTable {
+  background-color: #ffffff;
+  border: 1px solid #ebccba;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow-y: auto; 
+}
+
+/* ── Header Row (Orange) ── */
+.calendarHeader {
+  display: grid;
+  grid-template-columns: 110px repeat(7, 1fr);
+  background-color: #d86422;
+  color: white;
+  text-align: center;
+  font-weight: 600;
+  font-size: 0.85rem;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.timeHeaderBlock {
+  padding: 14px 0;
+  border-right: 2px solid #fcf1eb; 
+}
+
+.dayHeaderBlock {
+  padding: 14px 0;
+  border-right: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.dayHeaderBlock:last-child {
+  border-right: none;
+}
+
+/* ── Body Grid ── */
+.calendarBody {
+  display: grid;
+  grid-template-columns: 110px repeat(7, 1fr);
+  position: relative;
+}
+
+/* ── Left Time Column ── */
+.timeColumn {
+  border-right: 1px solid #ebccba;
+  background-color: #ffffff;
+  text-align: center;
+}
+
+.periodDivider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: #d86422;
+  font-size: 0.7rem;
+  font-weight: 700;
+  height: 40px; /* Locked height so we can align it perfectly */
+  box-sizing: border-box;
+}
+
+.periodLine {
+  height: 2px;
+  width: 15px;
+  background-color: #d86422;
+}
+
+.timeText {
+  height: 30px; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  color: #444;
+  font-weight: 600;
+}
+
+/* ── Day Columns ── */
+.dayColumn {
+  border-right: 1px solid #ebccba;
+  position: relative; 
+}
+
+.dayColumn:last-child {
+  border-right: none;
+}
+
+/* ── NEW: Alignment Spacers & Visible Grid Lines ── */
+.periodSpacer {
+  height: 40px; /* Matches the Morning/Afternoon text block perfectly */
+  width: 100%;
+}
+
+.gridLine {
+  height: 30px;
+  border-bottom: 1px solid #ebd4c7; /* Visible peach line! */
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* ── Colored Class Cards ── */
+.classCard {
+  position: absolute;
+  left: 0; 
+  right: 0; 
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; 
+  align-items: center;
+  text-align: center;
+  padding: 16px 4px;
+  z-index: 5;
+}
+
+.cardTop, .cardBottom {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.courseCode {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.courseName {
+  font-size: 0.65rem;
+  line-height: 1.2;
+}
+
+.courseDetails {
+  font-size: 0.6rem;
+  opacity: 0.9;
+  line-height: 1.3;
+}
