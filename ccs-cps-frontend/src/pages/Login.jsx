@@ -76,8 +76,8 @@ export default function Login({ onLoginSuccess, onForgotPassword }) {
           <form className={styles.form} noValidate onSubmit={handleLogin}>
             <FloatableInput
               id="email"
-              type="email"
-              label="Email address"
+              type="text"
+              label="ID Number"
               autoComplete="email"
               value={form.email}
               onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
@@ -128,6 +128,8 @@ export default function Login({ onLoginSuccess, onForgotPassword }) {
               LOGIN
             </AppButton>
           </form>
+
+          {/* <small className="text-muted fw-semibold fst-italic mt-3">For faculty & staff use only. <br />Unauthorized access is strictly prohibited.</small> */}
         </div>
 
         {/* Right panel */}

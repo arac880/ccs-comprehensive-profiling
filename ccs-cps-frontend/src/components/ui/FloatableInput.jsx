@@ -34,8 +34,10 @@ export default function FloatableInput({
     <div className={fieldClass}>
       <input
         id={inputId}
+        name={inputId}
         type={computedType}
         value={value}
+        placeholder=" " 
         disabled={disabled}
         autoComplete={autoComplete}
         className={styles.input}

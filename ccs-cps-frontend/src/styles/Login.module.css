@@ -1,6 +1,12 @@
 /* ============================================
    Login.module.css
    ============================================ */
+:root {
+  --card-border: 2px solid #e99e7583;
+  --card-shadow: 5px 8px 32px rgba(0, 0, 0, 0.20);
+  --h1-color: #b44f19;
+}
+
 
 /* ── Page wrapper ── */
 .page {
@@ -22,8 +28,8 @@
   min-height: 480px;
   border-radius: 12px;
   overflow: hidden;
-  border: 2px solid #E65100;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  border: var(--card-border);
+  box-shadow: var(--card-shadow);
 }
 
 /* ── Left: Form Panel ── */
@@ -56,7 +62,7 @@
   text-align: center;
   font-size: 1.5rem;
   font-weight: 700;
-  color: #E65100;
+  color: var(--h1-color);
   margin-bottom: 1.75rem;
   line-height: 1.4;
   font-family: 'Segoe UI', system-ui, sans-serif;
@@ -79,7 +85,7 @@
 
 .forgotLink {
   font-size: 0.82rem;
-  color: #E65100;
+  color: var(--h1-color);
   text-decoration: none;
   font-weight: 500;
   transition: color 0.2s ease;
