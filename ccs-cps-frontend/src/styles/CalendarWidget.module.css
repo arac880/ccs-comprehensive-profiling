@@ -5,6 +5,9 @@
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 2px 12px rgba(230, 81, 0, 0.09);
+  /* Protect natural height — never stretch to fill a flex/grid parent */
+  align-self: flex-start;
+  width: 100%;
 }
 
 /* ── Orange date header ── */
@@ -14,6 +17,8 @@
   display: flex;
   align-items: center;
   gap: 12px;
+  /* Fixed to content — never grow */
+  flex-shrink: 0;
 }
 
 /* Large day number */

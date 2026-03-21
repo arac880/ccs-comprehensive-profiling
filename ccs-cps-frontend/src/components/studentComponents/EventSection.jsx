@@ -1,4 +1,6 @@
+import AppButton from "../../components/ui/AppButton";
 import styles from "../../pages/studentPages/studentStyles/EventSection.module.css";
+
 const SAMPLE_EVENTS = [
   {
     id: 1,
@@ -16,12 +18,7 @@ export default function EventsSection({ events = SAMPLE_EVENTS, onShowMore }) {
         <div className={styles.emptyState}>
           <i
             className="bi bi-calendar-x"
-            style={{
-              fontSize: 28,
-              opacity: 0.3,
-              display: "block",
-              marginBottom: 8,
-            }}
+            style={{ fontSize: 28, opacity: 0.3, display: "block", marginBottom: 8 }}
           />
           No events available at the moment.
         </div>
@@ -30,36 +27,35 @@ export default function EventsSection({ events = SAMPLE_EVENTS, onShowMore }) {
           <div key={event.id} className={styles.eventItem}>
             <div className={styles.eventTopRow}>
               <p className={styles.eventTitle}>{event.title}</p>
-              <span className={styles.eventMeta}>
-                Created at: {event.createdAt}
-              </span>
+              <span className={styles.eventMeta}>Created at: {event.createdAt}</span>
             </div>
+
             <p className={styles.eventBody}>{event.body}</p>
+
             {event.attachment && (
-              <a
-                href={event.attachment.url}
-                className={styles.attachmentPill}
-                target="_blank"
-                rel="noreferrer"
+              /* PDF pill — AppButton primary md, opens the file */
+              <AppButton
+                variant="primary"
+                size="md"
+                onClick={() => window.open(event.attachment.url, "_blank")}
               >
-                <i
-                  className={`bi bi-file-earmark-pdf-fill ${styles.attachmentIcon}`}
-                />
+                <i className="bi bi-file-earmark-pdf-fill" style={{ marginRight: 6 }} />
                 {event.attachment.name}
-              </a>
+              </AppButton>
             )}
           </div>
         ))
       )}
 
+      {/* Show More — AppButton outline md, centered */}
       <div className={styles.showMoreWrap}>
-        <button
-          className={styles.showMoreBtn}
+        <AppButton
+          variant="primary"
+          size="md"
           onClick={onShowMore}
-          type="button"
         >
           SHOW MORE
-        </button>
+        </AppButton>
       </div>
     </div>
   );

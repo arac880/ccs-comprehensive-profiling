@@ -12,7 +12,7 @@ export default function TopNavBar({ notifCount = 0, onSignOut }) {
       </div>
 
       {/* Right: Icons */}
-      <div className="d-flex align-items-center gap-3">
+      <div className={styles.iconGroup}>
         {/* Notification bell */}
         <div className={styles.notifWrap}>
           <i className={`bi bi-bell-fill ${styles.actionIcon}`} />
