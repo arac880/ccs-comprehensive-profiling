@@ -1,33 +1,40 @@
 @import url("https://fonts.googleapis.com/css2?family=Afacad:wght@400;600;700&display=swap");
 
-/* ── Outer card — this is now the single root element ── */
+/* ── Wrapper — holds title + card ── */
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+}
+
+/* ── Outer card ── */
 .linksCard {
   background-color: #ffffff;
   border-radius: 14px;
   padding: 16px;
   box-shadow: 0 2px 12px rgba(230, 81, 0, 0.05);
-
-  /* Fills linksCell height via flex:1 set by dashboard CSS */
   display: flex;
   flex-direction: column;
+  flex: 1;
   box-sizing: border-box;
   width: 100%;
 }
 
-/* Title sits at the top of the card */
+/* Title sits outside the card */
 .sectionTitle {
   font-family: "Afacad", sans-serif;
   font-size: clamp(1rem, 1.5vw, 1.5rem);
   font-weight: 700;
   color: #b86e46;
-  margin: 0 0 10px;
+  margin: 0 0 8px 4px;
 }
 
 /* ── Links list ── */
 .linksList {
   display: flex;
   flex-direction: column;
-  flex: 1; /* fills remaining card height so items space out naturally */
+  flex: 1;
 }
 
 /* ── Each link row ── */

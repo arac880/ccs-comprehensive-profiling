@@ -26,32 +26,29 @@ const DEFAULT_LINKS = [
 
 export default function CCSLinks({ links = DEFAULT_LINKS }) {
   return (
-    /* Single root div — linksCell stretches this to full row height */
-    <div className={styles.linksCard}>
-
-      {/* Title now INSIDE the card — no external element stealing space */}
+    <div className={styles.wrapper}>
       <h6 className={styles.sectionTitle}>CCS Links</h6>
-
-      <div className={styles.linksList}>
-        {links.map((link) => (
-          <a
-            key={link.id}
-            href={link.url}
-            className={styles.linkItem}
-            target="_blank"
-            rel="noreferrer"
-          >
-            <div className={styles.iconCircle}>
-              <i className={`bi ${link.icon} ${styles.platformIcon}`} />
-            </div>
-            <div className={styles.linkText}>
-              <span className={styles.linkName}>{link.name}</span>
-              <span className={styles.linkSub}>{link.sub}</span>
-            </div>
-          </a>
-        ))}
+      <div className={styles.linksCard}>
+        <div className={styles.linksList}>
+          {links.map((link) => (
+            <a
+              key={link.id}
+              href={link.url}
+              className={styles.linkItem}
+              target="_blank"
+              rel="noreferrer"
+            >
+              <div className={styles.iconCircle}>
+                <i className={`bi ${link.icon} ${styles.platformIcon}`} />
+              </div>
+              <div className={styles.linkText}>
+                <span className={styles.linkName}>{link.name}</span>
+                <span className={styles.linkSub}>{link.sub}</span>
+              </div>
+            </a>
+          ))}
+        </div>
       </div>
-
     </div>
   );
 }

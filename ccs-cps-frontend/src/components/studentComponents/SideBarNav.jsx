@@ -1,37 +1,71 @@
-
 import { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import styles from "../../pages/studentPages/studentStyles/SideBarNav.module.css";
 import ccsLogo from "../../assets/ccs_logo.png";
 
 const NAV_ITEMS = [
-  { name: "Dashboard",       label: "Dashboard",        icon: "bi-grid-fill"      },
-  { name: "Events",          label: "Events",           icon: "bi-calendar-event" },
-  { name: "Schedule",        label: "Schedule",         icon: "bi-calendar3"      },
-  { name: "CollegeResearch", label: "College Research", icon: "bi-journal-text"   },
-  { name: "Profile",         label: "Profile",          icon: "bi-person"         },
-  { name: "Clearance",       label: "Clearance",        icon: "bi-patch-check"    },
+  {
+    name: "Dashboard",
+    label: "Dashboard",
+    icon: "bi-grid-fill",
+    path: "/student/dashboard",
+  },
+  {
+    name: "Events",
+    label: "Events",
+    icon: "bi-calendar-event",
+    path: "/student/events",
+  },
+  {
+    name: "Schedule",
+    label: "Schedule",
+    icon: "bi-calendar3",
+    path: "/student/schedule",
+  },
+  {
+    name: "CollegeResearch",
+    label: "College Research",
+    icon: "bi-journal-text",
+    path: "/student/college-research",
+  },
+  {
+    name: "Profile",
+    label: "Profile",
+    icon: "bi-person",
+    path: "/student/profile",
+  },
+  {
+    name: "Clearance",
+    label: "Clearance",
+    icon: "bi-patch-check",
+    path: "/student/clearance",
+  },
 ];
 
 const DEFAULT_STUDENT = {
-  name:      "Jessa V. Cariñaga",
-  id:        "2001518",
-  type:      "Regular",
-  status:    "Enrolled",
-  year:      "4th Year",
-  section:   "4IT-D",
+  name: "Jessa V. Cariñaga",
+  id: "2001518",
+  type: "Regular",
+  status: "Enrolled",
+  year: "4th Year",
+  section: "4IT-D",
   avatarUrl: null,
 };
 
 const MOBILE_BREAKPOINT = 992;
 
-export default function SideNavbar({
-  activeNav = "Dashboard",
-  onNavigate,
-  student   = DEFAULT_STUDENT,
-}) {
+export default function SideNavbar({ student = DEFAULT_STUDENT }) {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const activeNav =
+    NAV_ITEMS.find((item) => item.path === location.pathname)?.name ??
+    "Dashboard";
+
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [drawerOpen,  setDrawerOpen]  = useState(false);
-  const [isMobile,    setIsMobile]    = useState(window.innerWidth < MOBILE_BREAKPOINT);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(
+    window.innerWidth < MOBILE_BREAKPOINT,
+  );
 
   useEffect(() => {
     const onResize = () => {
@@ -44,18 +78,24 @@ export default function SideNavbar({
   }, []);
 
   const go = (name) => {
-    if (onNavigate) onNavigate(name);
+    const item = NAV_ITEMS.find((i) => i.name === name);
+    if (item) navigate(item.path);
     if (isMobile) setDrawerOpen(false);
   };
 
-  // ── Profile card (reused in expanded sidebar + drawer) ──────
+  // ── Profile card ────────────────────────────────────────────
   const ProfileCard = () => (
     <div className={styles.profileCard}>
       <div className={styles.avatar}>
-        {student.avatarUrl
-          ? <img src={student.avatarUrl} alt={student.name} className={styles.avatarImg} />
-          : <i className={`bi bi-person-fill ${styles.avatarIcon}`} />
-        }
+        {student.avatarUrl ? (
+          <img
+            src={student.avatarUrl}
+            alt={student.name}
+            className={styles.avatarImg}
+          />
+        ) : (
+          <i className={`bi bi-person-fill ${styles.avatarIcon}`} />
+        )}
       </div>
       <p className={styles.studentName}>{student.name}</p>
       <p className={styles.studentId}>{student.id}</p>
@@ -63,12 +103,13 @@ export default function SideNavbar({
       <p className={styles.studentMeta}>Type: {student.type}</p>
       <p className={styles.studentMeta}>Status: {student.status}</p>
       <p className={styles.studentMeta}>Current Year Level: {student.year}</p>
-      <p className={styles.studentMeta}>Section/s Enrolled: {student.section}</p>
+      <p className={styles.studentMeta}>
+        Section/s Enrolled: {student.section}
+      </p>
     </div>
   );
 
-  // ── Nav list (reused in expanded sidebar + drawer) ──────────
-  // Uses separate active/inactive classes — no CSS chaining
+  // ── Nav list ─────────────────────────────────────────────────
   const NavList = () => (
     <div className={styles.navWrapper}>
       {NAV_ITEMS.map((item, index) => {
@@ -79,20 +120,28 @@ export default function SideNavbar({
               className={`${styles.navItem} ${isActive ? styles.navItemActive : ""}`}
               onClick={() => go(item.name)}
             >
-              <i className={`bi ${item.icon} ${styles.navIcon} ${isActive ? styles.navIconActive : ""}`} />
-              <span className={`${styles.navLabel} ${isActive ? styles.navLabelActive : ""}`}>
+              <i
+                className={`bi ${item.icon} ${styles.navIcon} ${isActive ? styles.navIconActive : ""}`}
+              />
+              <span
+                className={`${styles.navLabel} ${isActive ? styles.navLabelActive : ""}`}
+              >
                 {item.label}
               </span>
-              {item.badge && <span className={styles.navBadge}>{item.badge}</span>}
+              {item.badge && (
+                <span className={styles.navBadge}>{item.badge}</span>
+              )}
             </div>
-            {index < NAV_ITEMS.length - 1 && <hr className={styles.navDivider} />}
+            {index < NAV_ITEMS.length - 1 && (
+              <hr className={styles.navDivider} />
+            )}
           </div>
         );
       })}
     </div>
   );
 
-  // ── CCS logo watermark (pinned to bottom via margin-top:auto) ──
+  // ── Logo ─────────────────────────────────────────────────────
   const Logo = ({ collapsed = false }) => (
     <div className={collapsed ? styles.collapsedLogoWrap : styles.logoWrap}>
       <img
@@ -104,14 +153,10 @@ export default function SideNavbar({
     </div>
   );
 
-
-  // ============================================================
-  //  MOBILE LAYOUT
-  // ============================================================
+  // ── MOBILE ───────────────────────────────────────────────────
   if (isMobile) {
     return (
       <>
-        {/* Fixed orange top bar */}
         <div className={styles.mobileTopBar}>
           <i
             className={`bi bi-list ${styles.mobileHamburger}`}
@@ -119,21 +164,25 @@ export default function SideNavbar({
           />
           <span className={styles.mobileTopBarTitle}>Student Portal</span>
           <div className={styles.mobileTopBarAvatar}>
-            {student.avatarUrl
-              ? <img src={student.avatarUrl} alt={student.name} />
-              : <i className="bi bi-person-fill" style={{ color: "#fff", fontSize: "1rem" }} />
-            }
+            {student.avatarUrl ? (
+              <img src={student.avatarUrl} alt={student.name} />
+            ) : (
+              <i
+                className="bi bi-person-fill"
+                style={{ color: "#fff", fontSize: "1rem" }}
+              />
+            )}
           </div>
         </div>
 
-        {/* Backdrop — tap outside to close */}
         <div
           className={`${styles.drawerBackdrop} ${drawerOpen ? styles.drawerBackdropShow : ""}`}
           onClick={() => setDrawerOpen(false)}
         />
 
-        {/* Sliding drawer — position:fixed, overlays everything */}
-        <div className={`${styles.drawer} ${drawerOpen ? styles.drawerOpen : ""}`}>
+        <div
+          className={`${styles.drawer} ${drawerOpen ? styles.drawerOpen : ""}`}
+        >
           <div className={styles.drawerHeader}>
             <span className={styles.drawerTitle}>Student</span>
             <i
@@ -143,10 +192,9 @@ export default function SideNavbar({
           </div>
           <ProfileCard />
           <NavList />
-          <Logo />   {/* logo pinned to bottom of drawer */}
+          <Logo />
         </div>
 
-        {/* Fixed bottom tab bar */}
         <div className={styles.bottomBar}>
           {NAV_ITEMS.map((item) => {
             const isActive = activeNav === item.name;
@@ -156,8 +204,12 @@ export default function SideNavbar({
                 className={`${styles.tabItem} ${isActive ? styles.tabItemActive : ""}`}
                 onClick={() => go(item.name)}
               >
-                <i className={`bi ${item.icon} ${styles.tabIcon} ${isActive ? styles.tabIconActive : ""}`} />
-                <span className={`${styles.tabLabel} ${isActive ? styles.tabLabelActive : ""}`}>
+                <i
+                  className={`bi ${item.icon} ${styles.tabIcon} ${isActive ? styles.tabIconActive : ""}`}
+                />
+                <span
+                  className={`${styles.tabLabel} ${isActive ? styles.tabLabelActive : ""}`}
+                >
                   {item.label}
                 </span>
               </div>
@@ -168,14 +220,14 @@ export default function SideNavbar({
     );
   }
 
-
-  // ============================================================
-  //  DESKTOP COLLAPSED — icon-only strip
-  // ============================================================
+  // ── DESKTOP COLLAPSED ────────────────────────────────────────
   if (isCollapsed) {
     return (
       <div className={styles.sidebarCollapsed}>
-        <div className={styles.collapsedToggle} onClick={() => setIsCollapsed(false)}>
+        <div
+          className={styles.collapsedToggle}
+          onClick={() => setIsCollapsed(false)}
+        >
           <i className={`bi bi-list ${styles.menuIcon}`} />
         </div>
 
@@ -191,21 +243,20 @@ export default function SideNavbar({
                 onClick={() => go(item.name)}
                 title={item.label}
               >
-                <i className={`bi ${item.icon} ${styles.collapsedNavIcon} ${isActive ? styles.collapsedNavIconActive : ""}`} />
+                <i
+                  className={`bi ${item.icon} ${styles.collapsedNavIcon} ${isActive ? styles.collapsedNavIconActive : ""}`}
+                />
               </div>
             );
           })}
         </nav>
 
-        <Logo collapsed />  {/* pinned to bottom */}
+        <Logo collapsed />
       </div>
     );
   }
 
-
-  // ============================================================
-  //  DESKTOP EXPANDED — full sidebar
-  // ============================================================
+  // ── DESKTOP EXPANDED ─────────────────────────────────────────
   return (
     <div className={styles.sidebar}>
       <div className={styles.sidebarHeader}>
@@ -218,7 +269,7 @@ export default function SideNavbar({
 
       <ProfileCard />
       <NavList />
-      <Logo />  {/* margin-top:auto pushes this to very bottom */}
+      <Logo />
     </div>
   );
 }

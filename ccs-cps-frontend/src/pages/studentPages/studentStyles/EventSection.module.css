@@ -77,6 +77,36 @@
   color: #070707;
   line-height: 1.65;
   margin: 0 0 14px;
+  white-space: pre-line;
+}
+
+/* ── PDF button wrapper — overrides AppButton styles ── */
+.pdfButtonWrap button {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  background-color: transparent !important;
+  color: #e65100 !important;
+  font-family: "Afacad", sans-serif !important;
+  font-size: clamp(0.85rem, 1.2vw, 0.95rem) !important;
+  font-weight: 600 !important;
+  padding: 8px 18px !important;
+  border: 2px solid #e65100;
+  border-radius: 6px !important;
+  cursor: pointer !important;
+  transition:
+    background-color 0.15s,
+    transform 0.1s !important;
+}
+
+.pdfButtonWrap button:hover {
+  background-color: #bf360c !important;
+  color: #fff !important;
+  transform: translateY(-1px) !important;
+}
+
+.pdfButtonWrap button:active {
+  transform: translateY(0) !important;
 }
 
 /* ── Empty state ── */
@@ -88,10 +118,48 @@
   color: #aaa;
 }
 
-/* ── Show More wrapper — centers the AppButton ── */
+/* ── Show More wrapper — overrides AppButton styles ── */
 .showMoreWrap {
-  font-family: "Afacad", sans-serif;
   display: flex;
   justify-content: center;
   margin-top: 18px;
+}
+
+.showMoreWrap button {
+  background-color: #e65100 !important;
+  color: #ffffff !important;
+  font-family: "Afacad", sans-serif !important;
+  font-size: clamp(0.85rem, 1.2vw, 0.95rem) !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.08em !important;
+  padding: 10px 36px !important;
+  border: 2px solid #e65100 !important;
+  border-radius: 6px !important;
+  cursor: pointer !important;
+  transition:
+    background-color 0.15s,
+    color 0.15s,
+    transform 0.1s !important;
+}
+
+.showMoreWrap button:hover {
+  background-color: #bf360c !important;
+  border-color: #bf360c !important;
+  transform: translateY(-1px) !important;
+}
+
+.showMoreWrap button:active {
+  transform: translateY(0) !important;
+}
+
+.eventDate {
+  font-family: "Afacad", sans-serif;
+  font-size: clamp(0.8rem, 1.1vw, 0.9rem);
+  color: #802d00;
+  margin: -6px 0 10px;
+  font-weight: 600;
+}
+
+.eventStatus {
+  color: #e65100;
 }
