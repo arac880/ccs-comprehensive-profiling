@@ -1,16 +1,15 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-
 // React Icons
 import { FaPercent } from "react-icons/fa";
 import { FaPesoSign } from "react-icons/fa6";
 import { FaBook } from "react-icons/fa6";
 import { FaFileLines } from "react-icons/fa6";
-import { FaRegCircleCheck } from "react-icons/fa6";
-import { MdOutlineCancel } from "react-icons/md";   // not-cleared circle
-import { MdCheckCircle } from "react-icons/md";   // cleared circle (summary list)
-import { MdCancel } from "react-icons/md";   // pending circle (summary list)
+import { FaClipboardCheck } from "react-icons/fa6"; // Clearance
+import { MdOutlineCancel } from "react-icons/md"; // not-cleared circle
+import { MdCheckCircle } from "react-icons/md"; // cleared circle (summary list)
+import { MdCancel } from "react-icons/md"; // pending circle (summary list)
 
 // Layout Components
 import SideBarNav from "../../components/studentComponents/SideBarNav";
@@ -39,44 +38,75 @@ export default function StudentClearance() {
 
   // Summary data for the top banner
   const summaryItems = [
-    { isCleared: false, text: "Your grades for Second Semester A.Y. 2025-2026 have not all been submitted by your instructor/s yet." },
-    { isCleared: true,  text: "You have fully settled your account balance." },
-    { isCleared: true,  text: "You have no records of pending book/s borrowed from the University Library." },
-    { isCleared: true,  text: "You do not have any on-hold records with any department." },
-    { isCleared: false, text: "You have not evaluated all of your instructor/s for Second Semester A.Y. 2025-2026." },
+    {
+      isCleared: false,
+      text: "Your grades for Second Semester A.Y. 2025-2026 have not all been submitted by your instructor/s yet.",
+    },
+    { isCleared: true, text: "You have fully settled your account balance." },
+    {
+      isCleared: true,
+      text: "You have no records of pending book/s borrowed from the University Library.",
+    },
+    {
+      isCleared: true,
+      text: "You do not have any on-hold records with any department.",
+    },
+    {
+      isCleared: false,
+      text: "You have not evaluated all of your instructor/s for Second Semester A.Y. 2025-2026.",
+    },
   ];
 
   const clearanceUI = (
     <div className={clearanceStyles.clearanceContainer}>
-
       {/* Header Section */}
       <div className={clearanceStyles.pageHeader}>
         <div className={clearanceStyles.titleWrapper}>
           <div className={clearanceStyles.iconBox}>
-            <FaRegCircleCheck size={22} color="#ffffff" />
+            <FaClipboardCheck size={22} color="#ffffff" />
           </div>
           <h2 className={clearanceStyles.pageTitle}>Clearance</h2>
         </div>
-        <span className="text-muted fst-italic fw-700">
-          NOTE: Updates in any part of the clearance will be reflected in not more than 30 minutes.
-        </span>
       </div>
 
       {/* Main Status Banner */}
+      <span
+        className="text-muted fst-italic d-flex justify-content-end mb-2"
+        style={{ fontSize: "0.75rem", fontWeight: "600" }}>
+        NOTE: Updates in any part of the clearance will be reflected in not more
+        than 30 minutes.
+      </span>
+
       <div className={clearanceStyles.statusBanner}>
         <div className={clearanceStyles.statusLeft}>
           <MdOutlineCancel size={64} color="#d32f2f" />
-          <span className={clearanceStyles.statusMainText}>Not yet cleared</span>
+          <span className={clearanceStyles.statusMainText}>
+            Not yet cleared
+          </span>
         </div>
         <div className={clearanceStyles.statusDivider}></div>
         <div className={clearanceStyles.statusRight}>
           <ul className={clearanceStyles.summaryList}>
             {summaryItems.map((item, idx) => (
-              <li key={idx} className={item.isCleared ? clearanceStyles.clearedItem : clearanceStyles.pendingItem}>
+              <li
+                key={idx}
+                className={
+                  item.isCleared
+                    ? clearanceStyles.clearedItem
+                    : clearanceStyles.pendingItem
+                }>
                 {item.isCleared ? (
-                  <MdCheckCircle size={18} color="#2e7d32" className={clearanceStyles.listIcon} />
+                  <MdCheckCircle
+                    size={18}
+                    color="#2e7d32"
+                    className={clearanceStyles.listIcon}
+                  />
                 ) : (
-                  <MdCancel size={18} color="#d32f2f" className={clearanceStyles.listIcon} />
+                  <MdCancel
+                    size={18}
+                    color="#d32f2f"
+                    className={clearanceStyles.listIcon}
+                  />
                 )}
                 <span>{item.text}</span>
               </li>
@@ -99,7 +129,8 @@ export default function StudentClearance() {
         <div className={clearanceStyles.cardBodyCenter}>
           <h4 className={clearanceStyles.statusFailText}>NOT YET COMPLETE</h4>
           <p className={clearanceStyles.subtext}>
-            Your grades for Second Semester A.Y. 2025-2026 have not all been submitted by your instructor/s yet.
+            Your grades for Second Semester A.Y. 2025-2026 have not all been
+            submitted by your instructor/s yet.
           </p>
           <div className={clearanceStyles.missingItemsWrapper}>
             <div className={clearanceStyles.missingItem}>
@@ -124,10 +155,18 @@ export default function StudentClearance() {
           <div className={clearanceStyles.department}>OUR</div>
         </div>
         <div className={clearanceStyles.cardBodyCenter}>
-          <h4 className={clearanceStyles.statusPassText}>REMAINING BALANCE: ₱0.00</h4>
+          <h4 className={clearanceStyles.statusPassText}>
+            REMAINING BALANCE: ₱0.00
+          </h4>
           <div className={clearanceStyles.extraDetails}>
-            <p className={clearanceStyles.successText}>✓ Tuition Fee: Fully Settled</p>
-            <p className={clearanceStyles.successText}>✓ Miscellaneous Fee: Fully Settled</p>
+            <p className={clearanceStyles.successText}>
+              ✓ Tuition Fee: Fully Settled
+            </p>
+            <p className={clearanceStyles.successText}>
+              ✓ Miscellaneous Fee: Fully Settled
+            </p>
+            <p className={clearanceStyles.mutedText}>
+              Go to the Office of the University Registrar if you have unsettled balance. </p>
           </div>
         </div>
       </div>
@@ -144,8 +183,9 @@ export default function StudentClearance() {
         <div className={clearanceStyles.cardBodyCenter}>
           <h4 className={clearanceStyles.statusPassText}>CLEARED</h4>
           <div className={clearanceStyles.extraDetails}>
-            <p className={clearanceStyles.neutralText}>No unreturned books or outstanding fines.</p>
-            <p className={clearanceStyles.mutedText}>Last borrowed: Systems Analysis and Design (Returned: Feb 14, 2026)</p>
+            <p className={clearanceStyles.neutralText}>
+              No unreturned books or outstanding fines.
+            </p>
           </div>
         </div>
       </div>
@@ -160,15 +200,20 @@ export default function StudentClearance() {
           <div className={clearanceStyles.department}>OUR</div>
         </div>
         <div className={clearanceStyles.cardBodyCenter}>
-          <h4 className={clearanceStyles.statusPassText}>ALL REQUIREMENTS SUBMITTED</h4>
+          <h4 className={clearanceStyles.statusPassText}>
+            ALL REQUIREMENTS SUBMITTED
+          </h4>
           <div className={clearanceStyles.extraDetailsRow}>
             <span className={clearanceStyles.successTag}>✓ Form 138</span>
-            <span className={clearanceStyles.successTag}>✓ PSA Birth Certificate</span>
-            <span className={clearanceStyles.successTag}>✓ Good Moral Character</span>
+            <span className={clearanceStyles.successTag}>
+              ✓ PSA Birth Certificate
+            </span>
+            <span className={clearanceStyles.successTag}>
+              ✓ Good Moral Character
+            </span>
           </div>
         </div>
       </div>
-
     </div>
   );
 
