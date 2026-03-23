@@ -1,71 +1,47 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
 import styles from "../../pages/studentPages/studentStyles/SideBarNav.module.css";
 import ccsLogo from "../../assets/ccs_logo.png";
 
+// React Icons — Font Awesome 6
+import { RiDashboardHorizontalFill } from "react-icons/ri";
+// import { FaUser }             from "react-icons/fa6"; // Profile
+import { FaCalendarDays }     from "react-icons/fa6"; // Schedule
+import { FaCalendarCheck }    from "react-icons/fa6"; // Events
+import { FaBookOpen }         from "react-icons/fa6"; // College Research
+import { FaClipboardCheck }   from "react-icons/fa6"; // Clearance
+import { FaBars }             from "react-icons/fa6"; // Hamburger / menu toggle
+import { FaXmark }            from "react-icons/fa6"; // Close drawer
+import { FaCircleUser }       from "react-icons/fa6"; // Avatar fallback
+
 const NAV_ITEMS = [
-  {
-    name: "Dashboard",
-    label: "Dashboard",
-    icon: "bi-grid-fill",
-    path: "/student/dashboard",
-  },
-  {
-    name: "Events",
-    label: "Events",
-    icon: "bi-calendar-event",
-    path: "/student/events",
-  },
-  {
-    name: "Schedule",
-    label: "Schedule",
-    icon: "bi-calendar3",
-    path: "/student/schedule",
-  },
-  {
-    name: "CollegeResearch",
-    label: "College Research",
-    icon: "bi-journal-text",
-    path: "/student/college-research",
-  },
-  {
-    name: "Profile",
-    label: "Profile",
-    icon: "bi-person",
-    path: "/student/profile",
-  },
-  {
-    name: "Clearance",
-    label: "Clearance",
-    icon: "bi-patch-check",
-    path: "/student/clearance",
-  },
+  { name: "Dashboard",       label: "Dashboard",        Icon: RiDashboardHorizontalFill },
+  // { name: "Profile",         label: "Profile",          Icon: FaUser            },
+  { name: "Clearance",       label: "Clearance",        Icon: FaClipboardCheck  },
+  { name: "Schedule",        label: "Schedule",         Icon: FaCalendarDays    },
+  { name: "Events",          label: "Events",           Icon: FaCalendarCheck   },
+  { name: "CollegeResearch", label: "College Research", Icon: FaBookOpen        },
 ];
 
 const DEFAULT_STUDENT = {
-  name: "Jessa V. Cariñaga",
-  id: "2001518",
-  type: "Regular",
-  status: "Enrolled",
-  year: "4th Year",
-  section: "4IT-D",
+  name:      "Jessa V. Cariñaga",
+  id:        "2001518",
+  type:      "Regular",
+  status:    "Enrolled",
+  year:      "4th Year",
+  section:   "4IT-D",
   avatarUrl: null,
 };
 
 const MOBILE_BREAKPOINT = 992;
 
-export default function SideNavbar({ student = DEFAULT_STUDENT }) {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const activeNav =
-    NAV_ITEMS.find((item) => item.path === location.pathname)?.name ??
-    "Dashboard";
-
+export default function SideNavbar({
+  activeNav = "Dashboard",
+  onNavigate,
+  student   = DEFAULT_STUDENT,
+}) {
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(
-    window.innerWidth < MOBILE_BREAKPOINT,
-  );
+  const [drawerOpen,  setDrawerOpen]  = useState(false);
+  const [isMobile,    setIsMobile]    = useState(window.innerWidth < MOBILE_BREAKPOINT);
 
   useEffect(() => {
     const onResize = () => {
@@ -78,24 +54,18 @@ export default function SideNavbar({ student = DEFAULT_STUDENT }) {
   }, []);
 
   const go = (name) => {
-    const item = NAV_ITEMS.find((i) => i.name === name);
-    if (item) navigate(item.path);
+    if (onNavigate) onNavigate(name);
     if (isMobile) setDrawerOpen(false);
   };
 
-  // ── Profile card ────────────────────────────────────────────
+  // ── Profile card ─────────────────────────────────────────────
   const ProfileCard = () => (
     <div className={styles.profileCard}>
       <div className={styles.avatar}>
-        {student.avatarUrl ? (
-          <img
-            src={student.avatarUrl}
-            alt={student.name}
-            className={styles.avatarImg}
-          />
-        ) : (
-          <i className={`bi bi-person-fill ${styles.avatarIcon}`} />
-        )}
+        {student.avatarUrl
+          ? <img src={student.avatarUrl} alt={student.name} className={styles.avatarImg} />
+          : <FaCircleUser className={styles.avatarIcon} />
+        }
       </div>
       <p className={styles.studentName}>{student.name}</p>
       <p className={styles.studentId}>{student.id}</p>
@@ -103,13 +73,11 @@ export default function SideNavbar({ student = DEFAULT_STUDENT }) {
       <p className={styles.studentMeta}>Type: {student.type}</p>
       <p className={styles.studentMeta}>Status: {student.status}</p>
       <p className={styles.studentMeta}>Current Year Level: {student.year}</p>
-      <p className={styles.studentMeta}>
-        Section/s Enrolled: {student.section}
-      </p>
+      <p className={styles.studentMeta}>Section/s Enrolled: {student.section}</p>
     </div>
   );
 
-  // ── Nav list ─────────────────────────────────────────────────
+  // ── Nav list ──────────────────────────────────────────────────
   const NavList = () => (
     <div className={styles.navWrapper}>
       {NAV_ITEMS.map((item, index) => {
@@ -120,28 +88,22 @@ export default function SideNavbar({ student = DEFAULT_STUDENT }) {
               className={`${styles.navItem} ${isActive ? styles.navItemActive : ""}`}
               onClick={() => go(item.name)}
             >
-              <i
-                className={`bi ${item.icon} ${styles.navIcon} ${isActive ? styles.navIconActive : ""}`}
+              <item.Icon
+                className={`${styles.navIcon} ${isActive ? styles.navIconActive : ""}`}
               />
-              <span
-                className={`${styles.navLabel} ${isActive ? styles.navLabelActive : ""}`}
-              >
+              <span className={`${styles.navLabel} ${isActive ? styles.navLabelActive : ""}`}>
                 {item.label}
               </span>
-              {item.badge && (
-                <span className={styles.navBadge}>{item.badge}</span>
-              )}
+              {item.badge && <span className={styles.navBadge}>{item.badge}</span>}
             </div>
-            {index < NAV_ITEMS.length - 1 && (
-              <hr className={styles.navDivider} />
-            )}
+            {index < NAV_ITEMS.length - 1 && <hr className={styles.navDivider} />}
           </div>
         );
       })}
     </div>
   );
 
-  // ── Logo ─────────────────────────────────────────────────────
+  // ── CCS Logo watermark ────────────────────────────────────────
   const Logo = ({ collapsed = false }) => (
     <div className={collapsed ? styles.collapsedLogoWrap : styles.logoWrap}>
       <img
@@ -153,40 +115,40 @@ export default function SideNavbar({ student = DEFAULT_STUDENT }) {
     </div>
   );
 
-  // ── MOBILE ───────────────────────────────────────────────────
+
+  // ============================================================
+  //  MOBILE LAYOUT
+  // ============================================================
   if (isMobile) {
     return (
       <>
+        {/* Fixed orange top bar */}
         <div className={styles.mobileTopBar}>
-          <i
-            className={`bi bi-list ${styles.mobileHamburger}`}
+          <FaBars
+            className={styles.mobileHamburger}
             onClick={() => setDrawerOpen(true)}
           />
           <span className={styles.mobileTopBarTitle}>Student Portal</span>
           <div className={styles.mobileTopBarAvatar}>
-            {student.avatarUrl ? (
-              <img src={student.avatarUrl} alt={student.name} />
-            ) : (
-              <i
-                className="bi bi-person-fill"
-                style={{ color: "#fff", fontSize: "1rem" }}
-              />
-            )}
+            {student.avatarUrl
+              ? <img src={student.avatarUrl} alt={student.name} />
+              : <FaCircleUser style={{ color: "#fff", fontSize: "1rem" }} />
+            }
           </div>
         </div>
 
+        {/* Backdrop */}
         <div
           className={`${styles.drawerBackdrop} ${drawerOpen ? styles.drawerBackdropShow : ""}`}
           onClick={() => setDrawerOpen(false)}
         />
 
-        <div
-          className={`${styles.drawer} ${drawerOpen ? styles.drawerOpen : ""}`}
-        >
+        {/* Sliding drawer */}
+        <div className={`${styles.drawer} ${drawerOpen ? styles.drawerOpen : ""}`}>
           <div className={styles.drawerHeader}>
             <span className={styles.drawerTitle}>Student</span>
-            <i
-              className={`bi bi-x-lg ${styles.closeIcon}`}
+            <FaXmark
+              className={styles.closeIcon}
               onClick={() => setDrawerOpen(false)}
             />
           </div>
@@ -195,6 +157,7 @@ export default function SideNavbar({ student = DEFAULT_STUDENT }) {
           <Logo />
         </div>
 
+        {/* Fixed bottom tab bar */}
         <div className={styles.bottomBar}>
           {NAV_ITEMS.map((item) => {
             const isActive = activeNav === item.name;
@@ -204,12 +167,10 @@ export default function SideNavbar({ student = DEFAULT_STUDENT }) {
                 className={`${styles.tabItem} ${isActive ? styles.tabItemActive : ""}`}
                 onClick={() => go(item.name)}
               >
-                <i
-                  className={`bi ${item.icon} ${styles.tabIcon} ${isActive ? styles.tabIconActive : ""}`}
+                <item.Icon
+                  className={`${styles.tabIcon} ${isActive ? styles.tabIconActive : ""}`}
                 />
-                <span
-                  className={`${styles.tabLabel} ${isActive ? styles.tabLabelActive : ""}`}
-                >
+                <span className={`${styles.tabLabel} ${isActive ? styles.tabLabelActive : ""}`}>
                   {item.label}
                 </span>
               </div>
@@ -220,15 +181,15 @@ export default function SideNavbar({ student = DEFAULT_STUDENT }) {
     );
   }
 
-  // ── DESKTOP COLLAPSED ────────────────────────────────────────
+
+  // ============================================================
+  //  DESKTOP COLLAPSED — icon-only strip
+  // ============================================================
   if (isCollapsed) {
     return (
       <div className={styles.sidebarCollapsed}>
-        <div
-          className={styles.collapsedToggle}
-          onClick={() => setIsCollapsed(false)}
-        >
-          <i className={`bi bi-list ${styles.menuIcon}`} />
+        <div className={styles.collapsedToggle} onClick={() => setIsCollapsed(false)}>
+          <FaBars className={styles.menuIcon} />
         </div>
 
         <hr className={styles.collapsedDivider} />
@@ -243,8 +204,8 @@ export default function SideNavbar({ student = DEFAULT_STUDENT }) {
                 onClick={() => go(item.name)}
                 title={item.label}
               >
-                <i
-                  className={`bi ${item.icon} ${styles.collapsedNavIcon} ${isActive ? styles.collapsedNavIconActive : ""}`}
+                <item.Icon
+                  className={`${styles.collapsedNavIcon} ${isActive ? styles.collapsedNavIconActive : ""}`}
                 />
               </div>
             );
@@ -256,13 +217,16 @@ export default function SideNavbar({ student = DEFAULT_STUDENT }) {
     );
   }
 
-  // ── DESKTOP EXPANDED ─────────────────────────────────────────
+
+  // ============================================================
+  //  DESKTOP EXPANDED — full sidebar
+  // ============================================================
   return (
     <div className={styles.sidebar}>
       <div className={styles.sidebarHeader}>
         <span className={styles.sidebarTitle}>Student</span>
-        <i
-          className={`bi bi-list ${styles.menuIcon}`}
+        <FaBars
+          className={styles.menuIcon}
           onClick={() => setIsCollapsed(true)}
         />
       </div>

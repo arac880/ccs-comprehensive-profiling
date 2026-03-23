@@ -1,4 +1,9 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&family=Lexend:wght@100..900&family=Outfit:wght@100..900&family=Space+Grotesk:wght@300..700&display=swap');
 
+*{
+  font-family: "Google Sans", sans-serif !important;
+;
+}
 /* ── Expanded sidebar ── */
 .sidebar {
   width: clamp(220px, 22vw, 280px);
@@ -68,7 +73,7 @@
 }
 
 .collapsedNavIcon {
-  font-size: clamp(1.1rem, 1.8vw, 1.4rem);
+  font-size: clamp(1.05rem, 1.7vw, 1.3rem);
   color: #e65100;
 }
 
@@ -88,8 +93,7 @@
 }
 
 .sidebarTitle {
-  font-family: "Gabarito", sans-serif;
-  font-size: clamp(1.2rem, 2vw, 1.6rem);
+    font-size: clamp(1.2rem, 2vw, 1.6rem);
   font-weight: 700;
   color: #e65100;
   letter-spacing: 0.02em;
@@ -97,10 +101,10 @@
 }
 
 .menuIcon {
-  font-size: clamp(1.2rem, 2vw, 1.5rem);
+  font-size: clamp(1.1rem, 1.8vw, 1.4rem);
   color: #e65100;
   cursor: pointer;
-  line-height: 1;
+  display: block;
 }
 
 /* ── Profile card ── */
@@ -134,19 +138,18 @@
 .avatarIcon {
   font-size: clamp(1.6rem, 3.5vw, 2.6rem);
   color: #e65100;
+  display: block;
 }
 
 .studentName {
-  font-family: "Gabarito", sans-serif;
-  font-size: clamp(0.82rem, 1.3vw, 1rem);
+  font-size: clamp(0.85rem, 1.3vw, 1rem);
   font-weight: 700;
   color: #ffffff;
   margin: 0 0 2px;
 }
 
 .studentId {
-  font-family: "Gabarito", sans-serif;
-  font-size: clamp(0.68rem, 1vw, 0.82rem);
+  font-size: clamp(0.72rem, 1vw, 0.85rem);
   color: rgba(255, 255, 255, 0.88);
   margin: 0 0 8px;
 }
@@ -157,8 +160,7 @@
 }
 
 .studentMeta {
-  font-family: "Gabarito", sans-serif;
-  font-size: clamp(0.64rem, 0.95vw, 0.76rem);
+  font-size: clamp(0.72rem, 1vw, 0.83rem);
   font-weight: 500;
   color: rgba(255, 255, 255, 0.92);
   margin: 0 0 3px;
@@ -205,11 +207,11 @@
 }
 
 .navIcon {
-  font-size: clamp(0.95rem, 1.5vw, 1.2rem);
+  font-size: clamp(0.9rem, 1.4vw, 1.1rem);
   color: #e65100;
   flex-shrink: 0;
   min-width: 18px;
-  text-align: center;
+  display: block;
 }
 
 .navIconActive {
@@ -217,8 +219,7 @@
 }
 
 .navLabel {
-  font-family: "Gabarito", sans-serif;
-  font-size: clamp(0.82rem, 1.2vw, 0.98rem);
+  font-size: clamp(0.95rem, 1.2vw, 1.1rem);
   font-weight: 600;
   color: #e65100;
 }
@@ -229,8 +230,7 @@
 }
 
 .navBadge {
-  font-family: "Gabarito", sans-serif;
-  font-size: 0.62rem;
+  font-size: 0.65rem;
   font-weight: 700;
   color: #ffffff;
   background-color: #e65100;
@@ -239,24 +239,23 @@
   margin-left: auto;
 }
 
-/* ── CCS Logo watermark — pinned to bottom of sidebar ── */
+/* ── CCS Logo watermark ── */
 .logoWrap {
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 20px 0 24px;
   opacity: 0.22;
-  margin-top: auto; /* pushes logo all the way to bottom */
+  margin-top: auto;
   flex-shrink: 0;
 }
 
 .logoImg {
-  width: clamp(64px, 7vw, 86px); /* larger than before */
+  width: clamp(64px, 7vw, 86px);
   height: clamp(64px, 7vw, 86px);
   object-fit: contain;
 }
 
-/* Collapsed sidebar logo */
 .collapsedLogoWrap {
   display: flex;
   justify-content: center;
@@ -274,7 +273,7 @@
 }
 
 /* ============================================================
-   MOBILE — TOP BAR (fixed, orange, 56px tall)
+   MOBILE — TOP BAR
    ============================================================ */
 .mobileTopBar {
   position: fixed;
@@ -292,7 +291,6 @@
 }
 
 .mobileTopBarTitle {
-  font-family: "Gabarito", sans-serif;
   font-size: 1.1rem;
   font-weight: 700;
   color: #ffffff;
@@ -300,10 +298,10 @@
 }
 
 .mobileHamburger {
-  font-size: 1.7rem;
+  font-size: 1.5rem;
   color: #ffffff;
   cursor: pointer;
-  line-height: 1;
+  display: block;
 }
 
 .mobileTopBarAvatar {
@@ -326,7 +324,7 @@
 }
 
 /* ============================================================
-   MOBILE — BACKDROP (darkens page when drawer is open)
+   MOBILE — BACKDROP
    ============================================================ */
 .drawerBackdrop {
   position: fixed;
@@ -344,7 +342,7 @@
 }
 
 /* ============================================================
-   MOBILE — DRAWER (slides in from left)
+   MOBILE — DRAWER
    ============================================================ */
 .drawer {
   position: fixed;
@@ -377,7 +375,6 @@
 }
 
 .drawerTitle {
-  font-family: "Gabarito", sans-serif;
   font-size: 1.3rem;
   font-weight: 700;
   color: #e65100;
@@ -388,10 +385,11 @@
   font-size: 1.2rem;
   color: #e65100;
   cursor: pointer;
+  display: block;
 }
 
 /* ============================================================
-   MOBILE — BOTTOM TAB BAR (fixed, 58px tall)
+   MOBILE — BOTTOM TAB BAR
    ============================================================ */
 .bottomBar {
   position: fixed;
@@ -423,15 +421,15 @@
   background-color: #fff3ee;
 }
 
-/* Active tab — standalone class, no chaining needed */
 .tabItemActive {
   border-top-color: #e65100;
   background-color: #fff3ee;
 }
 
 .tabIcon {
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   color: #c5a090;
+  display: block;
 }
 
 .tabIconActive {
@@ -439,8 +437,7 @@
 }
 
 .tabLabel {
-  font-family: "Gabarito", sans-serif;
-  font-size: 0.55rem;
+  font-size: 0.58rem;
   font-weight: 500;
   color: #c5a090;
   white-space: nowrap;
