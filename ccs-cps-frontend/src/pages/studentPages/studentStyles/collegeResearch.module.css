@@ -1,0 +1,136 @@
+/* ── collegeResearch.module.css ── */
+
+/* ═══════════════════════════════════════
+   DESKTOP LAYOUT  (mirrors dashboard.module.css)
+═══════════════════════════════════════ */
+
+/* Outer shell: sidebar + everything to its right */
+.dashboardWrapper {
+  display: flex;
+  min-height: 100vh;
+  background: #fdf4ef;
+}
+
+/* Right side: TopBarNav on top, scrollable main, Footer pinned at bottom */
+.rightColumn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* Scrollable body between TopBar and Footer */
+.mainContent {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px 24px 0;
+}
+
+/* ═══════════════════════════════════════
+   MOBILE LAYOUT
+═══════════════════════════════════════ */
+.mobileMain {
+  padding: 14px 12px 0;
+}
+
+/* ═══════════════════════════════════════
+   CONTENT WRAPPER
+═══════════════════════════════════════ */
+.researchContainer {
+  width: 100%;
+}
+
+/* ── White card ── */
+.researchCard {
+  background: #ffffff;
+  border-radius: 14px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.07);
+  padding: 20px 20px 28px;
+}
+
+/* ── Card header row ── */
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.cardControls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* ═══════════════════════════════════════
+   RESEARCH GRID
+═══════════════════════════════════════ */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+/* ── Empty state ── */
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 48px 0;
+  color: #c07850;
+  font-size: 0.9rem;
+}
+
+/* ═══════════════════════════════════════
+   RESPONSIVE BREAKPOINTS
+═══════════════════════════════════════ */
+
+/* Tablet ≤ 1100px → 3 columns */
+@media (max-width: 1100px) {
+  .grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Small tablet ≤ 768px → 2 columns, tighter padding */
+@media (max-width: 768px) {
+  .mainContent {
+    padding: 16px 16px 0;
+  }
+
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .cardHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* Mobile ≤ 480px → 2 columns, tightest gaps */
+@media (max-width: 480px) {
+  .researchCard {
+    padding: 14px 12px 20px;
+    border-radius: 10px;
+  }
+
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+}
+
+/* Very small ≤ 360px → 1 column */
+@media (max-width: 360px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}

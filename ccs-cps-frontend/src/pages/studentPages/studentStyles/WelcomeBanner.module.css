@@ -37,8 +37,7 @@
   font-family: "Freeman", sans-serif;
   font-size: clamp(2rem, 4.5vw, 3.5rem);
   color: #e65100;
-  font-style: italic;
-  font-weight: 400;
+  font-weight: bold;
   letter-spacing: -0.01em;
   line-height: 1;
 }

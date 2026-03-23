@@ -20,7 +20,7 @@ const NAV_ITEMS = [
   { name: "Clearance",       label: "Clearance",        Icon: FaClipboardCheck,          path: "/student/clearance" },
   { name: "Schedule",        label: "Schedule",         Icon: FaCalendarDays,            path: "/student/schedule" },
   { name: "Events",          label: "Events",           Icon: FaCalendarCheck,           path: "/student/events" },
-  { name: "CollegeResearch", label: "College Research", Icon: FaBookOpen,                path: null }, // No page created yet
+  { name: "CollegeResearch", label: "College Research", Icon: FaBookOpen,                path: "/student/research" }, // No page created yet
 ];
 
 const DEFAULT_STUDENT = {

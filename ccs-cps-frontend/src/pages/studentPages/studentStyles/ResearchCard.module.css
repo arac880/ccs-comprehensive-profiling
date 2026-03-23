@@ -1,0 +1,71 @@
+/* ── ResearchCard.module.css ── */
+
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;                          /* gap handled by divider + padding */
+  background: #fff8f5;
+  border: 1.5px solid #f0cfc0;
+  border-radius: 12px;
+  padding: 16px 12px 14px;
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+  overflow: hidden;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(230, 81, 0, 0.13);
+  border-color: #e65100;
+}
+
+/* ── Icon wrapper ── */
+.iconWrap {
+  width: 72px;
+  height: 82px;
+  background: #fde8dc;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-bottom: 14px;
+}
+
+.icon {
+  font-size: 38px;
+  color: #e65100;
+}
+
+/* ── Separator line ── */
+.divider {
+  width: 100%;
+  border: none;
+  border-top: 1.5px solid #f0cfc0;
+  margin: 0 0 12px;
+}
+
+/* ── Text ── */
+.info {
+  width: 100%;
+  text-align: center;
+}
+
+.title {
+  font-size: 0.88rem;             /* bumped up from 0.78rem */
+  font-weight: 700;
+  color: #3d1a00;
+  margin: 0 0 4px;
+  line-height: 1.35;
+  word-break: break-word;
+}
+
+.meta {
+  font-size: 0.72rem;
+  color: #b05a2a;
+  margin: 0;
+  line-height: 1.3;
+}

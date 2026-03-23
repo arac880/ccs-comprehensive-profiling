@@ -9,6 +9,7 @@ import FilterDropdown from "../../components/ui/FilterDropdown";
 import TitlePages from "../../components/ui/TitlePages";
 import Footer from "../../components/studentComponents/Footer";
 import styles from "./studentStyles/event.module.css";
+import { FaCalendarAlt } from "react-icons/fa";
 
 const ALL_EVENTS = [
   {
@@ -62,7 +63,12 @@ export default function StudentEvents() {
               <div className={styles.eventsCard}>
                 {/* Card header: TitlePages left, controls right */}
                 <div className={styles.cardHeader}>
-                  <TitlePages icon="bi-calendar-event-fill" title="Events" />
+                  <TitlePages
+                    icon={<FaCalendarAlt size={22} color="#ffffff" />}
+                    title="Events"
+                    iconBg="#E65100"
+                    textColor="#a34100"
+                  />
                   <div className={styles.cardControls}>
                     <FilterDropdown
                       value={filter}
@@ -87,8 +93,9 @@ export default function StudentEvents() {
             {/* ── Right column ── */}
             <aside className={styles.rightCol}>
               <CalendarWidget />
-              <div className="mb-3"></div>
-              <CcsLinks />
+              <div className={styles.ccsLinksFixed}>
+                <CcsLinks />
+              </div>
             </aside>
           </div>
         </div>

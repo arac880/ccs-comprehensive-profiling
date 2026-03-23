@@ -10,6 +10,7 @@ import StudentDashboard from "./pages/studentPages/studentDashboard";
 import StudentSchedule from "./pages/studentPages/studentSchedule";
 import StudentEvents from "./pages/studentPages/studentEvents";
 import StudentClearance from "./pages/studentPages/studentClearance";
+import CollegeResearch from "./pages/studentPages/collegeResearch";
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
         <Route path="/student/schedule" element={<StudentSchedule />} />
         <Route path="/student/events" element={<StudentEvents />} />
         <Route path="/student/clearance" element={<StudentClearance />} />
+        <Route path="/student/research" element={<CollegeResearch />} />
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </Router>

@@ -37,7 +37,7 @@
   display: grid;
   grid-template-columns: 1fr 280px;
   gap: clamp(12px, 1.6vw, 18px);
-  align-items: start;
+  align-items: stretch;
   flex: 1;
 }
 
@@ -78,6 +78,16 @@
   display: flex;
   flex-direction: column;
   gap: clamp(12px, 1.6vw, 18px); /* same gap as dashboard bottomRow */
+  height:100%;
+}
+
+.ccsLinksFixed {
+  height: 60%;
+  display: flex;
+}
+
+.ccsLinksFixed > * {
+  width: 100%;
 }
 
 /* ══ RESPONSIVE ══════════════════════════════════════ */

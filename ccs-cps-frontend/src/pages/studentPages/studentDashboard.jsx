@@ -10,6 +10,7 @@ import CCSLinks from "../../components/studentComponents/CcsLinks";
 import TitlePages from "../../components/ui/TitlePages";
 import Footer from "../../components/studentComponents/Footer";
 import styles from "./studentStyles/dashboard.module.css";
+import { FaCalendarAlt } from "react-icons/fa";
 
 const MOBILE_BREAKPOINT = 992;
 
@@ -30,7 +31,6 @@ export default function StudentDashboard() {
 
   const DashboardContent = () => (
     <div className={styles.dashLayout}>
-
       {/* ══ ROW 1: WelcomeBanner | CalendarWidget ══
           CSS grid row = both cells are EXACTLY the same height.
           The taller of the two drives the row; the shorter stretches. */}
@@ -49,11 +49,10 @@ export default function StudentDashboard() {
       <div className={styles.bottomRow}>
         <div className={styles.eventsCell}>
           <TitlePages
-            icon="bi-calendar-event-fill"
+            icon={<FaCalendarAlt size={22} color="#ffffff" />}
             title="Events"
             iconBg="#E65100"
-            iconColor="#ffffff"
-            textColor="#E65100"
+            textColor="#a34100"
           />
           <div className={styles.eventsList}>
             <EventsSection />
@@ -64,7 +63,6 @@ export default function StudentDashboard() {
           <CCSLinks />
         </div>
       </div>
-
     </div>
   );
 
