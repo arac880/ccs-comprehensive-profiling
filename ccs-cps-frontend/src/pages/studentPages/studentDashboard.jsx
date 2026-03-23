@@ -8,6 +8,7 @@ import EventsSection from "../../components/studentComponents/EventSection";
 import CalendarWidget from "../../components/ui/CalendarWidget";
 import CCSLinks from "../../components/studentComponents/CcsLinks";
 import TitlePages from "../../components/ui/TitlePages";
+import Footer from "../../components/studentComponents/Footer";
 import styles from "./studentStyles/dashboard.module.css";
 
 const MOBILE_BREAKPOINT = 992;
@@ -27,32 +28,46 @@ export default function StudentDashboard() {
 
   const handleSignOut = () => navigate("/");
 
-  // ── Shared dashboard content grid ────────────────────────
   const DashboardContent = () => (
-    <div className={styles.dashGrid}>
-      {/* Left column: welcome hero + events list */}
-      <div className={styles.dashLeft}>
-        <WelcomeBanner />
+    <div className={styles.dashLayout}>
 
-        <TitlePages
-          icon="bi-calendar-event-fill"
-          title="Events"
-          iconBg="#E65100"
-          iconColor="#ffffff"
-          textColor="#E65100"
-        />
-        <EventsSection />
+      {/* ══ ROW 1: WelcomeBanner | CalendarWidget ══
+          CSS grid row = both cells are EXACTLY the same height.
+          The taller of the two drives the row; the shorter stretches. */}
+      <div className={styles.topRow}>
+        <div className={styles.welcomeCell}>
+          <WelcomeBanner />
+        </div>
+        <div className={styles.calendarCell}>
+          <CalendarWidget />
+        </div>
       </div>
 
-      {/* Right column: today's date + CCS links */}
-      <div className={styles.dashRight}>
-        <CalendarWidget />
-        <CCSLinks />
+      {/* ══ ROW 2: EventsSection | CCSLinks ══
+          Same grid strategy — eventsCell drives height,
+          linksCell stretches to match exactly. */}
+      <div className={styles.bottomRow}>
+        <div className={styles.eventsCell}>
+          <TitlePages
+            icon="bi-calendar-event-fill"
+            title="Events"
+            iconBg="#E65100"
+            iconColor="#ffffff"
+            textColor="#E65100"
+          />
+          <div className={styles.eventsList}>
+            <EventsSection />
+          </div>
+        </div>
+
+        <div className={styles.linksCell}>
+          <CCSLinks />
+        </div>
       </div>
+
     </div>
   );
 
-  // ── Mobile layout ─────────────────────────────────────────
   if (isMobile) {
     return (
       <>
@@ -60,21 +75,20 @@ export default function StudentDashboard() {
         <main className={styles.mobileMain}>
           <DashboardContent />
         </main>
+        <Footer />
       </>
     );
   }
 
-  // ── Desktop layout ────────────────────────────────────────
   return (
     <div className={styles.dashboardWrapper}>
       <SideBarNav activeNav={currentNav} onNavigate={setCurrentNav} />
-
       <div className={styles.rightColumn}>
         <TopBarNav notifCount={3} onSignOut={handleSignOut} />
-
         <main className={styles.mainContent}>
           <DashboardContent />
         </main>
+        <Footer />
       </div>
     </div>
   );

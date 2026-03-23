@@ -1,0 +1,105 @@
+
+/* ── Shell ─────────────────────────────────────────────── */
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  background-color: #E65100;
+  color: #ffffff;
+
+  /* height scales: 40 px on mobile → 52 px on wide screens */
+  height: clamp(40px, 5vw, 52px);
+  padding: 0 clamp(12px, 3vw, 32px);
+
+  width: 100%;
+  box-sizing: border-box;
+  flex-shrink: 0;
+
+  font-family: "Afacad", sans-serif;
+  letter-spacing: 0.03em;
+}
+
+/* ── Left group ─────────────────────────────────────────── */
+.left {
+  display: flex;
+  align-items: center;
+  gap: clamp(6px, 1.2vw, 12px);
+  min-width: 0;
+}
+
+
+.sysName {
+  display: flex;
+  align-items: center;
+  gap: clamp(3px, 0.5vw, 7px);
+  white-space: nowrap;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.bold {
+  font-weight: 700;
+  /* 0.78 rem (xs) → 1 rem (xl) */
+  font-size: clamp(0.78rem, 1.6vw, 1rem);
+  letter-spacing: 0.06em;
+  flex-shrink: 0;
+}
+
+.sep {
+  opacity: 0.55;
+  font-size: clamp(0.78rem, 1.6vw, 1rem);
+  flex-shrink: 0;
+}
+
+.thin {
+  font-weight: 400;
+  font-size: clamp(0.72rem, 1.4vw, 0.92rem);
+  opacity: 0.92;
+
+  /* hide long label on very small screens */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.version {
+  flex-shrink: 0;
+  font-size: clamp(0.6rem, 1vw, 0.72rem);
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 4px;
+  padding: 1px clamp(4px, 0.6vw, 8px);
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+/* ── Right group ────────────────────────────────────────── */
+.right {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+.year {
+  font-weight: 700;
+  font-size: clamp(0.82rem, 1.6vw, 1rem);
+  letter-spacing: 0.08em;
+}
+
+/* xs: < 576px — hide subtitle, keep logo + bold + version + year */
+@media (max-width: 575.98px) {
+  .thin,
+  .sep {
+    display: none;
+  }
+}
+
+/* sm: 576–767px — show "CCS – Comprehensive..." but no version badge */
+@media (min-width: 576px) and (max-width: 767.98px) {
+  .version {
+    display: none;
+  }
+}
+
+/* md+: 768 px and above — everything visible, clamp handles the rest */
