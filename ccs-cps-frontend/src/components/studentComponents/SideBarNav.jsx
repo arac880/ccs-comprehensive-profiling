@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom"; // IMPORT ADDED
 import styles from "../../pages/studentPages/studentStyles/SideBarNav.module.css";
 import ccsLogo from "../../assets/ccs_logo.png";
+import Footer from "./Footer";
 
 // React Icons — Font Awesome 6
 import { RiDashboardHorizontalFill } from "react-icons/ri";
-// import { FaUser }             from "react-icons/fa6"; // Profile
 import { FaCalendarDays }     from "react-icons/fa6"; // Schedule
 import { FaCalendarCheck }    from "react-icons/fa6"; // Events
 import { FaBookOpen }         from "react-icons/fa6"; // College Research
@@ -13,13 +14,13 @@ import { FaBars }             from "react-icons/fa6"; // Hamburger / menu toggle
 import { FaXmark }            from "react-icons/fa6"; // Close drawer
 import { FaCircleUser }       from "react-icons/fa6"; // Avatar fallback
 
+// ADDED 'path' PROPERTY TO EACH ITEM based on your App.jsx
 const NAV_ITEMS = [
-  { name: "Dashboard",       label: "Dashboard",        Icon: RiDashboardHorizontalFill },
-  // { name: "Profile",         label: "Profile",          Icon: FaUser            },
-  { name: "Clearance",       label: "Clearance",        Icon: FaClipboardCheck  },
-  { name: "Schedule",        label: "Schedule",         Icon: FaCalendarDays    },
-  { name: "Events",          label: "Events",           Icon: FaCalendarCheck   },
-  { name: "CollegeResearch", label: "College Research", Icon: FaBookOpen        },
+  { name: "Dashboard",       label: "Dashboard",        Icon: RiDashboardHorizontalFill, path: "/student/dashboard" },
+  { name: "Clearance",       label: "Clearance",        Icon: FaClipboardCheck,          path: "/student/clearance" },
+  { name: "Schedule",        label: "Schedule",         Icon: FaCalendarDays,            path: "/student/schedule" },
+  { name: "Events",          label: "Events",           Icon: FaCalendarCheck,           path: "/student/events" },
+  { name: "CollegeResearch", label: "College Research", Icon: FaBookOpen,                path: null }, // No page created yet
 ];
 
 const DEFAULT_STUDENT = {
@@ -39,6 +40,7 @@ export default function SideNavbar({
   onNavigate,
   student   = DEFAULT_STUDENT,
 }) {
+  const navigate = useNavigate(); // HOOK INITIALIZED
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [drawerOpen,  setDrawerOpen]  = useState(false);
   const [isMobile,    setIsMobile]    = useState(window.innerWidth < MOBILE_BREAKPOINT);
@@ -53,9 +55,15 @@ export default function SideNavbar({
     return () => window.removeEventListener("resize", onResize);
   }, []);
 
-  const go = (name) => {
-    if (onNavigate) onNavigate(name);
+  // UPDATED GO FUNCTION
+  const go = (item) => {
+    if (onNavigate) onNavigate(item.name);
     if (isMobile) setDrawerOpen(false);
+    
+    // Check if the route exists before navigating
+    if (item.path) {
+      navigate(item.path);
+    }
   };
 
   // ── Profile card ─────────────────────────────────────────────
@@ -86,7 +94,7 @@ export default function SideNavbar({
           <div key={item.name}>
             <div
               className={`${styles.navItem} ${isActive ? styles.navItemActive : ""}`}
-              onClick={() => go(item.name)}
+              onClick={() => go(item)} // PASS ENTIRE ITEM INSTEAD OF JUST NAME
             >
               <item.Icon
                 className={`${styles.navIcon} ${isActive ? styles.navIconActive : ""}`}
@@ -128,7 +136,7 @@ export default function SideNavbar({
             className={styles.mobileHamburger}
             onClick={() => setDrawerOpen(true)}
           />
-          <span className={styles.mobileTopBarTitle}>Student Portal</span>
+          <span className={styles.mobileTopBarTitle}>CCS - Comprehensive Profiling System</span>
           <div className={styles.mobileTopBarAvatar}>
             {student.avatarUrl
               ? <img src={student.avatarUrl} alt={student.name} />
@@ -158,14 +166,14 @@ export default function SideNavbar({
         </div>
 
         {/* Fixed bottom tab bar */}
-        <div className={styles.bottomBar}>
+        {/* <div className={styles.bottomBar}>
           {NAV_ITEMS.map((item) => {
             const isActive = activeNav === item.name;
             return (
               <div
                 key={item.name}
                 className={`${styles.tabItem} ${isActive ? styles.tabItemActive : ""}`}
-                onClick={() => go(item.name)}
+                onClick={() => go(item)} // PASS ENTIRE ITEM
               >
                 <item.Icon
                   className={`${styles.tabIcon} ${isActive ? styles.tabIconActive : ""}`}
@@ -176,7 +184,7 @@ export default function SideNavbar({
               </div>
             );
           })}
-        </div>
+        </div> */}
       </>
     );
   }
@@ -201,7 +209,7 @@ export default function SideNavbar({
               <div
                 key={item.name}
                 className={`${styles.collapsedNavItem} ${isActive ? styles.collapsedNavItemActive : ""}`}
-                onClick={() => go(item.name)}
+                onClick={() => go(item)} // PASS ENTIRE ITEM
                 title={item.label}
               >
                 <item.Icon

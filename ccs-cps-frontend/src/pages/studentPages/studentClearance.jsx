@@ -18,6 +18,7 @@ import TopBarNav from "../../components/studentComponents/TopBarNav";
 // CSS Imports
 import layoutStyles from "./studentStyles/dashboard.module.css";
 import clearanceStyles from "./studentStyles/Clearance.module.css";
+import Footer from "../../components/studentComponents/Footer";
 
 const MOBILE_BREAKPOINT = 992;
 
@@ -166,7 +167,9 @@ export default function StudentClearance() {
               ✓ Miscellaneous Fee: Fully Settled
             </p>
             <p className={clearanceStyles.mutedText}>
-              Go to the Office of the University Registrar if you have unsettled balance. </p>
+              Go to the Office of the University Registrar if you have unsettled
+              balance.{" "}
+            </p>
           </div>
         </div>
       </div>
@@ -232,6 +235,7 @@ export default function StudentClearance() {
       <div className={layoutStyles.rightColumn}>
         <TopBarNav notifCount={3} onSignOut={handleSignOut} />
         <main className={layoutStyles.mainContent}>{clearanceUI}</main>
+        <Footer />
       </div>
     </div>
   );

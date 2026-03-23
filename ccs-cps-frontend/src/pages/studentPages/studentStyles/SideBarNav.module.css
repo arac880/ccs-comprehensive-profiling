@@ -291,7 +291,8 @@
 }
 
 .mobileTopBarTitle {
-  font-size: 1.1rem;
+  font-size: clamp(0.95rem, 2.5vw, 1.3rem);
+  text-align: center;
   font-weight: 700;
   color: #ffffff;
   margin: 0;

@@ -1,7 +1,7 @@
 /* ── Top bar shell ── */
 .topNav {
   background-color: #e65100;
-  min-height: clamp(54px, 7vw, 68px);
+  min-height: clamp(50px, 7vw, 65px);
   flex-shrink: 0;
 }
 

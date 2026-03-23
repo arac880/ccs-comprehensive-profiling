@@ -1,4 +1,3 @@
-
 import styles from "../../pages/studentPages/studentStyles/Footer.module.css";
 
 export default function CCSFooter() {
@@ -6,19 +5,19 @@ export default function CCSFooter() {
 
   return (
     <footer className={styles.footer}>
-      {/* Left: logo + system name */}
+      {/* Left: System Branding */}
       <div className={styles.left}>
         <div className={styles.sysName}>
           <span className={styles.bold}>CCS</span>
-          <span className={styles.sep}>–</span>
+          <span className={styles.sep}>|</span>
           <span className={styles.thin}>Comprehensive Profiling System</span>
-          <span className={styles.version}>v.1</span>
+          <span className={styles.version}>v1.0</span>
         </div>
       </div>
 
-      {/* Right: year */}
+      {/* Right: Copyright & Year */}
       <div className={styles.right}>
-        <span className={styles.year}>{year}</span>
+        <span className={styles.copyright}>© {year} All Rights Reserved</span>
       </div>
     </footer>
   );

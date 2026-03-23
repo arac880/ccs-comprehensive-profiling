@@ -47,7 +47,7 @@ export default function StudentEvents() {
     <div className={styles.pageRoot}>
       {/* ── Sidebar ── */}
       <aside className={styles.sidebarArea}>
-        <SideNavbar />
+        <SideNavbar activeNav="Events" />{" "}
       </aside>
 
       {/* ── Main column ── */}

@@ -1,11 +1,10 @@
 @import url("https://fonts.googleapis.com/css2?family=Afacad:wght@400;600;700&family=Freeman&family=ADLaM+Display&display=swap");
 
 .clearanceContainer {
-  padding: 10px 20px;
-  background-color: #f8f9fa; /* Cleaner, modern light-gray background */
-  min-height: 100vh;
-  font-family: "Afacad", sans-serif;
-  color: #2c3e50;
+  background: #ffffff;
+    border-radius: 14px;
+    padding: clamp(14px, 2vw, 20px);
+    box-shadow: 0 2px 12px rgba(230, 81, 0, 0.05);
 }
 
 /* Header Section */
