@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import styles from"../../pages/facultyPages/facultyStyles/SideNavbar.module.css";
+import styles from "../../pages/facultyPages/facultyStyles/sideNavbar.module.css";
 import ccsLogo from "../../assets/ccs_logo.png";
 
 const navItems = [
@@ -90,10 +90,7 @@ export default function SidebarNav({ activeNav = "Dashboard", onNavigate }) {
               </div>
               <div className={styles.profileInfo}>
                 <p className={styles.profileName}>{faculty.name}</p>
-                <p className={styles.profileId}>
-                
-                  {faculty.id}
-                </p>
+                <p className={styles.profileId}>{faculty.id}</p>
               </div>
             </div>
           </div>

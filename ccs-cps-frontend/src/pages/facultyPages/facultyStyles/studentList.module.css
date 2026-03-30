@@ -41,7 +41,7 @@
 }
 
 .pageHeading i {
-  color: #E65100;
+  color: #e65100;
 }
 
 /* ── Search bar ── */
@@ -143,9 +143,18 @@
   font-weight: 600;
 }
 
-.badgeActive   { background: #e6f4ea; color: #2d7a3c; }
-.badgeInactive { background: #fef3e2; color: #a05e00; }
-.badgeAtRisk   { background: #fde8e8; color: #a02020; }
+.badgeActive {
+  background: #e6f4ea;
+  color: #2d7a3c;
+}
+.badgeInactive {
+  background: #fef3e2;
+  color: #a05e00;
+}
+.badgeAtRisk {
+  background: #fde8e8;
+  color: #a02020;
+}
 
 /* ── Empty state ── */
 .emptyRow td {
@@ -153,4 +162,184 @@
   padding: 28px;
   color: #aaa;
   font-size: 13px;
+}
+
+/* =============================================
+   ADDED: Modal Styles
+   ============================================= */
+
+/* ── Modal Overlay ── */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  backdrop-filter: blur(2px);
+}
+
+/* ── Modal Container ── */
+.modalContent {
+  background: white;
+  width: 100%;
+  max-width: 650px;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: slideIn 0.2s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── Modal Header ── */
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid #f5ece5;
+}
+
+.modalTitle {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.closeBtn {
+  background: transparent;
+  border: none;
+  font-size: 18px;
+  color: #888;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+}
+
+.closeBtn:hover {
+  background: #f5ece5;
+  color: #1a1a1a;
+}
+
+/* ── Modal Tabs ── */
+.modalTabs {
+  display: flex;
+  background-color: #fdf8f5;
+  border-bottom: 1px solid #e8ddd5;
+  padding: 0 24px;
+}
+
+.tabBtn {
+  background: transparent;
+  border: none;
+  padding: 14px 20px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #666;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.tabBtn:hover {
+  color: #e65100;
+  border-bottom: 2px solid #e65100;
+}
+
+.tabBtn.activeTab {
+  color: #7b1a00;
+  border-bottom: 2px solid #7b1a00;
+}
+
+/* ── Modal Body & Forms ── */
+.modalBody {
+  padding: 24px;
+  min-height: 250px;
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.formGroup.fullWidth {
+  grid-column: 1 / -1;
+}
+
+.formGroup label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #444;
+}
+.formGroup input,
+.formGroup select {
+  width: 100%;
+  padding: 12px 14px;
+  border: 2px solid #e8ddd5;
+  border-radius: 8px;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: #333;
+  outline: none;
+  background: #fdfaf7;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.02);
+  transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+  box-sizing: border-box;
+}
+
+.formGroup input:focus,
+.formGroup select:focus {
+  border-color: #e65100;
+  background: #ffffff;
+  box-shadow: 0 0 0 4px rgba(230, 81, 0, 0.15);
+}
+
+.formGroup input::placeholder,
+.formGroup select::placeholder {
+  color: #aeb1b6;
+  font-weight: 400;
+}
+
+/* Make disabled inputs look intentionally inactive */
+.formGroup input:disabled {
+  background-color: #f2ebe6;
+  color: #888;
+  border-color: #e8ddd5;
+  cursor: not-allowed;
+  box-shadow: none;
+  opacity: 1; /* Fixes text dimming on Safari/iOS */
+}
+
+/* ── Modal Footer ── */
+.modalFooter {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 16px 24px;
+  background-color: #fdf8f5;
+  border-top: 1px solid #e8ddd5;
 }

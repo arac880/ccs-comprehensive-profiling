@@ -1,4 +1,4 @@
-import "../../pages/facultyPages/facultyStyles/TopNavbar.css";
+import "../../pages/facultyPages/facultyStyles/topNavbar.css";
 
 
 export default function TopBar() {
