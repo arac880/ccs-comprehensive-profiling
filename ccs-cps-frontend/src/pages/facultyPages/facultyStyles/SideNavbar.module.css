@@ -1,0 +1,304 @@
+ /* ── Root sidebar ── */
+.sidebar {
+  width: 255px;
+  min-height: 100vh;
+  background-color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.08);
+  position: relative;
+  z-index: 100;
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-right: 1px solid rgba(230, 81, 0, 0.08);
+}
+
+.sidebar.collapsed {
+  width: 68px;
+}
+
+/* ── Header ── */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 14px 14px;
+  min-height: 68px;
+  border-bottom: 1px solid rgba(230, 81, 0, 0.10);
+  margin-bottom: 16px;
+}
+
+.brandWrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow: hidden;
+}
+
+.brandAccent {
+  width: 5px;
+  height: 26px;
+  background: #E65100;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.brandName {
+  color: #E65100;
+  font-weight: 800;
+  font-size: 20px;
+  font-family: "Gabarito", sans-serif;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+}
+
+.toggleBtn {
+  background: #fff5f0;
+  border: 1px solid rgba(230, 81, 0, 0.15);
+  color: #E65100;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.2s, border-color 0.2s;
+  margin-left: auto;
+}
+
+.toggleBtn:hover {
+  background: #ffe8d9;
+  border-color: rgba(230, 81, 0, 0.35);
+}
+
+/* ── Profile (expanded) ── */
+.profileSection {
+  background: linear-gradient(135deg, #fff5f0 0%, #ffe8d9 100%);
+  margin: 0 12px 16px;
+  padding: 14px;
+  border-radius: 14px;
+  position: relative;
+  border: 1px solid rgba(230, 81, 0, 0.12);
+}
+
+.profileInner {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.profileAvatar {
+  width: 60px;
+  height: 60px;
+  background:  #bf360c;
+  border-radius: 12px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 21px;
+  color: #fff;
+  box-shadow: 0 4px 10px rgba(191, 54, 12, 0.35);
+}
+
+.profileInfo {
+  overflow: hidden;
+  flex: 1;
+}
+
+.profileName {
+  color: #2a1a0e;
+  font-size: 12.5px;
+  font-weight: 700;
+  margin: 0 0 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.profileBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(230, 81, 0, 0.12);
+  color: #E65100;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 20px;
+  letter-spacing: 0.3px;
+}
+
+.profileEditIcon {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  color: #E65100;
+  opacity: 0.4;
+  font-size: 12px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.profileEditIcon:hover {
+  opacity: 1;
+}
+.profileId {
+  color: #575757;
+  font-size: 10px;
+  font-weight: 500;
+  margin: 2px 0 0 4px;
+  letter-spacing: 0.3px;
+}
+
+/* ── Collapsed avatar ── */
+.collapsedAvatar {
+  width: 42px;
+  height: 42px;
+  background: linear-gradient(135deg, #ff8c42, #bf360c);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 19px;
+  color: #fff;
+  margin: 0 auto 16px;
+  box-shadow: 0 4px 10px rgba(191, 54, 12, 0.35);
+  cursor: pointer;
+}
+
+/* ── Section label ── */
+.navSectionLabel {
+  font-size: 9.5px;
+  font-weight: 700;
+  color: #bbb;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  padding: 0 14px 8px;
+}
+
+/* ── Nav wrapper ── */
+.sidebarNav {
+  flex-grow: 1;
+  margin: 0 10px 10px;
+  padding: 4px 6px;
+  overflow: visible;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* ── Nav item — EXPANDED ── */
+.navItemRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  color: #666;
+  transition: background 0.18s, color 0.18s, transform 0.15s;
+  position: relative;
+  white-space: nowrap;
+  overflow: visible;
+}
+
+.navItemRow:hover {
+  background: #fff5f0;
+  color: #E65100;
+  transform: translateX(3px);
+}
+
+.navItemRow:hover .navIcon {
+  color: #E65100;
+}
+
+.navItemRow.activeNav {
+  background: linear-gradient(135deg, #E65100, #ff6d00);
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(230, 81, 0, 0.28);
+  transform: translateX(0);
+}
+
+.navItemRow.activeNav .navIcon {
+  color: #fff;
+}
+
+/* ── Nav item — COLLAPSED (icon centered) ── */
+.sidebar.collapsed .navItemRow {
+  justify-content: center;
+  padding: 11px 0;
+  gap: 0;
+}
+
+.sidebar.collapsed .navItemRow:hover {
+  transform: none;
+}
+
+.navIcon {
+  font-size: 18px;
+  color: #bbb;
+  flex-shrink: 0;
+  width: 20px;
+  text-align: center;
+  transition: color 0.18s;
+}
+
+.navLabel {
+  flex: 1;
+}
+
+/* ── SignOut ── */
+.navItemRow.signOut {
+  color: #e53935;
+}
+
+.navItemRow.signOut .navIcon {
+  color: #e53935;
+}
+
+.navItemRow.signOut:hover {
+  background: #fff5f5;
+  color: #c62828;
+}
+
+.navItemRow.signOut:hover .navIcon {
+  color: #c62828;
+}
+
+/* ── Dividers ── */
+.navDivider {
+  border: none;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  margin: 1px 8px;
+}
+
+.navDividerSignout {
+  border: none;
+  border-top: 1px solid rgba(0, 0, 0, 0.07);
+  margin: 8px 8px;
+}
+
+/* ── Watermark ── */
+.sidebarWatermark {
+  display: flex;
+  justify-content: center;
+  padding: 14px 0 20px;
+  opacity: 0.15;
+}
+
+.sidebarWatermark img {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+  transition: width 0.3s, height 0.3s;
+}
+
+.sidebar:not(.collapsed) .sidebarWatermark img {
+  width: 150px;
+  height: 150px;
+}
