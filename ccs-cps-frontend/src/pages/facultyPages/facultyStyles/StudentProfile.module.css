@@ -1,0 +1,368 @@
+
+.pageRoot {
+  min-height: 100vh;
+  background-color: #f9fafb;
+  display: flex;
+}
+
+.pageMain {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  overflow: hidden;
+}
+
+.pageContent {
+  flex-grow: 1;
+  padding: 16px;
+  overflow-y: auto;
+  background-color: #fffaf6;
+}
+
+/* ── Header row ── */
+.pageHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.backBtn {
+  background: transparent;
+  border: none;
+  color: #f36a0efa;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.backBtn:hover {
+  background: transparent;
+  border: none;
+  text-decoration: underline;
+}
+
+.headerActions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+/* ── Profile Hero Card ── */
+.heroCard {
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 16px;
+}
+
+.heroAvatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: #fdf0e8;
+  border: 2px solid #f0d8c8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: 700;
+  color: #c0390a;
+  flex-shrink: 0;
+}
+
+.heroInfo {
+  flex-grow: 1;
+}
+
+.heroName {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 4px;
+}
+
+.heroMeta {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.heroMetaItem {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  color: #666;
+}
+
+.heroMetaItem i {
+  color: #e65100;
+  font-size: 13px;
+}
+
+/* Status badge in hero */
+.badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.badgeActive {
+  background: #e6f4ea;
+  color: #2d7a3c;
+}
+
+.badgeInactive {
+  background: #fef3e2;
+  color: #a05e00;
+}
+
+.badgeAtRisk {
+  background: #fde8e8;
+  color: #a02020;
+}
+
+/* ── Profile Body ── */
+.profileBody {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+/* ── Tab Sidebar ── */
+.tabSidebar {
+  width: 180px;
+  flex-shrink: 0;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.tabSidebarHeader {
+  background: #AA300A;
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  padding: 10px 14px;
+  text-transform: uppercase;
+}
+
+.tabItem {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 11px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #555;
+  cursor: pointer;
+  border-left: 3px solid transparent;
+  transition: all 0.15s;
+  border-bottom: 1px solid #fdf5ef;
+}
+
+.tabItem i {
+  font-size: 14px;
+  color: #bbb;
+  width: 16px;
+  text-align: center;
+  transition: color 0.15s;
+}
+
+.tabItem:hover {
+  background: #fdf8f5;
+  color: #e65100;
+}
+
+.tabItem:hover i {
+  color: #e65100;
+}
+
+.tabItemActive {
+  background: #fdf0e8;
+  color: #7b1a00;
+  border-left: 3px solid #e65100;
+  font-weight: 700;
+}
+
+.tabItemActive i {
+  color: #e65100;
+}
+
+/* ── Detail Card ── */
+.detailCard {
+  flex-grow: 1;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.detailCardHeader {
+  background: #AA300A;
+  border-bottom: 1px solid #e8ddd5;
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.detailCardTitle {
+  font-size: 14px;
+  font-weight: 700;
+  color: #faf8f8;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
+.detailCardTitle i {
+  color: #faf7f6;
+}
+
+.detailCardBody {
+  padding: 20px;
+}
+
+/* ── Info Grid (view mode) ── */
+.infoGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.infoItem {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.infoItem.fullWidth {
+  grid-column: 1 / -1;
+}
+
+.infoLabel {
+  font-size: 11px;
+  font-weight: 700;
+  color: #999;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.infoValue {
+  font-size: 14px;
+  font-weight: 500;
+  color: #1a1a1a;
+  padding: 8px 12px;
+  background: #fdf8f5;
+  border: 1px solid #f0e6dc;
+  border-radius: 6px;
+  min-height: 36px;
+  display: flex;
+  align-items: center;
+}
+
+/* ── Edit Form Grid ── */
+.formGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.formGroup.fullWidth {
+  grid-column: 1 / -1;
+}
+
+.formGroup label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #999;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.formGroup input,
+.formGroup select {
+  width: 100%;
+  padding: 9px 12px;
+  border: 2px solid #e8ddd5;
+  border-radius: 6px;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: #333;
+  outline: none;
+  background: #fdfaf7;
+  transition: all 0.2s;
+  box-sizing: border-box;
+}
+
+.formGroup input:focus,
+.formGroup select:focus {
+  border-color: #e65100;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(230, 81, 0, 0.12);
+}
+
+.formGroup input:disabled {
+  background-color: #f2ebe6;
+  color: #888;
+  border-color: #e8ddd5;
+  cursor: not-allowed;
+}
+
+/* ── Edit actions footer ── */
+.editFooter {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 16px 20px;
+  border-top: 1px solid #e8ddd5;
+  background: #fdf8f5;
+}
+
+/* ── Loading / Error states ── */
+.stateBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  color: #aaa;
+  font-size: 14px;
+  gap: 12px;
+}
+
+.stateBox i {
+  font-size: 36px;
+  color: #ddd;
+}
+
+.stateBox.errorState i {
+  color: #f5c2c2;
+}
+
+.stateBox.errorState p {
+  color: #c0390a;
+}

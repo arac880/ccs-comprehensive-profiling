@@ -1,3 +1,4 @@
+
 .toastContainer {
   position: fixed;
   top: 24px;
@@ -5,71 +6,129 @@
   z-index: 10000;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
 
 .toast {
+  position: relative;
   display: flex;
-  align-items: center;
-  gap: 12px;
-  min-width: 250px;
-  padding: 14px 20px;
-  border-radius: 8px;
-  background: white;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-  animation: slideInRight 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-  border-left: 4px solid transparent;
+  align-items: flex-start;
+  gap: 16px;
+  min-width: 340px;
+  max-width: 420px;
+  padding: 16px;
+  border-radius: 14px;
+  background: #ffffff;
+  overflow: hidden; 
+  
+  /* Deep, buttery shadow with a faint outer border glow */
+  box-shadow: 
+    0 15px 30px -5px rgba(0, 0, 0, 0.08), 
+    0 10px 15px -6px rgba(0, 0, 0, 0.04),
+    0 0 0 1px rgba(0, 0, 0, 0.05); 
+    
+  animation: slideInRight 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
 }
 
-@keyframes slideInRight {
-  from {
-    transform: translateX(100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
+/* ── The "Squircle" Icon Container ── */
+.iconWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+
+.iconWrapper i {
+  font-size: 20px;
+}
+
+/* ── Typography & Layout ── */
+.toastContent {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 2px;
+}
+
+.toastTitle {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: #111827;
+  letter-spacing: -0.01em;
 }
 
 .toastText {
-  font-size: 14px;
-  font-weight: 600;
-  color: #333;
+  font-size: 13px;
+  font-weight: 500;
+  color: #6b7280;
   margin: 0;
-  flex-grow: 1;
+  line-height: 1.5;
 }
 
-.success {
-  border-left-color: #28a745;
-}
-.success i {
-  color: #28a745;
-}
+/* ── Type Specific Color Theming ── */
 
-.error {
-  border-left-color: #dc3545;
-}
-.error i {
-  color: #dc3545;
-}
+/* Success */
+.success .iconWrapper { background: #d1fae5; color: #10b981; }
+.success .progressBar { background: #10b981; }
 
-.info {
-  border-left-color: #e65100;
-}
-.info i {
-  color: #e65100;
-}
+/* Error */
+.error .iconWrapper { background: #fee2e2; color: #ef4444; }
+.error .progressBar { background: #ef4444; }
 
+/* Info (Using your Department Orange) */
+.info .iconWrapper { background: #fff0e6; color: #E65100; }
+.info .progressBar { background: #E65100; }
+
+/* ── Close Button ── */
 .closeBtn {
-  background: none;
+  background: transparent;
   border: none;
-  color: #999;
+  color: #9ca3af;
   cursor: pointer;
-  font-size: 16px;
-  padding: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  margin: -4px -4px 0 0; 
 }
 
 .closeBtn:hover {
-  color: #333;
+  background: #f3f4f6;
+  color: #111827;
+}
+
+/* ── Animated Progress Bar ── */
+.progressBar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  width: 100%;
+  animation: progress shrink linear forwards;
+  transform-origin: left;
+}
+
+@keyframes progress {
+  0% { transform: scaleX(1); }
+  100% { transform: scaleX(0); }
+}
+
+/* ── Spring Animation ── */
+@keyframes slideInRight {
+  from {
+    transform: translateX(120%) scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+  }
 }

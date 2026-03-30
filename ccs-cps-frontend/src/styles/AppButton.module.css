@@ -6,19 +6,17 @@
 
 /* --- Base --- */
 .btn {
-  position: relative;
-  display: inline-flex;
+ display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
-  font-family: "Segoe UI", system-ui, sans-serif;
+  gap: 6px;
+  padding: 9px 10px;
+  border-radius: 8px;
   font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  border: 2px solid transparent;
-  border-radius: 50px; /* Made it a pill shape for that rounder look */
-  cursor: pointer;
-  outline: none;
+  font-size: 13px;
+  border: none !important;
+  transition: all 0.2s ease;
+  white-space: nowrap;  
   /* Upgraded animation with a smooth, springy cubic-bezier */
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   user-select: none;
@@ -54,7 +52,7 @@
 }
 
 .btn--primary:hover:not(:disabled) {
-  background-color: #ff6d00; /* Brighter orange pop on hover */
+  background-color: #ff5e00; /* Brighter orange pop on hover */
   border-color: #ff6d00;
   transform: translateY(-2px);
   box-shadow: 0 8px 20px rgba(230, 81, 0, 0.35); /* Soft glowing shadow */
@@ -62,13 +60,13 @@
 
 /* Secondary */
 .btn--secondary {
-  background-color: #f5a623;
+  background-color: #e69615;
   border-color: #f5a623;
   color: #ffffff;
 }
 
 .btn--secondary:hover:not(:disabled) {
-  background-color: #ffb74d; /* Brighter gold/orange */
+  background-color: #f3a735; /* Brighter gold/orange */
   border-color: #ffb74d;
   transform: translateY(-2px);
   box-shadow: 0 8px 20px rgba(245, 166, 35, 0.35);
@@ -129,8 +127,8 @@
 
 .btn--md {
   font-size: 0.85rem;
-  padding: 0.625rem 1.75rem; /* Slightly wider padding for pill shapes */
-  min-height: 44px;
+  padding: 0.625rem 1.4rem; /* Slightly wider padding for pill shapes */
+  min-height: 40px;
 }
 
 .btn--lg {

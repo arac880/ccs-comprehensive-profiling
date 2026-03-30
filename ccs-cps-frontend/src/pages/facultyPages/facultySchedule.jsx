@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import SideNavbar from "../../components/facultyComponents/SideNavbar";
-import TopNavbar from "../../components/facultyComponents/TopNavbar";
+import SideNavbar from "../../components/facultyComponents/sideNavbar";
+import TopNavbar from "../../components/facultyComponents/topNavbar";
 import styles from "../../pages/facultyPages/facultyStyles/schedule.module.css";
 
 /* ── Schedule data ── */

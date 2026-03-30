@@ -19,21 +19,44 @@ const AppToast = ({
 
   if (!isVisible) return null;
 
-  const iconClass =
-    type === "success"
-      ? "bi-check-circle-fill"
-      : type === "error"
-        ? "bi-exclamation-octagon-fill"
-        : "bi-info-circle-fill";
+  const config = {
+    success: {
+      icon: "bi-check2-circle",
+      title: "Success",
+    },
+    error: {
+      icon: "bi-exclamation-octagon",
+      title: "Error",
+    },
+    info: {
+      icon: "bi-info-circle",
+      title: "Notification",
+    },
+  };
+
+  const currentConfig = config[type] || config.info;
 
   return (
     <div className={styles.toastContainer}>
       <div className={`${styles.toast} ${styles[type]}`}>
-        <i className={`bi ${iconClass}`} style={{ fontSize: "18px" }} />
-        <p className={styles.toastText}>{message}</p>
+        
+        <div className={styles.iconWrapper}>
+          <i className={`bi ${currentConfig.icon}`} />
+        </div>
+
+        <div className={styles.toastContent}>
+          <h4 className={styles.toastTitle}>{currentConfig.title}</h4>
+          <p className={styles.toastText}>{message}</p>
+        </div>
+
         <button className={styles.closeBtn} onClick={onClose}>
           <i className="bi bi-x-lg" />
         </button>
+
+        <div 
+          className={styles.progressBar} 
+          style={{ animationDuration: `${duration}ms` }}
+        />
       </div>
     </div>
   );

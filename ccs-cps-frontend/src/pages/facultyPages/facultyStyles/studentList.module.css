@@ -1,11 +1,9 @@
-/* =============================================
-   Student List — CSS Module
-   ============================================= */
-
 .pageRoot {
   min-height: 100vh;
-  background-color: #fdf5ef;
+  background-color: #fffaf6;
   display: flex;
+  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 
 .pageMain {
@@ -17,158 +15,255 @@
 
 .pageContent {
   flex-grow: 1;
-  padding: 16px;
+  padding: 24px 32px;
   overflow-y: auto;
-  background-color: #fdf5ef;
 }
 
-/* ── Header row ── */
+/* ── Header ── */
 .pageHeader {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 16px;
+  margin-bottom: 24px;
+  gap: 16px;
 }
 
-.pageHeading {
-  font-size: 15px;
-  font-weight: 700;
-  color: #1a1a1a;
+.headerTitleGroup {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin: 0;
+  gap: 12px;
 }
 
-.pageHeading i {
-  color: #e65100;
-}
-
-/* ── Search bar ── */
-.searchBar {
+.iconBox {
   display: flex;
   align-items: center;
-  gap: 8px;
-  background: white;
-  border: 1px solid #e8ddd5;
-  border-radius: 6px;
-  padding: 6px 12px;
-  width: 220px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-}
-
-.searchBar i {
-  color: #bbb;
-  font-size: 13px;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background-color: #fff0e6;
+  color: #E65100;
+  border-radius: 8px;
   flex-shrink: 0;
 }
 
+.pageHeading {
+  font-size: 18px;
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+/* ── Controls & Search ── */
+.controls {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.searchWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 12px;
+  color: #9CA3AF;
+  font-size: 14px;
+}
+
 .searchInput {
-  border: none;
-  outline: none;
+  background: #FFFFFF;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 9px 12px 9px 36px;
+  width: 240px;
   font-size: 13px;
-  width: 100%;
-  background: transparent;
-  color: #1a1a1a;
+  color: #111827;
+  transition: all 0.2s ease;
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: #E65100;
+  box-shadow: 0 0 0 3px rgba(230, 81, 0, 0.08);
 }
 
 .searchInput::placeholder {
-  color: #bbb;
+  color: #a0aec0;
 }
 
-/* ── Table card ── */
-.tableCard {
-  background: white;
+/* Primary Action Button */
+.addBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px 16px;
   border-radius: 8px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  font-weight: 600;
+  font-size: 13px;
+  background-color: #E65100 !important;
+  color: #FFFFFF !important;
+  border: none !important;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.addBtn:hover {
+  background-color: #d34a00 !important;
+  transform: translateY(-1px);
+}
+
+/* ── Table Card ── */
+.tableCard {
+  background: #FFFFFF;
+  border-radius: 12px;
+  border: 1px solid #eef0f3;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
   overflow: hidden;
+}
+
+.tableResponsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 13px;
+  min-width: 650px;
 }
 
 .table thead th {
-  background: #7b1a00;
-  color: white;
-  padding: 10px 14px;
+  background: #aa300a;
+  color: #fbfbff;
+  padding: 12px 24px;
   text-align: left;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
-  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border-bottom: 1px solid #E5E7EB;
   white-space: nowrap;
 }
 
 .table tbody td {
-  padding: 10px 14px;
-  border-bottom: 1px solid #f5ece5;
-  color: #1a1a1a;
+  padding: 12px 24px;
+  border-bottom: 1px solid #F3F4F6;
   vertical-align: middle;
 }
 
-.table tbody tr:last-child td {
-  border-bottom: none;
+.hoverRow {
+  transition: background-color 0.1s ease;
 }
 
-.table tbody tr:hover td {
-  background: #fdf8f5;
+.hoverRow:hover {
+  background-color: #fffaf6;
 }
 
-/* ── Avatar initials ── */
+/* ── Student Information ── */
+.studentCell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  white-space: nowrap;
+}
+
 .avatarInitials {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 28px;
   height: 28px;
+  border: 1px solid #fbd38d80;
   border-radius: 50%;
-  background: #fdf0e8;
-  border: 1px solid #f0d8c8;
+  background: #fffaf0;
   font-size: 10px;
-  font-weight: 700;
-  color: #c0390a;
-  margin-right: 8px;
-  vertical-align: middle;
+  font-weight: 600;
+  color: #dd6b20;
   flex-shrink: 0;
+}
+
+.studentName {
+  font-size: 13px;
+  font-weight: 500;
+  color: #111827;
+}
+
+.subText {
+  font-size: 13px;
+  color: #111827;
+  white-space: nowrap;
 }
 
 /* ── Status badges ── */
 .badge {
-  display: inline-block;
-  padding: 3px 10px;
-  border-radius: 12px;
-  font-size: 11px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 12px;
   font-weight: 600;
+  white-space: nowrap;
 }
 
 .badgeActive {
-  background: #e6f4ea;
-  color: #2d7a3c;
+  background: #f0fdf4;
+  color: #166534;
+  border: 1px solid #afd1b3;
 }
+
 .badgeInactive {
-  background: #fef3e2;
-  color: #a05e00;
+  background: #f8fafc;
+  color: #475569;
+  border: 1px solid #e2e8f0;
 }
+
 .badgeAtRisk {
-  background: #fde8e8;
-  color: #a02020;
+  background: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+
+/* ── Action Button ── */
+.viewBtn {
+  background: #fff5ef;
+  border: 1px solid #e96a1641;
+  color: #f36a0efa;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.viewBtn:hover {
+  color: #f3dccf;
+  background: #E65100;
+  border-color: #fbd38d;
 }
 
 /* ── Empty state ── */
 .emptyRow td {
   text-align: center;
-  padding: 28px;
-  color: #aaa;
+  padding: 40px;
+  color: #6B7280;
   font-size: 13px;
 }
 
 /* =============================================
-   ADDED: Modal Styles
+   Modal Styles
    ============================================= */
 
-/* ── Modal Overlay ── */
 .modalOverlay {
   position: fixed;
   top: 0;
@@ -181,9 +276,9 @@
   justify-content: center;
   z-index: 9999;
   backdrop-filter: blur(2px);
+  padding: 16px;
 }
 
-/* ── Modal Container ── */
 .modalContent {
   background: white;
   width: 100%;
@@ -193,6 +288,7 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  max-height: 90vh;
   animation: slideIn 0.2s ease-out;
 }
 
@@ -201,13 +297,13 @@
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
 
-/* ── Modal Header ── */
 .modalHeader {
   display: flex;
   align-items: center;
@@ -238,12 +334,13 @@
   color: #1a1a1a;
 }
 
-/* ── Modal Tabs ── */
 .modalTabs {
   display: flex;
   background-color: #fdf8f5;
   border-bottom: 1px solid #e8ddd5;
   padding: 0 24px;
+  overflow-x: auto;
+  white-space: nowrap;
 }
 
 .tabBtn {
@@ -268,10 +365,9 @@
   border-bottom: 2px solid #7b1a00;
 }
 
-/* ── Modal Body & Forms ── */
 .modalBody {
   padding: 24px;
-  min-height: 250px;
+  overflow-y: auto;
 }
 
 .formGrid {
@@ -295,6 +391,7 @@
   font-weight: 600;
   color: #444;
 }
+
 .formGroup input,
 .formGroup select {
   width: 100%;
@@ -306,8 +403,7 @@
   color: #333;
   outline: none;
   background: #fdfaf7;
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.02);
-  transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+  transition: all 0.2s ease;
   box-sizing: border-box;
 }
 
@@ -321,20 +417,16 @@
 .formGroup input::placeholder,
 .formGroup select::placeholder {
   color: #aeb1b6;
-  font-weight: 400;
 }
 
-/* Make disabled inputs look intentionally inactive */
 .formGroup input:disabled {
   background-color: #f2ebe6;
   color: #888;
   border-color: #e8ddd5;
   cursor: not-allowed;
-  box-shadow: none;
-  opacity: 1; /* Fixes text dimming on Safari/iOS */
+  opacity: 1;
 }
 
-/* ── Modal Footer ── */
 .modalFooter {
   display: flex;
   justify-content: flex-end;
@@ -342,4 +434,43 @@
   padding: 16px 24px;
   background-color: #fdf8f5;
   border-top: 1px solid #e8ddd5;
+}
+
+
+/* =============================================
+   RESPONSIVE MEDIA QUERIES
+   ============================================= */
+
+@media screen and (max-width: 768px) {
+  .pageContent {
+    padding: 16px;
+  }
+
+  .pageHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .controls {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .searchWrapper {
+    width: 100%;
+  }
+
+  .searchInput {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .addBtn {
+    width: 100%;
+  }
+
+  .formGrid {
+    grid-template-columns: 1fr;
+  }
 }

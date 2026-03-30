@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import AppButton from "../ui/AppButton";
 import AppModal from "../ui/Modal";
 import AppToast from "../ui/AppToast";
@@ -6,27 +6,25 @@ import ConfirmModal from "../ui/ConfirmModal";
 import ErrorModal from "../ui/ErrorModal";
 import styles from "../../pages/facultyPages/facultyStyles/studentList.module.css";
 
+const initialFormState = {
+  studentId: "",
+  firstName: "",
+  lastName: "",
+  birthdate: "",
+  age: "",
+  gender: "",
+  address: "",
+  program: "",
+  year: "",
+  section: "",
+  email: "",
+};
+
 const AddStudentModal = ({ isOpen, onClose }) => {
   const [activeTab, setActiveTab] = useState("personal");
-
-  // Form State
-  const [formData, setFormData] = useState({
-    studentId: "", // Added Student ID
-    firstName: "",
-    lastName: "",
-    birthdate: "",
-    age: "",
-    gender: "",
-    address: "",
-    program: "",
-    year: "",
-    section: "",
-    email: "",
-  });
-
+  const [formData, setFormData] = useState(initialFormState);
   const [errors, setErrors] = useState({});
 
-  // New Utility UI States
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [isErrorOpen, setIsErrorOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -39,20 +37,28 @@ const AddStudentModal = ({ isOpen, onClose }) => {
     type: "success",
   });
 
+  useEffect(() => {
+    if (isOpen) {
+      setFormData(initialFormState);
+      setErrors({});
+      setActiveTab("personal");
+    }
+  }, [isOpen]);
+
   const showToast = (message, type = "success") => {
     setToast({ isVisible: true, message, type });
   };
 
   const calculateAge = (dobString) => {
     if (!dobString) return "";
-    const today = new Date();
     const birthDate = new Date(dobString);
+    const today = new Date();
     let age = today.getFullYear() - birthDate.getFullYear();
     const m = today.getMonth() - birthDate.getMonth();
     if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
       age--;
     }
-    return age > 0 ? age : 0;
+    return age >= 0 ? age : 0;
   };
 
   const handleChange = (e) => {
@@ -74,11 +80,10 @@ const AddStudentModal = ({ isOpen, onClose }) => {
   const validateForm = () => {
     const newErrors = {};
     const requiredFields = [
-      "studentId", // Added to validation
+      "studentId",
       "firstName",
       "lastName",
       "birthdate",
-      "age",
       "gender",
       "address",
       "program",
@@ -86,37 +91,68 @@ const AddStudentModal = ({ isOpen, onClose }) => {
       "section",
       "email",
     ];
+
     requiredFields.forEach((field) => {
       if (
         !formData[field] ||
-        formData[field] === "Select Gender" ||
-        formData[field] === "Select Program" ||
-        formData[field] === "Select Year"
+        formData[field].toString().startsWith("Select ")
       ) {
         newErrors[field] = "This field is required";
       }
     });
+
+    if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = "Please enter a valid email address";
+    }
+
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+
+    if (Object.keys(newErrors).length > 0) {
+      const personalFields = [
+        "firstName",
+        "lastName",
+        "birthdate",
+        "gender",
+        "address",
+      ];
+      const academicFields = ["studentId", "program", "year", "section"];
+
+      if (personalFields.some((field) => newErrors[field])) {
+        setActiveTab("personal");
+      } else if (academicFields.some((field) => newErrors[field])) {
+        setActiveTab("academic");
+      } else {
+        setActiveTab("contact");
+      }
+      return false;
+    }
+    return true;
   };
 
-  // STEP 1: Click Save -> Validate -> Open Confirm Modal
   const handleInitialSubmit = () => {
     if (!validateForm()) {
-      showToast("Please fill out all required fields.", "error");
+      showToast("Please fill out all required fields correctly.", "error");
       return;
     }
     setIsConfirmOpen(true);
   };
 
-  // STEP 2: Execute Save (Triggered from Confirm Modal)
   const executeSave = async () => {
     setIsSubmitting(true);
     try {
+      const sanitizedData = {
+        ...formData,
+        firstName: formData.firstName.trim(),
+        lastName: formData.lastName.trim(),
+        studentId: formData.studentId.trim(),
+        email: formData.email.trim(),
+        section: formData.section.trim(),
+      };
+
       const response = await fetch("http://localhost:5000/api/students", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(sanitizedData),
       });
 
       const data = await response.json();
@@ -125,26 +161,11 @@ const AddStudentModal = ({ isOpen, onClose }) => {
         throw new Error(data.message || "Failed to save student.");
       }
 
-      // Success!
       setIsConfirmOpen(false);
       showToast("Student profile saved successfully!", "success");
 
       setTimeout(() => {
-        setFormData({
-          studentId: "",
-          firstName: "",
-          lastName: "",
-          birthdate: "",
-          age: "",
-          gender: "",
-          address: "",
-          program: "",
-          year: "",
-          section: "",
-          email: "",
-        });
-        setErrors({});
-        onClose(); // Close the main modal
+        onClose(); 
       }, 1000);
     } catch (error) {
       console.error("Submission error:", error);
@@ -152,7 +173,7 @@ const AddStudentModal = ({ isOpen, onClose }) => {
       setErrorMessage(
         error.message || "An error occurred while connecting to the server.",
       );
-      setIsErrorOpen(true); // Show the Error Modal
+      setIsErrorOpen(true);
     } finally {
       setIsSubmitting(false);
     }
@@ -161,6 +182,7 @@ const AddStudentModal = ({ isOpen, onClose }) => {
   const RequiredMark = () => (
     <span style={{ color: "#dc3545", marginLeft: "2px" }}>*</span>
   );
+
   const ErrorText = ({ message }) =>
     message ? (
       <span style={{ color: "#dc3545", fontSize: "11px", marginTop: "4px" }}>
@@ -170,12 +192,10 @@ const AddStudentModal = ({ isOpen, onClose }) => {
 
   if (!isOpen) return null;
 
-  // Get today's date in YYYY-MM-DD format to prevent future birthdates
   const todayString = new Date().toISOString().split("T")[0];
 
   return (
     <>
-      {/* Toast Notification */}
       <AppToast
         isVisible={toast.isVisible}
         message={toast.message}
@@ -183,46 +203,41 @@ const AddStudentModal = ({ isOpen, onClose }) => {
         onClose={() => setToast({ ...toast, isVisible: false })}
       />
 
-      {/* Main Student Modal */}
       <AppModal
         isOpen={isOpen}
         onClose={onClose}
         title="New Student Profile"
         icon="bi-person-plus-fill"
-        maxWidth="650px"
-      >
+        maxWidth="650px">
         <div className={styles.modalTabs}>
           <button
             className={`${styles.tabBtn} ${activeTab === "personal" ? styles.activeTab : ""}`}
             onClick={() => setActiveTab("personal")}
-            type="button"
-          >
+            type="button">
             <i
               className="bi bi-person-lines-fill"
               style={{ marginRight: "6px" }}
-            />{" "}
+            />
             Personal Info
           </button>
           <button
             className={`${styles.tabBtn} ${activeTab === "academic" ? styles.activeTab : ""}`}
             onClick={() => setActiveTab("academic")}
-            type="button"
-          >
+            type="button">
             <i
               className="bi bi-mortarboard-fill"
               style={{ marginRight: "6px" }}
-            />{" "}
+            />
             Academic Details
           </button>
           <button
             className={`${styles.tabBtn} ${activeTab === "contact" ? styles.activeTab : ""}`}
             onClick={() => setActiveTab("contact")}
-            type="button"
-          >
+            type="button">
             <i
               className="bi bi-telephone-fill"
               style={{ marginRight: "6px" }}
-            />{" "}
+            />
             Contact Info
           </button>
         </div>
@@ -233,7 +248,7 @@ const AddStudentModal = ({ isOpen, onClose }) => {
             <div className={styles.formGrid}>
               <div className={styles.formGroup}>
                 <label>
-                  <i className="bi bi-person" style={{ marginRight: "4px" }} />{" "}
+                  <i className="bi bi-person" style={{ marginRight: "4px" }} />
                   First Name <RequiredMark />
                 </label>
                 <input
@@ -249,7 +264,7 @@ const AddStudentModal = ({ isOpen, onClose }) => {
 
               <div className={styles.formGroup}>
                 <label>
-                  <i className="bi bi-person" style={{ marginRight: "4px" }} />{" "}
+                  <i className="bi bi-person" style={{ marginRight: "4px" }} />
                   Last Name <RequiredMark />
                 </label>
                 <input
@@ -264,27 +279,16 @@ const AddStudentModal = ({ isOpen, onClose }) => {
               </div>
 
               <div className={styles.formGroup}>
-                <label>
-                  <i
-                    className="bi bi-calendar-date"
-                    style={{ marginRight: "4px" }}
-                  />{" "}
-                  Birthdate <RequiredMark />
-                </label>
+                <label>Birthdate</label>
                 <input
                   type="date"
                   name="birthdate"
-                  value={formData.birthdate}
+                  value={
+                    formData.birthdate || ""
+                  } 
                   onChange={handleChange}
                   max={todayString}
-                  onClick={(e) => {
-                    // Forces the native calendar picker to open when clicking anywhere in the field
-                    if (e.target.showPicker) e.target.showPicker();
-                  }}
-                  style={{
-                    borderColor: errors.birthdate ? "#dc3545" : "",
-                    cursor: "pointer",
-                  }}
+                  style={{ borderColor: errors.birthdate ? "#dc3545" : "" }}
                 />
                 <ErrorText message={errors.birthdate} />
               </div>
@@ -315,15 +319,14 @@ const AddStudentModal = ({ isOpen, onClose }) => {
                   <i
                     className="bi bi-gender-ambiguous"
                     style={{ marginRight: "4px" }}
-                  />{" "}
+                  />
                   Gender <RequiredMark />
                 </label>
                 <select
                   name="gender"
                   value={formData.gender}
                   onChange={handleChange}
-                  style={{ borderColor: errors.gender ? "#dc3545" : "" }}
-                >
+                  style={{ borderColor: errors.gender ? "#dc3545" : "" }}>
                   <option value="">Select Gender</option>
                   <option value="Male">Male</option>
                   <option value="Female">Female</option>
@@ -334,7 +337,7 @@ const AddStudentModal = ({ isOpen, onClose }) => {
 
               <div className={`${styles.formGroup} ${styles.fullWidth}`}>
                 <label>
-                  <i className="bi bi-geo-alt" style={{ marginRight: "4px" }} />{" "}
+                  <i className="bi bi-geo-alt" style={{ marginRight: "4px" }} />
                   Address <RequiredMark />
                 </label>
                 <input
@@ -353,13 +356,12 @@ const AddStudentModal = ({ isOpen, onClose }) => {
           {/* ACADEMIC DETAILS TAB */}
           {activeTab === "academic" && (
             <div className={styles.formGrid}>
-              {/* NEW: Student ID Field */}
               <div className={styles.formGroup}>
                 <label>
                   <i
                     className="bi bi-card-text"
                     style={{ marginRight: "4px" }}
-                  />{" "}
+                  />
                   Student ID <RequiredMark />
                 </label>
                 <input
@@ -378,15 +380,14 @@ const AddStudentModal = ({ isOpen, onClose }) => {
                   <i
                     className="bi bi-journal-bookmark"
                     style={{ marginRight: "4px" }}
-                  />{" "}
+                  />
                   Program <RequiredMark />
                 </label>
                 <select
                   name="program"
                   value={formData.program}
                   onChange={handleChange}
-                  style={{ borderColor: errors.program ? "#dc3545" : "" }}
-                >
+                  style={{ borderColor: errors.program ? "#dc3545" : "" }}>
                   <option value="">Select Program</option>
                   <option value="BS Computer Science">
                     BS Computer Science
@@ -403,15 +404,14 @@ const AddStudentModal = ({ isOpen, onClose }) => {
                   <i
                     className="bi bi-bar-chart-steps"
                     style={{ marginRight: "4px" }}
-                  />{" "}
+                  />
                   Year <RequiredMark />
                 </label>
                 <select
                   name="year"
                   value={formData.year}
                   onChange={handleChange}
-                  style={{ borderColor: errors.year ? "#dc3545" : "" }}
-                >
+                  style={{ borderColor: errors.year ? "#dc3545" : "" }}>
                   <option value="">Select Year</option>
                   <option value="1st Year">1st Year</option>
                   <option value="2nd Year">2nd Year</option>
@@ -426,7 +426,7 @@ const AddStudentModal = ({ isOpen, onClose }) => {
                   <i
                     className="bi bi-diagram-2"
                     style={{ marginRight: "4px" }}
-                  />{" "}
+                  />
                   Section <RequiredMark />
                 </label>
                 <input
@@ -450,7 +450,7 @@ const AddStudentModal = ({ isOpen, onClose }) => {
                   <i
                     className="bi bi-envelope"
                     style={{ marginRight: "4px" }}
-                  />{" "}
+                  />
                   Email <RequiredMark />
                 </label>
                 <input
@@ -471,24 +471,21 @@ const AddStudentModal = ({ isOpen, onClose }) => {
           <AppButton
             variant="secondary"
             onClick={onClose}
-            disabled={isSubmitting}
-          >
-            <i className="bi bi-x-circle" style={{ marginRight: "6px" }} />{" "}
+            disabled={isSubmitting}>
+            <i className="bi bi-x-circle" style={{ marginRight: "6px" }} />
             Cancel
           </AppButton>
 
           <AppButton
             variant="primary"
             onClick={handleInitialSubmit}
-            disabled={isSubmitting}
-          >
-            <i className="bi bi-check2-circle" style={{ marginRight: "6px" }} />{" "}
+            disabled={isSubmitting}>
+            <i className="bi bi-check2-circle" style={{ marginRight: "6px" }} />
             Save Student
           </AppButton>
         </div>
       </AppModal>
 
-      {/* Confirmation Modal */}
       <ConfirmModal
         isOpen={isConfirmOpen}
         onClose={() => setIsConfirmOpen(false)}
@@ -498,7 +495,6 @@ const AddStudentModal = ({ isOpen, onClose }) => {
         isProcessing={isSubmitting}
       />
 
-      {/* Error Modal */}
       <ErrorModal
         isOpen={isErrorOpen}
         onClose={() => setIsErrorOpen(false)}
