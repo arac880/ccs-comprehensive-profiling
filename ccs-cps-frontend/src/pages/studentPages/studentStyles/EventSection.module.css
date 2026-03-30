@@ -1,4 +1,3 @@
-
 @import url("https://fonts.googleapis.com/css2?family=Afacad:wght@400;500;600;700&family=Freeman&display=swap");
 
 /* ── Section header ── */
@@ -32,12 +31,11 @@
 
 /* ── Individual event item ── */
 .eventItem {
-  background-color: #fff8f5;
-  border: 1.5px solid #f0d8cc;
+  background-color: #fde6dc;
+  border: 1.5px solid #f4b9a2;
   border-radius: 10px;
   padding: 14px 16px;
   margin-bottom: 14px;
-  position: relative;
 }
 
 .eventItem:last-child {
@@ -56,17 +54,17 @@
 
 .eventTitle {
   font-family: "Afacad", sans-serif;
-  font-size: clamp(0.9rem, 1.4vw, 1.02rem);
+  font-size: clamp(1rem, 1.6vw, 1.15rem);
   font-weight: 700;
-  color: #2a1a0a;
+  color: #802d00;
   margin: 0;
   line-height: 1.3;
 }
 
 .eventMeta {
   font-family: "Afacad", sans-serif;
-  font-size: clamp(0.6rem, 0.9vw, 0.7rem);
-  color: #e65100;
+  font-size: clamp(0.8rem, 1.1vw, 0.9rem);
+  color: #802d00;
   white-space: nowrap;
   opacity: 0.8;
   flex-shrink: 0;
@@ -75,63 +73,93 @@
 /* ── Event body text ── */
 .eventBody {
   font-family: "Afacad", sans-serif;
-  font-size: clamp(0.75rem, 1.1vw, 0.85rem);
-  color: #666666;
+  font-size: clamp(0.85rem, 1.2vw, 0.95rem);
+  color: #070707;
   line-height: 1.65;
   margin: 0 0 14px;
+  white-space: pre-line;
 }
 
-/* ── PDF attachment pill ── */
-.attachmentPill {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background-color: #fff3ee;
-  border: 1.5px solid #f5c4aa;
-  border-radius: 8px;
-  padding: 5px 14px;
+/* ── PDF button wrapper — overrides AppButton styles ── */
+.pdfButtonWrap button {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  background-color: transparent !important;
+  color: #e65100 !important;
+  font-family: "Afacad", sans-serif !important;
+  font-size: clamp(0.85rem, 1.2vw, 0.95rem) !important;
+  font-weight: 600 !important;
+  padding: 8px 18px !important;
+  border: 2px solid #e65100;
+  border-radius: 6px !important;
+  cursor: pointer !important;
+  transition:
+    background-color 0.15s,
+    transform 0.1s !important;
+}
+
+.pdfButtonWrap button:hover {
+  background-color: #bf360c !important;
+  color: #fff !important;
+  transform: translateY(-1px) !important;
+}
+
+.pdfButtonWrap button:active {
+  transform: translateY(0) !important;
+}
+
+/* ── Empty state ── */
+.emptyState {
+  text-align: center;
+  padding: 32px 0;
   font-family: "Afacad", sans-serif;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: #e65100;
-  cursor: pointer;
-  text-decoration: none;
-  transition: background-color 0.15s;
+  font-size: 0.95rem;
+  color: #aaa;
 }
 
-.attachmentPill:hover {
-  background-color: #ffe0cc;
-  color: #e65100;
-}
-
-.attachmentIcon {
-  font-size: 0.85rem;
-}
-
-/* ── Show More button ── */
+/* ── Show More wrapper — overrides AppButton styles ── */
 .showMoreWrap {
   display: flex;
   justify-content: center;
   margin-top: 18px;
 }
 
-.showMoreBtn {
-  font-family: "Afacad", sans-serif;
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  color: #e65100;
-  background-color: transparent;
-  border: 2px solid #e65100;
-  border-radius: 999px;
-  padding: 7px 32px;
-  cursor: pointer;
+.showMoreWrap button {
+  background-color: #e65100 !important;
+  color: #ffffff !important;
+  font-family: "Afacad", sans-serif !important;
+  font-size: clamp(0.85rem, 1.2vw, 0.95rem) !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.08em !important;
+  padding: 10px 36px !important;
+  border: 2px solid #e65100 !important;
+  border-radius: 6px !important;
+  cursor: pointer !important;
   transition:
     background-color 0.15s,
-    color 0.15s;
+    color 0.15s,
+    transform 0.1s !important;
 }
 
-.showMoreBtn:hover {
-  background-color: #e65100;
-  color: #ffffff;
+.showMoreWrap button:hover {
+  background-color: #bf360c !important;
+  border-color: #bf360c !important;
+  transform: translateY(-1px) !important;
+}
+
+.showMoreWrap button:active {
+  transform: translateY(0) !important;
+}
+
+.eventDate {
+  font-family: "Afacad", sans-serif;
+  font-size: clamp(0.8rem, 1.1vw, 0.9rem);
+  color: #802d00;
+  margin: -6px 0 10px;
+  font-weight: 600;
+}
+
+.eventStatus {
+  color: #e65100;
 }

@@ -1,0 +1,135 @@
+@import url("https://fonts.googleapis.com/css2?family=Afacad:wght@400;500;600;700&display=swap");
+
+/* ── Page root ── */
+.pageRoot {
+  display: flex;
+  min-height: 100vh;
+  background-color: #f5ece6;
+  font-family: "Afacad", sans-serif;
+}
+
+/* ── Sidebar area ── */
+.sidebarArea {
+  flex-shrink: 0;
+}
+
+/* ── Main column ── */
+.mainCol {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 100vh;
+}
+
+/* ── Scrollable area below topbar ── */
+.scrollArea {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding: clamp(14px, 2vw, 22px) clamp(14px, 2.4vw, 24px);
+  gap: clamp(12px, 1.6vw, 18px);
+}
+
+/* ── Content row: events + right panel ── */
+.contentRow {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: clamp(12px, 1.6vw, 18px);
+  align-items: stretch;
+  flex: 1;
+}
+
+/* ── Events column ── */
+.eventsCol {
+  min-width: 0;
+}
+
+/* ── Events card ── */
+.eventsCard {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: clamp(14px, 2vw, 20px);
+  box-shadow: 0 2px 12px rgba(230, 81, 0, 0.05);
+}
+
+/* ── Card header: TitlePages left, controls right ── */
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+/* ── Filter + Search grouped right ── */
+.cardControls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* ── Right column: matches dashboard's 280px + gap ── */
+.rightCol {
+  width: 280px;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(12px, 1.6vw, 18px); /* same gap as dashboard bottomRow */
+  height:100%;
+}
+
+.ccsLinksFixed {
+  height: 60%;
+  display: flex;
+}
+
+.ccsLinksFixed > * {
+  width: 100%;
+}
+
+/* ══ RESPONSIVE ══════════════════════════════════════ */
+
+/* lg — stack to single column */
+@media (max-width: 991.98px) {
+  .contentRow {
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+  .rightCol {
+    width: 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  .rightCol > * {
+    flex: 1;
+    min-width: 240px;
+  }
+}
+
+/* md */
+@media (max-width: 767.98px) {
+  .scrollArea {
+    padding: 14px;
+  }
+  .cardHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .cardControls {
+    width: 100%;
+  }
+}
+
+/* sm */
+@media (max-width: 575.98px) {
+  .contentRow,
+  .rightCol {
+    gap: 10px;
+  }
+  .rightCol {
+    flex-direction: column;
+  }
+}

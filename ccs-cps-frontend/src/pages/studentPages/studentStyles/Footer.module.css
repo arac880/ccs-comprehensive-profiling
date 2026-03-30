@@ -1,0 +1,110 @@
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #e65100;
+  color: #ffffff;
+  
+  height: 52px; 
+  padding: 0 32px;
+  width: 100%;
+  box-sizing: border-box;
+  flex-shrink: 0;
+
+  font-family: 'Inter', 'Google Sans', system-ui, sans-serif;
+  box-shadow: 0 -2px 10px rgba(230, 81, 0, 0.15); 
+  z-index: 10;
+}
+
+.left {
+  display: flex;
+  align-items: center;
+}
+
+.sysName {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
+}
+
+.bold {
+  font-weight: 800;
+  font-size: 1.05rem;
+  letter-spacing: 0.05em;
+}
+
+.sep {
+  opacity: 0.5;
+  font-size: 0.9rem;
+  font-weight: 300;
+  user-select: none;
+}
+
+.thin {
+  font-weight: 500;
+  font-size: 0.95rem;
+  opacity: 0.95;
+  letter-spacing: 0.02em;
+}
+
+.version {
+  font-size: 0.7rem;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 99px; 
+  padding: 2px 10px;
+  letter-spacing: 0.05em;
+  margin-left: 4px;
+}
+
+.right {
+  display: flex;
+  align-items: center;
+}
+
+.copyright {
+  font-weight: 500;
+  font-size: 0.85rem;
+  letter-spacing: 0.03em;
+  opacity: 0.9;
+}
+
+/* ── Responsive Behavior ────────────────────────────────── */
+
+/* md: Tablets & Smaller Desktop */
+@media (max-width: 992px) {
+  .footer {
+    padding: 0 24px;
+  }
+}
+
+/* sm: Large Phones */
+@media (max-width: 768px) {
+  .footer {
+    padding: 0 16px;
+    height: 48px;
+  }
+  
+  /* Hide the long text to save space, keep "CCS | v1.0" */
+  .thin,
+  .sep {
+    display: none;
+  }
+  
+  .copyright {
+    font-size: 0.75rem;
+  }
+}
+
+/* xs: Small Phones */
+@media (max-width: 480px) {
+  .version {
+    display: none;
+  }
+  
+  .copyright {
+    letter-spacing: 0;
+  }
+}
