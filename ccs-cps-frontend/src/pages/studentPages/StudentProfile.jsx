@@ -488,11 +488,10 @@ const NON_ACADEMIC = [
 
 const VIOLATIONS = [
   {
-    offense: "Dress Code Violation",
-    date: "September 14, 2023",
-    severity: "Minor",
-    status: "Resolved",
+    offense: "Late Submission",
+    date: "March 10, 2026",
     sanction: "Verbal Warning",
+    warningLevel: "1st Warning",
   },
 ];
 

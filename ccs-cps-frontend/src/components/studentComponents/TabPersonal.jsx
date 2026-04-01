@@ -1,7 +1,6 @@
 // components/studentComponents/TabPersonal.jsx
-import { useState } from "react";
 import styles from "../../pages/studentPages/studentStyles/Tab.module.css";
-import { FiEdit2 } from "react-icons/fi";
+import EditButton from "../../components/ui/EditButton";
 
 function Field({ label, value }) {
   return (
@@ -12,27 +11,33 @@ function Field({ label, value }) {
   );
 }
 
-function SectionBlock({ title, children }) {
+function SectionBlock({ title, children, action }) {
   return (
     <div className={styles.section}>
-      <div className={styles.sectionTitle}>{title}</div>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <div className={styles.sectionTitle}>{title}</div>
+        {action && <div>{action}</div>}
+      </div>
+
       <div className={styles.infoGrid}>{children}</div>
     </div>
   );
 }
-
 export default function TabPersonal({ student }) {
   return (
     <div>
-      {/* ── Single Edit button for the entire Personal Information tab ── */}
-      <div className={styles.tabTopBar}>
-        <button className={styles.editBtn} title="Edit Personal Information">
-          <FiEdit2 size={13} />
-          <span>Edit</span>
-        </button>
-      </div>
-
-      <SectionBlock title="Basic Information">
+      <SectionBlock
+        title="Basic Information"
+        action={
+          <EditButton iconOnly onClick={() => console.log("Edit clicked")} />
+        }
+      >
         <Field label="First Name" value={student.firstName} />
         <Field label="Middle Initial" value={student.middleInitial} />
         <Field label="Last Name" value={student.lastName} />

@@ -3,10 +3,21 @@ import { useState } from "react";
 import styles from "../../pages/studentPages/studentStyles/Tab.module.css";
 
 function gradeClass(g) {
+  if (!g) return "";
+
+  const str = String(g).toUpperCase();
+
+  // Handle non-numeric grades
+  if (["INC", "IP"].includes(str)) return styles.gradeMid;
+  if (["OD", "UD"].includes(str)) return styles.gradeLow;
+
   const n = parseFloat(g);
-  if (n <= 1.5) return styles.gradeHigh;
-  if (n <= 2.0) return styles.gradeMid;
-  return styles.gradeLow;
+
+  if (n <= 1.5) return styles.gradeHigh; // Excellent
+  if (n <= 2.25) return styles.gradeMid; // Good / Passing
+  if (n <= 3.0) return styles.gradeLow; // Barely Passing
+
+  return styles.gradeLow; // 5.00 or invalid
 }
 
 function SemBlock({ sem }) {
@@ -168,35 +179,57 @@ export default function TabAcademic({ history }) {
         <div
           style={{
             display: "flex",
-            gap: "1rem",
-            flexWrap: "wrap",
+            flexDirection: "column",
+            gap: "0.4rem",
             marginBottom: "1.25rem",
-            padding: "0.6rem 0.9rem",
+            padding: "0.7rem 1rem",
             background: "#f9fafb",
             borderRadius: "8px",
             border: "1px solid #e5e7eb",
+            fontSize: "0.7rem",
           }}
         >
-          <span
-            style={{ fontSize: "0.7rem", color: "#6b7280", fontWeight: 600 }}
-          >
-            Grade Guide:
-          </span>
-          <span style={{ fontSize: "0.7rem" }}>
-            <span style={{ color: "#16a34a", fontWeight: 700 }}>1.00–1.50</span>{" "}
-            Excellent
-          </span>
-          <span style={{ fontSize: "0.7rem" }}>
-            <span style={{ color: "#374151", fontWeight: 700 }}>1.51–2.00</span>{" "}
-            Good
-          </span>
-          <span style={{ fontSize: "0.7rem" }}>
-            <span style={{ color: "#dc2626", fontWeight: 700 }}>2.01+</span>{" "}
-            Average
-          </span>
-          <span style={{ fontSize: "0.7rem", color: "#6b7280" }}>
-            · Click ▲/▼ to expand/collapse each semester
-          </span>
+          <div style={{ fontWeight: 700, color: "#374151" }}>
+            Grading System:
+          </div>
+
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "0.8rem" }}>
+            <span>
+              <b>1.00</b> (96–100)
+            </span>
+            <span>
+              <b>1.25</b> (92–95)
+            </span>
+            <span>
+              <b>1.50</b> (88–91)
+            </span>
+            <span>
+              <b>1.75</b> (84–87)
+            </span>
+            <span>
+              <b>2.00</b> (80–83)
+            </span>
+            <span>
+              <b>2.25</b> (75–79)
+            </span>
+            <span>
+              <b>2.50</b> (70–74)
+            </span>
+            <span>
+              <b>2.75</b> (65–69)
+            </span>
+            <span>
+              <b>3.00</b> (60–64)
+            </span>
+            <span>
+              <b>5.00</b> (0–59)
+            </span>
+          </div>
+
+          <div style={{ marginTop: "0.3rem", color: "#6b7280" }}>
+            INC – Incomplete · IP – In Progress · OD – Officially Dropped · UD –
+            Unofficially Dropped
+          </div>
         </div>
 
         {history.map((sem, idx) => (

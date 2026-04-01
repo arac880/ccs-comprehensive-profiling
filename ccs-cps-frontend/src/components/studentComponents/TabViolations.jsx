@@ -1,17 +1,5 @@
-// components/studentComponents/TabViolations.jsx
 import styles from "../../pages/studentPages/studentStyles/Tab.module.css";
 import { FiAlertTriangle, FiCheckCircle } from "react-icons/fi";
-
-const SEV_BADGE = {
-  Minor: `${styles.badge} ${styles.badgeAmber}`,
-  Moderate: `${styles.badge} ${styles.badgeOrange}`,
-  Major: `${styles.badge} ${styles.badgeRed}`,
-};
-
-const STATUS_BADGE = {
-  Resolved: `${styles.badge} ${styles.badgeGreen}`,
-  Pending: `${styles.badge} ${styles.badgeAmber}`,
-};
 
 export default function TabViolations({ violations }) {
   return (
@@ -32,30 +20,15 @@ export default function TabViolations({ violations }) {
                 <div>
                   <div className={styles.violTitle}>{v.offense}</div>
                   <div className={styles.violDate}>{v.date}</div>
+
+                  {/* ✅ Updated Sanction Display */}
                   {v.sanction && (
                     <div className={styles.violSanction}>
                       Sanction: {v.sanction}
+                      {v.warningLevel && ` (${v.warningLevel})`}
                     </div>
                   )}
                 </div>
-              </div>
-              <div className={styles.violRight}>
-                <span
-                  className={
-                    SEV_BADGE[v.severity] ||
-                    `${styles.badge} ${styles.badgeOrange}`
-                  }
-                >
-                  {v.severity}
-                </span>
-                <span
-                  className={
-                    STATUS_BADGE[v.status] ||
-                    `${styles.badge} ${styles.badgeGreen}`
-                  }
-                >
-                  {v.status}
-                </span>
               </div>
             </div>
           ))

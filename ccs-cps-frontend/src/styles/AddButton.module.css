@@ -1,0 +1,31 @@
+/* AddButton styles */
+.addBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background-color: transparent;
+  border: 1px solid #fff; /* amber/orange border */
+  border-radius: 4px;
+  padding: 0.3rem 0.6rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  background-color: #e65100; /* orange text */
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: white;
+}
+
+.addBtn:hover {
+  background-color: white;
+  color: #e65100;
+  border: 1px solid #e65100;
+}
+
+.addBtn span {
+  color: white; /* orange text specifically for the label */
+  font-weight: 500;
+}
+
+.addBtn:hover span {
+  color: #e65100;
+}

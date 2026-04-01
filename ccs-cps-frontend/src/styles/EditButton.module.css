@@ -1,0 +1,40 @@
+.editBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+
+  padding: 0.35rem 0.65rem;
+  font-size: 0.7rem;
+  font-weight: 500;
+
+  background: #ffffff;
+
+  /* 🔥 ORANGE BORDER */
+  border: 1px solid #fb923c; /* light orange */
+  border-radius: 6px;
+
+  color: #ea580c; /* orange text */
+
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+/* Hover effect */
+.editBtn:hover {
+  background: #fff7ed; /* soft orange bg */
+  border-color: #f97316; /* stronger orange */
+  color: #c2410c; /* darker orange text */
+}
+
+/* Icon style */
+.icon {
+  display: flex;
+}
+
+/* Icon-only version */
+.iconOnly {
+  padding: 0.35rem;
+  width: 28px;
+  height: 28px;
+  justify-content: center;
+}

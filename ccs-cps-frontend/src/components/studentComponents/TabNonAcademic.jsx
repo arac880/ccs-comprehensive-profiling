@@ -1,12 +1,13 @@
 // components/studentComponents/TabNonAcademic.jsx
 import styles from "../../pages/studentPages/studentStyles/Tab.module.css";
-import { FiStar, FiEdit2, FiPlus } from "react-icons/fi";
+import AddButton from "../../components/ui/AddButton";
+import EditButton from "../../components/ui/EditButton";
 
 const CAT_COLOR = {
   Competition: `${styles.badge} ${styles.badgeOrange}`,
-  Event:       `${styles.badge} ${styles.badgeBlue}`,
-  Seminar:     `${styles.badge} ${styles.badgeGreen}`,
-  Workshop:    `${styles.badge} ${styles.badgeAmber}`,
+  Event: `${styles.badge} ${styles.badgeBlue}`,
+  Seminar: `${styles.badge} ${styles.badgeGreen}`,
+  Workshop: `${styles.badge} ${styles.badgeAmber}`,
 };
 
 export default function TabNonAcademic({ activities }) {
@@ -14,12 +15,11 @@ export default function TabNonAcademic({ activities }) {
     <div>
       <div className={styles.section}>
         <div className={styles.sectionHeader}>
-          <div className={styles.sectionTitle}>Activities &amp; Recognitions</div>
+          <div className={styles.sectionTitle}>
+            Activities &amp; Recognitions
+          </div>
           <div className={styles.headerActions}>
-            <button className={styles.addBtn} title="Add Activity">
-              <FiPlus size={13} />
-              <span>Add</span>
-            </button>
+            <AddButton onClick={() => console.log("Add activity")} />
           </div>
         </div>
 
@@ -32,25 +32,41 @@ export default function TabNonAcademic({ activities }) {
                 <div className={styles.cardHeader}>
                   <div className={styles.cardTitle}>{act.title}</div>
                   <div className={styles.cardActions}>
-                    <button className={styles.iconBtn} title="Edit">
-                      <FiEdit2 size={13} />
-                    </button>
+                    <EditButton
+                      iconOnly
+                      onClick={() => console.log("Edit activity:", act)}
+                    />
                   </div>
                 </div>
 
                 <div className={styles.cardMeta}>
-                  <span className={CAT_COLOR[act.category] || `${styles.badge} ${styles.badgeBlue}`}>
+                  <span
+                    className={
+                      CAT_COLOR[act.category] ||
+                      `${styles.badge} ${styles.badgeBlue}`
+                    }
+                  >
                     {act.category}
                   </span>
                   <span className={styles.cardMetaYear}>{act.year}</span>
                 </div>
 
                 <div className={styles.badgeRow}>
-                  {act.role && <span className={`${styles.badge} ${styles.badgeOrange}`}>{act.role}</span>}
-                  {act.placement && <span className={`${styles.badge} ${styles.badgeAmber}`}>🏆 {act.placement}</span>}
+                  {act.role && (
+                    <span className={`${styles.badge} ${styles.badgeOrange}`}>
+                      {act.role}
+                    </span>
+                  )}
+                  {act.placement && (
+                    <span className={`${styles.badge} ${styles.badgeAmber}`}>
+                      🏆 {act.placement}
+                    </span>
+                  )}
                 </div>
 
-                {act.description && <p className={styles.cardDesc}>{act.description}</p>}
+                {act.description && (
+                  <p className={styles.cardDesc}>{act.description}</p>
+                )}
               </div>
             ))}
           </div>
