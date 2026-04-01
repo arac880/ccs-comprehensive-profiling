@@ -6,7 +6,7 @@ import Footer from "../../components/studentComponents/Footer";
 import SearchBar from "../../components/ui/SearchBar";
 import TitlePages from "../../components/ui/TitlePages";
 import ResearchCard from "../../components/studentComponents/ResearchCard";
-import styles from "./studentStyles/collegeResearch.module.css";
+import styles from "./studentStyles/CollegeResearch.module.css";
 import { FaSearch } from "react-icons/fa";
 import { PiBookOpenTextFill } from "react-icons/pi";
 

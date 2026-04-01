@@ -6,8 +6,8 @@ import SideBarNav from "../../components/studentComponents/SideBarNav";
 import TopBarNav from "../../components/studentComponents/TopBarNav";
 
 // CSS Imports
-import layoutStyles from "./studentStyles/dashboard.module.css";
-import schedStyles from "./studentStyles/schedule.module.css";
+import layoutStyles from "./studentStyles/Dashboard.module.css";
+import schedStyles from "./studentStyles/Schedule.module.css";
 import Footer from "../../components/studentComponents/Footer";
 
 const MOBILE_BREAKPOINT = 992;

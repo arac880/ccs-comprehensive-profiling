@@ -9,7 +9,7 @@ import CalendarWidget from "../../components/ui/CalendarWidget";
 import CCSLinks from "../../components/studentComponents/CcsLinks";
 import TitlePages from "../../components/ui/TitlePages";
 import Footer from "../../components/studentComponents/Footer";
-import styles from "./studentStyles/dashboard.module.css";
+import styles from "./studentStyles/Dashboard.module.css";
 import { FaCalendarAlt } from "react-icons/fa";
 
 const MOBILE_BREAKPOINT = 992;

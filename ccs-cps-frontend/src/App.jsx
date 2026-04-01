@@ -12,14 +12,15 @@ import FacultyDashboard from "./pages/facultyPages/facultyDashboard";
 import FacultyStudentList from "./pages/facultyPages/FacultyStudentList";
 import FacultySchedule from "./pages/facultyPages/facultySchedule";
 import FacultyEvents from "./pages/facultyPages/facultyEvents";
-import StudentProfile from "./pages/facultyPages/StudentProfile";
+import FacultyStudentProfile from "./pages/facultyPages/StudentProfile";
 
 // Student pages
-import StudentDashboard from "./pages/studentPages/studentDashboard";
-import StudentSchedule from "./pages/studentPages/studentSchedule";
-import StudentEvents from "./pages/studentPages/studentEvents";
-import StudentClearance from "./pages/studentPages/studentClearance";
-import CollegeResearch from "./pages/studentPages/collegeResearch";
+import StudentDashboard from "./pages/studentPages/StudentDashboard";
+import StudentSchedule from "./pages/studentPages/StudentSchedule";
+import StudentEvents from "./pages/studentPages/StudentEvents";
+import StudentClearance from "./pages/studentPages/StudentClearance";
+import CollegeResearch from "./pages/studentPages/CollegeResearch";
+import StudentProfile from "./pages/studentPages/StudentProfile";
 
 function App() {
   return (
@@ -33,17 +34,21 @@ function App() {
         <Route path="/faculty/student-list" element={<FacultyStudentList />} />
         <Route path="/faculty/schedule" element={<FacultySchedule />} />
         <Route path="/faculty/events" element={<FacultyEvents />} />
-        <Route path="/faculty/student/:id" element={<StudentProfile />} />
-
+        <Route
+          path="/faculty/student/:id"
+          element={<FacultyStudentProfile />}
+        />
 
         {/* Student */}
         <Route path="/student/dashboard" element={<StudentDashboard />} />
         <Route path="/student/schedule" element={<StudentSchedule />} />
-
-        {/* Fallback → login */}
         <Route path="/student/events" element={<StudentEvents />} />
         <Route path="/student/clearance" element={<StudentClearance />} />
         <Route path="/student/research" element={<CollegeResearch />} />
+        <Route path="/student/profile" element={<StudentProfile />} />
+
+        {/* Fallback → login */}
+
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </Router>
