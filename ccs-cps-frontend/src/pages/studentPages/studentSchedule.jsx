@@ -6,8 +6,8 @@ import SideBarNav from "../../components/studentComponents/SideBarNav";
 import TopBarNav from "../../components/studentComponents/TopBarNav";
 
 // CSS Imports
-import layoutStyles from "./studentStyles/Dashboard.module.css";
-import schedStyles from "./studentStyles/Schedule.module.css";
+import layoutStyles from "./studentStyles/dashboard.module.css";
+import schedStyles from "./studentStyles/schedule.module.css";
 import Footer from "../../components/studentComponents/Footer";
 
 const MOBILE_BREAKPOINT = 992;
@@ -127,7 +127,8 @@ export default function StudentSchedule() {
               stroke="white"
               strokeWidth="2"
               strokeLinecap="round"
-              strokeLinejoin="round">
+              strokeLinejoin="round"
+            >
               <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
               <line x1="16" y1="2" x2="16" y2="6"></line>
               <line x1="8" y1="2" x2="8" y2="6"></line>
@@ -184,7 +185,8 @@ export default function StudentSchedule() {
                 {timeSlots.slice(0, 12).map((_, idx) => (
                   <div
                     key={`am-grid-${idx}`}
-                    className={schedStyles.gridLine}></div>
+                    className={schedStyles.gridLine}
+                  ></div>
                 ))}
 
                 {/* AFTERNOON GRID LINES */}
@@ -192,7 +194,8 @@ export default function StudentSchedule() {
                 {timeSlots.slice(12, 30).map((_, idx) => (
                   <div
                     key={`pm-grid-${idx}`}
-                    className={schedStyles.gridLine}></div>
+                    className={schedStyles.gridLine}
+                  ></div>
                 ))}
 
                 {/* Class Cards */}
@@ -212,7 +215,8 @@ export default function StudentSchedule() {
                           top: styleProps.top,
                           height: styleProps.height,
                           backgroundColor: cls.color,
-                        }}>
+                        }}
+                      >
                         <div className={schedStyles.cardTop}>
                           <span className={schedStyles.courseCode}>
                             {cls.course}

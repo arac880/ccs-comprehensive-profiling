@@ -4,7 +4,7 @@ import SideNavbar from "../../components/facultyComponents/SideNavbar";
 import TopNavbar from "../../components/facultyComponents/TopNavbar";
 import AppButton from "../../components/ui/AppButton";
 import AppToast from "../../components/ui/AppToast";
-import styles from "./facultyStyles/studentProfile.module.css";
+import styles from "./facultyStyles/StudentProfile.module.css";
 
 /* ── Helpers ── */
 const STATUS_CLASS = { Regular: "badgeActive", Irregular: "badgeAtRisk" };
@@ -145,11 +145,11 @@ const StudentProfile = () => {
   /* ═══════════ RENDER ═══════════ */
   return (
     <div className={styles.pageRoot}>
-        <AppToast 
-        isVisible={toast.visible} 
-        message={toast.message} 
-        type={toast.type} 
-        onClose={() => setToast({ ...toast, visible: false })} 
+      <AppToast
+        isVisible={toast.visible}
+        message={toast.message}
+        type={toast.type}
+        onClose={() => setToast({ ...toast, visible: false })}
       />
       <SideNavbar activeNav="StudentList" onNavigate={() => {}} />
 
@@ -161,7 +161,8 @@ const StudentProfile = () => {
           <div className={styles.pageHeader}>
             <button
               className={styles.backBtn}
-              onClick={() => navigate("/faculty/student-list")}>
+              onClick={() => navigate("/faculty/student-list")}
+            >
               <i className="bi bi-arrow-left" /> Back to Student List
             </button>
 
@@ -172,7 +173,8 @@ const StudentProfile = () => {
                 {!isEditing && (
                   <AppButton
                     variant="primary"
-                    onClick={() => setIsEditing(true)}>
+                    onClick={() => setIsEditing(true)}
+                  >
                     <i
                       className="bi bi-pencil-fill"
                       style={{ marginRight: "6px" }}
@@ -202,7 +204,8 @@ const StudentProfile = () => {
               <p>{error}</p>
               <AppButton
                 variant="secondary"
-                onClick={() => navigate("/faculty/student-list")}>
+                onClick={() => navigate("/faculty/student-list")}
+              >
                 Return to Student List
               </AppButton>
             </div>
@@ -254,13 +257,15 @@ const StudentProfile = () => {
                       outline: "none",
                       minWidth: "100px",
                       flexShrink: 0,
-                    }}>
+                    }}
+                  >
                     <option value="Regular">Regular</option>
                     <option value="Irregular">Irregular</option>
                   </select>
                 ) : (
                   <span
-                    className={`${styles.badge} ${styles[STATUS_CLASS[student.status] || "badgeActive"]}`}>
+                    className={`${styles.badge} ${styles[STATUS_CLASS[student.status] || "badgeActive"]}`}
+                  >
                     {student.status || "Regular"}
                   </span>
                 )}
@@ -275,7 +280,8 @@ const StudentProfile = () => {
                     <div
                       key={tab.key}
                       className={`${styles.tabItem} ${activeTab === tab.key ? styles.tabItemActive : ""}`}
-                      onClick={() => setActiveTab(tab.key)}>
+                      onClick={() => setActiveTab(tab.key)}
+                    >
                       <i className={`bi ${tab.icon}`} />
                       {tab.label}
                     </div>
@@ -297,7 +303,8 @@ const StudentProfile = () => {
                           fontSize: "12px",
                           color: "#e65100",
                           fontWeight: 600,
-                        }}>
+                        }}
+                      >
                         <i
                           className="bi bi-pencil-fill"
                           style={{ marginRight: 4 }}
@@ -370,7 +377,8 @@ const StudentProfile = () => {
                               <select
                                 name="gender"
                                 value={editData.gender || ""}
-                                onChange={handleChange}>
+                                onChange={handleChange}
+                              >
                                 <option value="">Select Gender</option>
                                 <option value="Male">Male</option>
                                 <option value="Female">Female</option>
@@ -378,7 +386,8 @@ const StudentProfile = () => {
                               </select>
                             </div>
                             <div
-                              className={`${styles.formGroup} ${styles.fullWidth}`}>
+                              className={`${styles.formGroup} ${styles.fullWidth}`}
+                            >
                               <label>Address</label>
                               <input
                                 name="address"
@@ -419,7 +428,8 @@ const StudentProfile = () => {
                               <select
                                 name="program"
                                 value={editData.program || ""}
-                                onChange={handleChange}>
+                                onChange={handleChange}
+                              >
                                 <option value="">Select Program</option>
                                 <option value="BS Computer Science">
                                   BS Computer Science
@@ -434,7 +444,8 @@ const StudentProfile = () => {
                               <select
                                 name="year"
                                 value={editData.year || ""}
-                                onChange={handleChange}>
+                                onChange={handleChange}
+                              >
                                 <option value="">Select Year</option>
                                 <option value="1st Year">1st Year</option>
                                 <option value="2nd Year">2nd Year</option>
@@ -488,7 +499,8 @@ const StudentProfile = () => {
                       <AppButton
                         variant="secondary"
                         onClick={handleCancel}
-                        disabled={isSaving}>
+                        disabled={isSaving}
+                      >
                         <i
                           className="bi bi-x-circle"
                           style={{ marginRight: "6px" }}
@@ -499,7 +511,8 @@ const StudentProfile = () => {
                         variant="primary"
                         onClick={handleSave}
                         loading={isSaving}
-                        disabled={isSaving}>
+                        disabled={isSaving}
+                      >
                         <i
                           className="bi bi-check2-circle"
                           style={{ marginRight: "6px" }}

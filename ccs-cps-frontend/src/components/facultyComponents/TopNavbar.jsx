@@ -1,5 +1,4 @@
-import "../../pages/facultyPages/facultyStyles/topNavbar.css";
-
+import "../../pages/facultyPages/facultyStyles/TopNavbar.css";
 
 export default function TopBar() {
   return (
