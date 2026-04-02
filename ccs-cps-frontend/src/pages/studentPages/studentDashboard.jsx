@@ -8,7 +8,7 @@ import EventsSection from "../../components/studentComponents/EventSection";
 import CalendarWidget from "../../components/ui/CalendarWidget";
 import CCSLinks from "../../components/studentComponents/CcsLinks";
 import TitlePages from "../../components/ui/TitlePages";
-import Footer from "../../components/studentComponents/Footer";
+import Footer from "../../components/Footer";
 import styles from "./studentStyles/dashboard.module.css";
 import { FaCalendarAlt } from "react-icons/fa";
 

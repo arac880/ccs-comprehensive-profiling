@@ -4,7 +4,7 @@ import SideNavbar from "../../components/facultyComponents/SideNavbar";
 import TopNavbar from "../../components/facultyComponents/TopNavbar";
 import AppButton from "../../components/ui/AppButton";
 import AppToast from "../../components/ui/AppToast";
-import styles from "./facultyStyles/StudentProfile.module.css";
+import styles from "./facultyStyles/studentProfile.module.css";
 
 /* ── Helpers ── */
 const STATUS_CLASS = { Regular: "badgeActive", Irregular: "badgeAtRisk" };

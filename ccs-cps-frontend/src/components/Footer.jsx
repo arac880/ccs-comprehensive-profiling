@@ -1,4 +1,4 @@
-import styles from "../../pages/studentPages/studentStyles/Footer.module.css";
+import styles from "./styles/Footer.module.css";
 
 export default function CCSFooter() {
   const year = new Date().getFullYear();

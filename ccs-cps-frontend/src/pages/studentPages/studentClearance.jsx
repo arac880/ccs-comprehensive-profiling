@@ -18,7 +18,7 @@ import TopBarNav from "../../components/studentComponents/TopBarNav";
 // CSS Imports
 import layoutStyles from "./studentStyles/dashboard.module.css";
 import clearanceStyles from "./studentStyles/Clearance.module.css";
-import Footer from "../../components/studentComponents/Footer";
+import Footer from "../../components/Footer";
 
 const MOBILE_BREAKPOINT = 992;
 
@@ -73,7 +73,8 @@ export default function StudentClearance() {
       {/* Main Status Banner */}
       <span
         className="text-muted fst-italic d-flex justify-content-end mb-2"
-        style={{ fontSize: "0.75rem", fontWeight: "600" }}>
+        style={{ fontSize: "0.75rem", fontWeight: "600" }}
+      >
         NOTE: Updates in any part of the clearance will be reflected in not more
         than 30 minutes.
       </span>
@@ -95,7 +96,8 @@ export default function StudentClearance() {
                   item.isCleared
                     ? clearanceStyles.clearedItem
                     : clearanceStyles.pendingItem
-                }>
+                }
+              >
                 {item.isCleared ? (
                   <MdCheckCircle
                     size={18}
