@@ -11,6 +11,7 @@ import TabNonAcademic from "../../components/studentComponents/TabNonAcademic";
 import TabViolations from "../../components/studentComponents/TabViolations";
 import TabSkills from "../../components/studentComponents/TabSkills";
 import TabAffiliations from "../../components/studentComponents/TabAffiliations";
+import TabSecurity from "../../components/studentComponents/TabSecurity";
 
 import TitlePages from "../../components/ui/TitlePages";
 import { FaUserAlt } from "react-icons/fa";
@@ -58,16 +59,7 @@ const STUDENT = {
   fatherContact: "+63 917 234 5678",
   fatherEmail: "roberto.carinaga@gmail.com",
   fatherEducation: "Bachelor of Science in Civil Engineering",
-  // Mother
-  motherName: "Maria V. Cariñaga",
-  motherOccupation: "Teacher",
-  motherContact: "+63 918 765 4321",
-  motherEmail: "maria.carinaga@email.com",
-  // Father
-  fatherName: "Roberto C. Cariñaga",
-  fatherOccupation: "Engineer",
-  fatherContact: "+63 917 654 3210",
-  fatherEmail: "roberto.carinaga@email.com",
+
   lastPasswordChange: "January 5, 2026",
   twoFAEnabled: false,
 };
@@ -613,6 +605,7 @@ const TABS = [
   { key: "violations", label: "Violations" },
   { key: "skills", label: "Skills" },
   { key: "affiliations", label: "Affiliations" },
+  { key: "security", label: "Account Security" },
 ];
 
 /* ═══════════════════════════════════════════
@@ -635,6 +628,8 @@ export default function StudentProfile() {
         return <TabSkills skills={SKILLS} />;
       case "affiliations":
         return <TabAffiliations affiliations={AFFILIATIONS} />;
+      case "security":
+        return <TabSecurity student={STUDENT} />;
       default:
         return null;
     }
