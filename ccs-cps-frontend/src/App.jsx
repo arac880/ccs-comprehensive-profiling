@@ -15,7 +15,7 @@ import FacultyEvents from "./pages/facultyPages/facultyEvents";
 import FacultyStudentProfile from "./pages/facultyPages/StudentProfile";
 
 // Student pages
-import StudentDashboard from "./pages/studentPages/StudentDashboard";
+import StudentDashboard from "./pages/studentPages/studentDashboard";
 import StudentSchedule from "./pages/studentPages/StudentSchedule";
 import StudentEvents from "./pages/studentPages/StudentEvents";
 import StudentClearance from "./pages/studentPages/StudentClearance";
