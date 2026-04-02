@@ -16,11 +16,11 @@ import FacultyStudentProfile from "./pages/facultyPages/StudentProfile";
 
 // Student pages
 import StudentDashboard from "./pages/studentPages/studentDashboard";
-import StudentSchedule from "./pages/studentPages/StudentSchedule";
-import StudentEvents from "./pages/studentPages/StudentEvents";
-import StudentClearance from "./pages/studentPages/StudentClearance";
-import CollegeResearch from "./pages/studentPages/CollegeResearch";
-import StudentProfile from "./pages/studentPages/StudentProfile";
+import StudentSchedule from "./pages/studentPages/studentSchedule";
+import StudentEvents from "./pages/studentPages/studentEvents";
+import StudentClearance from "./pages/studentPages/studentClearance";
+import CollegeResearch from "./pages/studentPages/collegeResearch";
+import StudentProfile from "./pages/studentPages/studentProfile";
 
 function App() {
   return (
