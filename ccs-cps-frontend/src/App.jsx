@@ -18,9 +18,9 @@ import FacultyStudentProfile from "./pages/facultyPages/StudentProfile";
 import StudentDashboard from "./pages/studentPages/studentDashboard";
 import StudentSchedule from "./pages/studentPages/studentSchedule";
 import StudentEvents from "./pages/studentPages/studentEvents";
-import StudentClearance from "./pages/studentPages/StudentClearance";
+import StudentClearance from "./pages/studentPages/studentClearance";
 import CollegeResearch from "./pages/studentPages/collegeResearch";
-import StudentProfile from "./pages/studentPages/StudentProfile";
+import StudentProfile from "./pages/studentPages/studentProfile";
 
 function App() {
   return (
