@@ -260,7 +260,7 @@ export default function StudentSchedule() {
     <div className={layoutStyles.dashboardWrapper}>
       <SideBarNav activeNav={currentNav} onNavigate={setCurrentNav} />
       <div className={layoutStyles.rightColumn}>
-        <TopBarNav notifCount={3} onSignOut={handleSignOut} />
+        <TopBarNav onSignOut={handleSignOut} />
         <main className={layoutStyles.mainContent}>{scheduleUI}</main>
         <Footer />
       </div>
