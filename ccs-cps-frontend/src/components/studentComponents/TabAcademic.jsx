@@ -38,7 +38,6 @@ function SemBlock({ sem }) {
           gap: "0.75rem",
           flexWrap: "wrap",
           borderBottom: open ? "1px solid #f5dece" : "none",
-          borderRadius: open ? "10px 10px 0 0" : "10px",
         }}
       >
         <div style={{ flex: 1 }}>

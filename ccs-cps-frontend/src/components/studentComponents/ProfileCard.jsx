@@ -2,7 +2,7 @@
 import { useRef, useState } from "react";
 import { FaUserCircle } from "react-icons/fa";
 import EditButton from "../../components/ui/EditButton";
-import styles from "../../pages/studentPages/studentStyles/profileCard.module.css";
+import styles from "../../pages/studentPages/studentStyles/ProfileCard.module.css";
 
 const STATUS_COLOR = {
   Regular: { bg: "#f0fdf4", color: "#16a34a", border: "#bbf7d0" },
