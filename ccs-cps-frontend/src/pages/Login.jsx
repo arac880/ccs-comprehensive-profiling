@@ -56,10 +56,8 @@ export default function Login({ onLoginSuccess, onForgotPassword }) {
   return (
     <div className={styles.page}>
       <div className={styles.card}>
-
         {/* Left panel */}
         <div className={styles.formPanel}>
-
           {/* Branding */}
           <div className={styles.brand}>
             <img
@@ -80,7 +78,9 @@ export default function Login({ onLoginSuccess, onForgotPassword }) {
               label="ID Number"
               autoComplete="email"
               value={form.email}
-              onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
+              onChange={(e) =>
+                setForm((f) => ({ ...f, email: e.target.value }))
+              }
               error={errors.email}
               disabled={isLoading}
             />
@@ -91,7 +91,9 @@ export default function Login({ onLoginSuccess, onForgotPassword }) {
               label="Password"
               autoComplete="current-password"
               value={form.password}
-              onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
+              onChange={(e) =>
+                setForm((f) => ({ ...f, password: e.target.value }))
+              }
               error={errors.password}
               disabled={isLoading}
             />
@@ -142,7 +144,6 @@ export default function Login({ onLoginSuccess, onForgotPassword }) {
           />
           <div className={styles.heroOverlay} />
         </div>
-
       </div>
     </div>
   );
