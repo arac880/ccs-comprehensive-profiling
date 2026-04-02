@@ -20,7 +20,7 @@ import StudentSchedule from "./pages/studentPages/studentSchedule";
 import StudentEvents from "./pages/studentPages/studentEvents";
 import StudentClearance from "./pages/studentPages/studentClearance";
 import CollegeResearch from "./pages/studentPages/collegeResearch";
-import StudentProfile from "./pages/studentPages/studentProfile";
+import StudentProfile from "./pages/studentPages/StudentProfile";
 
 function App() {
   return (
