@@ -7,7 +7,7 @@ import EventSection from "../../components/studentComponents/EventSection";
 import SearchBar from "../../components/ui/SearchBar";
 import FilterDropdown from "../../components/ui/FilterDropdown";
 import TitlePages from "../../components/ui/TitlePages";
-import Footer from "../../components/studentComponents/Footer";
+import Footer from "../../components/Footer";
 import styles from "./studentStyles/event.module.css";
 import { FaCalendarAlt } from "react-icons/fa";
 

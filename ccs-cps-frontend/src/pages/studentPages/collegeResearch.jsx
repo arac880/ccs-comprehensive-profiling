@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import SideBarNav from "../../components/studentComponents/SideBarNav";
 import TopBarNav from "../../components/studentComponents/TopBarNav";
-import Footer from "../../components/studentComponents/Footer";
+import Footer from "../../components/Footer";
 import SearchBar from "../../components/ui/SearchBar";
 import TitlePages from "../../components/ui/TitlePages";
 import ResearchCard from "../../components/studentComponents/ResearchCard";

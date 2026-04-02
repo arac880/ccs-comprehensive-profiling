@@ -18,7 +18,7 @@ import TopBarNav from "../../components/studentComponents/TopBarNav";
 // CSS Imports
 import layoutStyles from "./studentStyles/dashboard.module.css";
 import clearanceStyles from "./studentStyles/Clearance.module.css";
-import Footer from "../../components/studentComponents/Footer";
+import Footer from "../../components/Footer";
 
 const MOBILE_BREAKPOINT = 992;
 

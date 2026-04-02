@@ -2,7 +2,7 @@
 import { useState } from "react";
 import SideNavbar from "../../components/studentComponents/SideBarNav";
 import TopBarNav from "../../components/studentComponents/TopBarNav";
-import Footer from "../../components/studentComponents/Footer";
+import Footer from "../../components/Footer";
 
 import ProfileCard from "../../components/studentComponents/ProfileCard";
 import TabPersonal from "../../components/studentComponents/TabPersonal";
