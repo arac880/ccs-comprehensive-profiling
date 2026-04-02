@@ -1,10 +1,13 @@
 .topbar {
-  background-color: #E65100;
+  background-color: #e65100;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 10px 24px;
   flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  z-index: 99;
 }
 
 .topbar-logo-text {
@@ -53,9 +56,9 @@
 }
 
 .topbar-search button {
-  background-color: #E65100;
+  background-color: #e65100;
   border: none;
-  border-radius: 0; 
+  border-radius: 0;
   height: 100%;
   padding: 0 14px;
   display: flex;

@@ -6,6 +6,7 @@ import {
 } from "react-router-dom";
 
 import Login from "./pages/Login";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 // Faculty pages
 import FacultyDashboard from "./pages/facultyPages/facultyDashboard";
@@ -29,26 +30,99 @@ function App() {
         {/* Auth */}
         <Route path="/login" element={<Login />} />
 
-        {/* Faculty */}
-        <Route path="/faculty/dashboard" element={<FacultyDashboard />} />
-        <Route path="/faculty/student-list" element={<FacultyStudentList />} />
-        <Route path="/faculty/schedule" element={<FacultySchedule />} />
-        <Route path="/faculty/events" element={<FacultyEvents />} />
+        {/* Faculty Routes */}
+        <Route
+          path="/faculty/dashboard"
+          element={
+            <ProtectedRoute allowedRoles={["faculty", "dean"]}>
+              <FacultyDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/faculty/student-list"
+          element={
+            <ProtectedRoute allowedRoles={["faculty", "dean"]}>
+              <FacultyStudentList />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/faculty/schedule"
+          element={
+            <ProtectedRoute allowedRoles={["faculty", "dean"]}>
+              <FacultySchedule />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/faculty/events"
+          element={
+            <ProtectedRoute allowedRoles={["faculty", "dean"]}>
+              <FacultyEvents />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/faculty/student/:id"
-          element={<FacultyStudentProfile />}
+          element={
+            <ProtectedRoute allowedRoles={["faculty", "dean"]}>
+              <FacultyStudentProfile />
+            </ProtectedRoute>
+          }
         />
 
-        {/* Student */}
-        <Route path="/student/dashboard" element={<StudentDashboard />} />
-        <Route path="/student/schedule" element={<StudentSchedule />} />
-        <Route path="/student/events" element={<StudentEvents />} />
-        <Route path="/student/clearance" element={<StudentClearance />} />
-        <Route path="/student/research" element={<CollegeResearch />} />
-        <Route path="/student/profile" element={<StudentProfile />} />
+        {/* Student Routes */}
+        <Route
+          path="/student/dashboard"
+          element={
+            <ProtectedRoute allowedRoles={["student"]}>
+              <StudentDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/student/schedule"
+          element={
+            <ProtectedRoute allowedRoles={["student"]}>
+              <StudentSchedule />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/student/events"
+          element={
+            <ProtectedRoute allowedRoles={["student"]}>
+              <StudentEvents />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/student/clearance"
+          element={
+            <ProtectedRoute allowedRoles={["student"]}>
+              <StudentClearance />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/student/research"
+          element={
+            <ProtectedRoute allowedRoles={["student"]}>
+              <CollegeResearch />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/student/profile"
+          element={
+            <ProtectedRoute allowedRoles={["student"]}>
+              <StudentProfile />
+            </ProtectedRoute>
+          }
+        />
 
-        {/* Fallback → login */}
-
+        {/* Fallback */}
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </Router>

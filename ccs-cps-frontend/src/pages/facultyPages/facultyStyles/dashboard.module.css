@@ -13,6 +13,7 @@
   flex-direction: column;
   flex-grow: 1;
   overflow: hidden;
+  height: 100vh;
 }
 
 .dashboardContent {
@@ -84,13 +85,13 @@
 }
 
 .cardTitle i {
-  color: #E65100;
+  color: #e65100;
   font-size: 16px;
 }
 
 .emptyNotice {
   background-color: #fdf0e8;
-  color: #E65100;
+  color: #e65100;
   text-align: center;
   font-size: 13px;
   padding: 12px;
@@ -102,7 +103,7 @@
   background-color: #fdf0e8;
   border-radius: 6px;
   margin-bottom: 10px;
-  border-left: 3px solid #E65100;
+  border-left: 3px solid #e65100;
 }
 
 .eventBlock:last-child {
@@ -123,7 +124,7 @@
 }
 
 .calendarHeader {
-  background-color: #E65100;
+  background-color: #e65100;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -145,8 +146,12 @@
   color: white;
 }
 
-.dow { font-weight: 700; }
-.moy { opacity: 0.85; }
+.dow {
+  font-weight: 700;
+}
+.moy {
+  opacity: 0.85;
+}
 
 .calendarExpand {
   margin-left: auto;
@@ -173,7 +178,7 @@
 .calendarNavBtn {
   background: none;
   border: none;
-  color: #E65100;
+  color: #e65100;
   cursor: pointer;
   padding: 2px 6px;
   border-radius: 4px;
@@ -224,13 +229,15 @@
   border-radius: 50%;
   cursor: pointer;
   color: #333;
-  transition: background 0.12s, color 0.12s;
+  transition:
+    background 0.12s,
+    color 0.12s;
   user-select: none;
 }
 
 .calendarCell:hover {
   background-color: #fdf0e8;
-  color: #E65100;
+  color: #e65100;
 }
 
 .calendarCellSunday {
@@ -238,7 +245,7 @@
 }
 
 .calendarCellToday {
-  background-color: #E65100 !important;
+  background-color: #e65100 !important;
   color: white !important;
   font-weight: 700;
 }

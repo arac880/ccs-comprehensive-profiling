@@ -3,10 +3,9 @@
    ============================================ */
 :root {
   --card-border: 2px solid #e99e7583;
-  --card-shadow: 5px 8px 32px rgba(0, 0, 0, 0.20);
+  --card-shadow: 5px 8px 32px rgba(0, 0, 0, 0.2);
   --h1-color: #b44f19;
 }
-
 
 /* ── Page wrapper ── */
 .page {
@@ -65,7 +64,7 @@
   color: var(--h1-color);
   margin-bottom: 1.75rem;
   line-height: 1.4;
-  font-family: 'Segoe UI', system-ui, sans-serif;
+  font-family: "Segoe UI", system-ui, sans-serif;
 }
 
 /* Form stack */
@@ -92,8 +91,21 @@
 }
 
 .forgotLink:hover {
-  color: #E65100;
+  color: #e65100;
   text-decoration: underline;
+}
+
+.version {
+  margin-top: 10px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #b44f19;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 99px;
+  padding: 2px 10px;
+  letter-spacing: 0.05em;
+  margin-left: 4px;
 }
 
 /* Server error */

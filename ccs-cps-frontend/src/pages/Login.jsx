@@ -9,28 +9,22 @@ import ccsHero from "../assets/CCS_CPS_Login_Picture.png";
 
 export default function Login({ onLoginSuccess, onForgotPassword }) {
   const navigate = useNavigate();
-  const [form, setForm] = useState({ email: "", password: "" });
-  const [errors, setErrors] = useState({ email: "", password: "" });
+  const [form, setForm] = useState({ id: "", password: "" });
+  const [errors, setErrors] = useState({ id: "", password: "" });
   const [isLoading, setIsLoading] = useState(false);
   const [serverError, setServerError] = useState("");
 
   function validate() {
-    const newErrors = { email: "", password: "" };
+    const newErrors = { id: "", password: "" };
     let valid = true;
 
-    if (!form.email.trim()) {
-      newErrors.email = "Email address is required.";
-      valid = false;
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
-      newErrors.email = "Please enter a valid email address.";
+    if (!form.id.trim()) {
+      newErrors.id = "ID Number is required.";
       valid = false;
     }
 
     if (!form.password) {
       newErrors.password = "Password is required.";
-      valid = false;
-    } else if (form.password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters.";
       valid = false;
     }
 
@@ -41,13 +35,41 @@ export default function Login({ onLoginSuccess, onForgotPassword }) {
   async function handleLogin(e) {
     e.preventDefault();
     setServerError("");
+
+    if (!validate()) return;
+
     setIsLoading(true);
     try {
-      await new Promise((r) => setTimeout(r, 1500));
-      onLoginSuccess?.({ email: form.email });
-      navigate("/faculty/dashboard");
+      const res = await fetch("http://localhost:5000/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: form.id, password: form.password }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setServerError(
+          data.message || "Invalid credentials. Please try again.",
+        );
+        return;
+      }
+
+      // Save to localStorage
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("role", data.role);
+      localStorage.setItem("user", JSON.stringify(data.user));
+
+      onLoginSuccess?.(data.user);
+
+      // Redirect based on role
+      if (data.role === "student") {
+        navigate("/student/dashboard");
+      } else {
+        navigate("/faculty/dashboard");
+      }
     } catch (err) {
-      setServerError(err?.message || "Invalid credentials. Please try again.");
+      setServerError("Cannot connect to server. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -73,15 +95,12 @@ export default function Login({ onLoginSuccess, onForgotPassword }) {
           {/* Login form */}
           <form className={styles.form} noValidate onSubmit={handleLogin}>
             <FloatableInput
-              id="email"
+              id="id"
               type="text"
               label="ID Number"
-              autoComplete="email"
-              value={form.email}
-              onChange={(e) =>
-                setForm((f) => ({ ...f, email: e.target.value }))
-              }
-              error={errors.email}
+              value={form.id}
+              onChange={(e) => setForm((f) => ({ ...f, id: e.target.value }))}
+              error={errors.id}
               disabled={isLoading}
             />
 
@@ -119,7 +138,6 @@ export default function Login({ onLoginSuccess, onForgotPassword }) {
               </a>
             </div>
 
-            {/* Submit — triggers handleLogin via form onSubmit */}
             <AppButton
               type="submit"
               variant="primary"
@@ -131,7 +149,7 @@ export default function Login({ onLoginSuccess, onForgotPassword }) {
             </AppButton>
           </form>
 
-          {/* <small className="text-muted fw-semibold fst-italic mt-3">For faculty & staff use only. <br />Unauthorized access is strictly prohibited.</small> */}
+          <span className={styles.version}>v1.01</span>
         </div>
 
         {/* Right panel */}

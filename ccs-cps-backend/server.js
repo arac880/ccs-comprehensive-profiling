@@ -6,6 +6,7 @@ const cors = require("cors");
 require("dotenv").config();
 const { connectDB } = require("./config/db");
 const studentRoutes = require("./routes/studentRoutes");
+const authRoutes = require("./routes/authRoutes");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -19,6 +20,7 @@ connectDB();
 
 // Routes
 app.use("/api/students", studentRoutes);
+app.use("/api/auth", authRoutes);
 
 // Root Endpoint (Just for testing)
 app.get("/", (req, res) => {
