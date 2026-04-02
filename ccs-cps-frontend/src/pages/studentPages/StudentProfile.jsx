@@ -611,7 +611,7 @@ const TABS = [
 /* ═══════════════════════════════════════════
    PAGE
 ═══════════════════════════════════════════ */
-export default function StudentProfile() {
+export default function studentProfile() {
   const [activeTab, setActiveTab] = useState("personal");
 
   const renderTab = () => {
