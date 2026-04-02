@@ -1,13 +1,6 @@
-// components/studentComponents/TabSkills.jsx
 import styles from "../../pages/studentPages/studentStyles/Tab.module.css";
-import { FiCode, FiDatabase, FiLayers, FiActivity, FiEdit2, FiPlus } from "react-icons/fi";
-
-const CAT_ICON = {
-  Programming: <FiCode size={13} />,
-  Database:    <FiDatabase size={13} />,
-  Design:      <FiLayers size={13} />,
-  Sports:      <FiActivity size={13} />,
-};
+import DeleteButton from "../../components/ui/DeleteButton";
+import AddButton from "../../components/ui/AddButton";
 
 export default function TabSkills({ skills }) {
   const categories = [...new Set(skills.map((s) => s.category))];
@@ -18,38 +11,33 @@ export default function TabSkills({ skills }) {
         <div className={styles.sectionHeader}>
           <div className={styles.sectionTitle}>Skills &amp; Proficiencies</div>
           <div className={styles.headerActions}>
-            <button className={styles.addBtn} title="Add Skill">
-              <FiPlus size={13} />
-              <span>Add Skill</span>
-            </button>
+            <AddButton onClick={() => console.log("Add Skill")} />
           </div>
         </div>
 
-        {categories.map((cat) => (
-          <div key={cat}>
-            <div className={styles.skillCat}>
-              {CAT_ICON[cat]} {cat}
+        {/* ✅ CATEGORY COLUMNS */}
+        <div className={styles.skillColumns}>
+          {categories.map((cat) => (
+            <div key={cat} className={styles.skillColumn}>
+              <div className={styles.skillCat}>{cat}</div>
+
+              <ul className={styles.skillList}>
+                {skills
+                  .filter((s) => s.category === cat)
+                  .map((skill, i) => (
+                    <li key={i} className={styles.skillItem}>
+                      <span>{skill.name}</span>
+
+                      <DeleteButton
+                        iconOnly
+                        onClick={() => console.log("Delete skill:", skill)}
+                      />
+                    </li>
+                  ))}
+              </ul>
             </div>
-            <div className={styles.skillGrid}>
-              {skills.filter((s) => s.category === cat).map((skill, i) => (
-                <div key={i} className={styles.skillRow}>
-                  <div className={styles.skillTop}>
-                    <span className={styles.skillName}>{skill.name}</span>
-                    <div className={styles.skillRight}>
-                      <span className={styles.skillLevel}>{skill.level}</span>
-                      <button className={styles.iconBtn} title="Edit skill">
-                        <FiEdit2 size={11} />
-                      </button>
-                    </div>
-                  </div>
-                  <div className={styles.skillBar}>
-                    <div className={styles.skillFill} style={{ width: `${skill.percent}%` }} />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </div>
   );

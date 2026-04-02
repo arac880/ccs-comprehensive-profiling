@@ -2,6 +2,7 @@
 import styles from "../../pages/studentPages/studentStyles/Tab.module.css";
 import AddButton from "../../components/ui/AddButton";
 import EditButton from "../../components/ui/EditButton";
+import DeleteButton from "../../components/ui/DeleteButton";
 
 const CAT_COLOR = {
   Competition: `${styles.badge} ${styles.badgeOrange}`,
@@ -32,6 +33,10 @@ export default function TabNonAcademic({ activities }) {
                 <div className={styles.cardHeader}>
                   <div className={styles.cardTitle}>{act.title}</div>
                   <div className={styles.cardActions}>
+                    <DeleteButton
+                      iconOnly
+                      onClick={() => console.log("Delete activity:", act)}
+                    />
                     <EditButton
                       iconOnly
                       onClick={() => console.log("Edit activity:", act)}
@@ -50,22 +55,13 @@ export default function TabNonAcademic({ activities }) {
                   </span>
                   <span className={styles.cardMetaYear}>{act.year}</span>
                 </div>
-
-                <div className={styles.badgeRow}>
-                  {act.role && (
-                    <span className={`${styles.badge} ${styles.badgeOrange}`}>
-                      {act.role}
-                    </span>
-                  )}
-                  {act.placement && (
-                    <span className={`${styles.badge} ${styles.badgeAmber}`}>
-                      🏆 {act.placement}
-                    </span>
-                  )}
-                </div>
-
                 {act.description && (
                   <p className={styles.cardDesc}>{act.description}</p>
+                )}
+                {act.date && (
+                  <div className={styles.cardDate}>
+                    {new Date(act.date).toLocaleDateString()}
+                  </div>
                 )}
               </div>
             ))}

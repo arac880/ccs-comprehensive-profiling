@@ -24,7 +24,7 @@
 .sectionTitle {
   font-size: clamp(0.8rem, 1.5vw, 0.9rem);
   font-weight: 700;
-  color: #E65100;
+  color: #e65100;
   text-transform: uppercase;
   letter-spacing: 0.07em;
   display: flex;
@@ -34,7 +34,7 @@
 }
 
 .sectionTitle::after {
-  content: '';
+  content: "";
   display: block;
   width: clamp(40px, 8vw, 120px);
   height: 1px;
@@ -56,17 +56,22 @@
   align-items: center;
   gap: 0.3rem;
   padding: 0.3rem 0.7rem;
-  border: 1.5px solid #E65100;
+  border: 1.5px solid #e65100;
   background: none;
-  color: #E65100;
+  color: #e65100;
   border-radius: 7px;
   font-size: 0.75rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.15s, color 0.15s;
+  transition:
+    background 0.15s,
+    color 0.15s;
   white-space: nowrap;
 }
-.editBtn:hover { background: #E65100; color: #fff; }
+.editBtn:hover {
+  background: #e65100;
+  color: #fff;
+}
 
 /* Add button */
 .addBtn {
@@ -74,8 +79,8 @@
   align-items: center;
   gap: 0.3rem;
   padding: 0.3rem 0.7rem;
-  border: 1.5px solid #E65100;
-  background: #E65100;
+  border: 1.5px solid #e65100;
+  background: #e65100;
   color: #fff;
   border-radius: 7px;
   font-size: 0.75rem;
@@ -84,7 +89,10 @@
   transition: background 0.15s;
   white-space: nowrap;
 }
-.addBtn:hover { background: #bf360c; border-color: #bf360c; }
+.addBtn:hover {
+  background: #bf360c;
+  border-color: #bf360c;
+}
 
 /* Icon-only button (small, inside cards) */
 .iconBtn {
@@ -98,10 +106,17 @@
   color: #6b7280;
   border-radius: 6px;
   cursor: pointer;
-  transition: border-color 0.15s, color 0.15s, background 0.15s;
+  transition:
+    border-color 0.15s,
+    color 0.15s,
+    background 0.15s;
   flex-shrink: 0;
 }
-.iconBtn:hover { border-color: #E65100; color: #E65100; background: #fff3ed; }
+.iconBtn:hover {
+  border-color: #e65100;
+  color: #e65100;
+  background: #fff3ed;
+}
 
 /* ── Info grid (label + value pairs) ── */
 .infoGrid {
@@ -164,8 +179,12 @@
   border-bottom: 1px solid #f3f4f6;
   transition: background 0.12s;
 }
-.table tbody tr:last-child { border-bottom: none; }
-.table tbody tr:hover { background: #fafafa; }
+.table tbody tr:last-child {
+  border-bottom: none;
+}
+.table tbody tr:hover {
+  background: #fafafa;
+}
 
 .table tbody td {
   padding: 0.65rem 0.9rem;
@@ -178,7 +197,7 @@
   background: none;
   border: none;
   cursor: pointer;
-  color: #E65100;
+  color: #e65100;
   font-size: 0.72rem;
   font-weight: 700;
   display: flex;
@@ -197,12 +216,36 @@
   font-size: 0.65rem;
   font-weight: 700;
 }
-.badgeOrange { background: #fff3ed; color: #E65100; border: 1px solid #f5c8a8; }
-.badgeGreen  { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
-.badgeBlue   { background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; }
-.badgeAmber  { background: #fffbeb; color: #d97706; border: 1px solid #fde68a; }
-.badgeRed    { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
-.badgePurple { background: #faf5ff; color: #7c3aed; border: 1px solid #e9d5ff; }
+.badgeOrange {
+  background: #fff3ed;
+  color: #e65100;
+  border: 1px solid #f5c8a8;
+}
+.badgeGreen {
+  background: #f0fdf4;
+  color: #16a34a;
+  border: 1px solid #bbf7d0;
+}
+.badgeBlue {
+  background: #eff6ff;
+  color: #2563eb;
+  border: 1px solid #bfdbfe;
+}
+.badgeAmber {
+  background: #fffbeb;
+  color: #d97706;
+  border: 1px solid #fde68a;
+}
+.badgeRed {
+  background: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+}
+.badgePurple {
+  background: #faf5ff;
+  color: #7c3aed;
+  border: 1px solid #e9d5ff;
+}
 
 .badgeRow {
   display: flex;
@@ -225,7 +268,9 @@
   padding: 1rem 1.1rem;
   transition: box-shadow 0.2s;
 }
-.card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.07); }
+.card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.07);
+}
 
 .cardHeader {
   display: flex;
@@ -245,7 +290,7 @@
 
 .cardActions {
   display: flex;
-  gap: 0.3rem;
+  gap: 6px;
   flex-shrink: 0;
 }
 
@@ -272,56 +317,96 @@
 }
 
 /* ── Skill bars ── */
-.skillCat {
-  font-size: 0.72rem;
-  font-weight: 700;
-  color: #374151;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  margin: 1rem 0 0.5rem;
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-.skillCat:first-of-type { margin-top: 0; }
+/* ============================= */
+/* SKILLS LAYOUT */
+/* ============================= */
 
-.skillGrid {
+/* container for all categories */
+.skillColumns {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(220px, 100%), 1fr));
-  gap: 0.55rem;
+  grid-template-columns: repeat(4, 1fr); /* desktop: 4 columns */
+  gap: 20px;
+  margin-top: 10px;
 }
 
-.skillRow {
-  background: #f9fafb;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  padding: 0.6rem 0.8rem;
+/* each category column */
+.skillColumn {
+  min-width: 0;
 }
 
-.skillTop {
+/* category title */
+.skillCat {
+  font-weight: 600;
+  margin-bottom: 10px;
+  font-size: 15px;
+  color: #333;
+}
+
+/* list container */
+.skillList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* each skill row */
+.skillItem {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 0.38rem;
-  gap: 0.4rem;
+
+  font-size: 14px;
+  padding: 5px 0;
+
+  border-bottom: 1px solid #f0f0f0;
 }
 
-.skillRight {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
+/* skill text */
+.skillItem span {
+  color: #444;
+}
+
+/* spacing for delete button */
+.skillItem button {
   flex-shrink: 0;
 }
 
-.skillName { font-size: 0.82rem; font-weight: 600; color: #1a1a2e; }
-.skillLevel { font-size: 0.65rem; font-weight: 700; color: #E65100; text-transform: uppercase; }
+/* ============================= */
+/* RESPONSIVE DESIGN */
+/* ============================= */
 
-.skillBar { height: 5px; background: #e5e7eb; border-radius: 5px; overflow: hidden; }
-.skillFill {
-  height: 100%;
-  background: linear-gradient(90deg, #E65100, #ff8a65);
-  border-radius: 5px;
-  transition: width 0.5s ease;
+/* 💻 Large tablets */
+@media (max-width: 1024px) {
+  .skillColumns {
+    grid-template-columns: repeat(2, 1fr); /* 2 columns */
+  }
+}
+
+/* 📱 Tablets */
+@media (max-width: 768px) {
+  .skillColumns {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+  }
+
+  .skillCat {
+    font-size: 14px;
+  }
+
+  .skillItem {
+    font-size: 13px;
+  }
+}
+
+/* 📱 Mobile */
+@media (max-width: 480px) {
+  .skillColumns {
+    grid-template-columns: 1fr; /* 1 column */
+  }
+
+  .skillItem {
+    padding: 6px 0;
+  }
 }
 
 /* ── Org card ── */
@@ -354,10 +439,20 @@
   flex-shrink: 0;
 }
 
-.orgName { font-size: 0.9rem; font-weight: 700; color: #1a1a2e; }
-.orgCollege { font-size: 0.7rem; color: #6b7280; margin-top: 0.1rem; }
+.orgName {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #1a1a2e;
+}
+.orgCollege {
+  font-size: 0.7rem;
+  color: #6b7280;
+  margin-top: 0.1rem;
+}
 
-.orgRecords { padding: 0.6rem 0; }
+.orgRecords {
+  padding: 0.6rem 0;
+}
 
 .orgRecord {
   display: flex;
@@ -368,7 +463,9 @@
   border-bottom: 1px solid #f9f9f9;
   flex-wrap: wrap;
 }
-.orgRecord:last-child { border-bottom: none; }
+.orgRecord:last-child {
+  border-bottom: none;
+}
 
 .recYear {
   font-size: 0.68rem;
@@ -378,7 +475,10 @@
   min-width: 80px;
 }
 
-.recPos { font-weight: 600; color: #1a1a2e; }
+.recPos {
+  font-weight: 600;
+  color: #1a1a2e;
+}
 
 /* ── Violation row ── */
 .violRow {
@@ -393,12 +493,38 @@
   flex-wrap: wrap;
 }
 
-.violLeft { display: flex; gap: 0.7rem; flex: 1; min-width: 0; }
-.violIcon { color: #E65100; flex-shrink: 0; padding-top: 2px; font-size: 1rem; }
-.violTitle { font-size: 0.88rem; font-weight: 700; color: #1a1a2e; }
-.violDate { font-size: 0.72rem; color: #6b7280; margin-top: 0.12rem; }
-.violSanction { font-size: 0.72rem; color: #374151; margin-top: 0.12rem; }
-.violRight { display: flex; gap: 0.45rem; align-items: center; }
+.violLeft {
+  display: flex;
+  gap: 0.7rem;
+  flex: 1;
+  min-width: 0;
+}
+.violIcon {
+  color: #e65100;
+  flex-shrink: 0;
+  padding-top: 2px;
+  font-size: 1rem;
+}
+.violTitle {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #1a1a2e;
+}
+.violDate {
+  font-size: 0.72rem;
+  color: #6b7280;
+  margin-top: 0.12rem;
+}
+.violSanction {
+  font-size: 0.72rem;
+  color: #374151;
+  margin-top: 0.12rem;
+}
+.violRight {
+  display: flex;
+  gap: 0.45rem;
+  align-items: center;
+}
 
 /* ── Empty / success states ── */
 .empty {
@@ -422,9 +548,18 @@
 }
 
 /* Grade colors */
-.gradeHigh { color: #16a34a; font-weight: 700; }
-.gradeMid  { color: #374151; font-weight: 600; }
-.gradeLow  { color: #dc2626; font-weight: 700; }
+.gradeHigh {
+  color: #16a34a;
+  font-weight: 700;
+}
+.gradeMid {
+  color: #374151;
+  font-weight: 600;
+}
+.gradeLow {
+  color: #dc2626;
+  font-weight: 700;
+}
 
 /* ── Guardian sub-section label ── */
 .guardianSubLabel {
