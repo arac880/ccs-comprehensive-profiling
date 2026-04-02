@@ -20,7 +20,10 @@ export default function TabNonAcademic({ activities }) {
             Activities &amp; Recognitions
           </div>
           <div className={styles.headerActions}>
-            <AddButton onClick={() => console.log("Add activity")} />
+            <AddButton
+              title="Add Activity"
+              onClick={() => console.log("Add activity")}
+            />
           </div>
         </div>
 

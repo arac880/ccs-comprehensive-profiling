@@ -549,7 +549,7 @@ const AFFILIATIONS = [
   {
     type: "org",
     org: "SITES",
-    fullName: "Society of Information Technology Enthusiasts",
+    fullName: "Society of Information Technology Student",
     college: "College of Computing Studies",
     color: "#2E7D32",
     records: [
@@ -568,7 +568,7 @@ const AFFILIATIONS = [
   {
     type: "org",
     org: "CCS",
-    fullName: "College of Computing Studies Student Council",
+    fullName: "College of Computing Studies",
     college: "College of Computing Studies",
     color: "#E65100",
     records: [

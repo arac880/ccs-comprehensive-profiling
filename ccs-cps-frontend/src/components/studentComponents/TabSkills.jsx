@@ -11,7 +11,10 @@ export default function TabSkills({ skills }) {
         <div className={styles.sectionHeader}>
           <div className={styles.sectionTitle}>Skills &amp; Proficiencies</div>
           <div className={styles.headerActions}>
-            <AddButton onClick={() => console.log("Add Skill")} />
+            <AddButton
+              title="Add Skill"
+              onClick={() => console.log("Add Skill")}
+            />
           </div>
         </div>
 

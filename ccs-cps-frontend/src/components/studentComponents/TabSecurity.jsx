@@ -1,14 +1,9 @@
 // components/studentComponents/TabSecurity.jsx
 import { useState } from "react";
-import {
-  FaLock,
-  FaEye,
-  FaEyeSlash,
-  FaShieldAlt,
-  FaCheckCircle,
-} from "react-icons/fa";
+import { FaLock, FaShieldAlt, FaCheckCircle } from "react-icons/fa";
 import styles from "../../pages/studentPages/studentStyles/Tab.module.css";
 import AppButton from "../../components/ui/AppButton";
+import FloatableInput from "../../components/ui/FloatableInput";
 
 /* ══════════════════════════════════════
    PASSWORD STRENGTH HELPER
@@ -29,38 +24,18 @@ function getStrength(password) {
 }
 
 /* ══════════════════════════════════════
-   FIELD WITH SHOW / HIDE TOGGLE
+   PASSWORD REQUIREMENTS CHECKER
 ══════════════════════════════════════ */
-function PasswordField({ id, label, value, onChange, placeholder, hint }) {
-  const [show, setShow] = useState(false);
-  return (
-    <div className={styles.secField}>
-      <label htmlFor={id} className={styles.secLabel}>
-        {label}
-      </label>
-      <div className={styles.secInputWrap}>
-        <input
-          id={id}
-          type={show ? "text" : "password"}
-          value={value}
-          onChange={onChange}
-          placeholder={placeholder}
-          className={styles.secInput}
-          autoComplete="off"
-        />
-        <button
-          type="button"
-          className={styles.secToggle}
-          onClick={() => setShow((s) => !s)}
-          tabIndex={-1}
-          aria-label={show ? "Hide password" : "Show password"}
-        >
-          {show ? <FaEyeSlash size={14} /> : <FaEye size={14} />}
-        </button>
-      </div>
-      {hint && <p className={styles.secHint}>{hint}</p>}
-    </div>
-  );
+function getRequirements(password) {
+  return [
+    { label: "At least 8 characters", met: password.length >= 8 },
+    { label: "At least 1 uppercase letter", met: /[A-Z]/.test(password) },
+    { label: "At least 1 number", met: /[0-9]/.test(password) },
+    {
+      label: "At least 1 special character",
+      met: /[^A-Za-z0-9]/.test(password),
+    },
+  ];
 }
 
 /* ══════════════════════════════════════
@@ -77,6 +52,7 @@ export default function TabSecurity({ student }) {
   const [loading, setLoading] = useState(false);
 
   const strength = getStrength(form.next);
+  const requirements = getRequirements(form.next);
 
   const set = (key) => (e) => {
     setForm((f) => ({ ...f, [key]: e.target.value }));
@@ -90,6 +66,12 @@ export default function TabSecurity({ student }) {
     if (!form.next) e.next = "New password is required.";
     else if (form.next.length < 8)
       e.next = "Password must be at least 8 characters.";
+    else if (!/[A-Z]/.test(form.next))
+      e.next = "Password must contain at least 1 uppercase letter.";
+    else if (!/[0-9]/.test(form.next))
+      e.next = "Password must contain at least 1 number.";
+    else if (!/[^A-Za-z0-9]/.test(form.next))
+      e.next = "Password must contain at least 1 special character.";
     else if (form.next === form.prev)
       e.next = "New password must differ from the current one.";
     if (!form.confirm) e.confirm = "Please confirm your new password.";
@@ -105,7 +87,6 @@ export default function TabSecurity({ student }) {
       return;
     }
     setLoading(true);
-    // Simulate API call
     setTimeout(() => {
       setLoading(false);
       setSuccess(true);
@@ -130,12 +111,6 @@ export default function TabSecurity({ student }) {
             <span className={styles.infoLabel}>Last Password Change</span>
             <span className={styles.infoValue}>
               {student?.lastPasswordChange ?? "N/A"}
-            </span>
-          </div>
-          <div className={styles.infoField}>
-            <span className={styles.infoLabel}>Account Status</span>
-            <span className={`${styles.badge} ${styles.badgeGreen}`}>
-              Active
             </span>
           </div>
         </div>
@@ -163,32 +138,51 @@ export default function TabSecurity({ student }) {
             <div className={styles.secForm}>
               {/* Current password */}
               <div>
-                <PasswordField
-                  id="sec-prev"
-                  label="Current Password"
+                <span className={styles.secFieldTitle}>Current Password</span>
+                <FloatableInput
+                  type="password"
+                  label="Enter current password"
                   value={form.prev}
                   onChange={set("prev")}
-                  placeholder="Enter your current password"
+                  error={errors.prev}
                 />
-                {errors.prev && (
-                  <p className={styles.secError}>{errors.prev}</p>
-                )}
               </div>
 
-              {/* Divider */}
               <hr className={styles.secDivider} />
 
               {/* New password */}
               <div>
-                <PasswordField
-                  id="sec-next"
-                  label="New Password"
+                <span className={styles.secFieldTitle}>New Password</span>
+                <FloatableInput
+                  type="password"
+                  label="Enter new password"
                   value={form.next}
                   onChange={set("next")}
-                  placeholder="Enter your new password"
+                  error={errors.next}
                 />
 
-                {/* Strength meter — shown only when typing */}
+                {/* ── Password requirements checklist ── */}
+                {form.next && (
+                  <ul className={styles.secRequirements}>
+                    {requirements.map((req) => (
+                      <li
+                        key={req.label}
+                        className={styles.secRequirementItem}
+                        style={{ color: req.met ? "#16a34a" : "#6b7280" }}
+                      >
+                        <span
+                          className={styles.secRequirementDot}
+                          style={{
+                            background: req.met ? "#16a34a" : "#d1d5db",
+                          }}
+                        />
+                        {req.label}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+
+                {/* Strength meter */}
                 {form.next && (
                   <div className={styles.secStrengthWrap}>
                     <div className={styles.secStrengthBar}>
@@ -211,48 +205,19 @@ export default function TabSecurity({ student }) {
                     </span>
                   </div>
                 )}
-
-                {errors.next && (
-                  <p className={styles.secError}>{errors.next}</p>
-                )}
-
-                {/* Requirements */}
-                <ul className={styles.secReqs}>
-                  <li className={form.next.length >= 8 ? styles.secReqMet : ""}>
-                    At least 8 characters
-                  </li>
-                  <li
-                    className={/[A-Z]/.test(form.next) ? styles.secReqMet : ""}
-                  >
-                    One uppercase letter
-                  </li>
-                  <li
-                    className={/[0-9]/.test(form.next) ? styles.secReqMet : ""}
-                  >
-                    One number
-                  </li>
-                  <li
-                    className={
-                      /[^A-Za-z0-9]/.test(form.next) ? styles.secReqMet : ""
-                    }
-                  >
-                    One special character
-                  </li>
-                </ul>
               </div>
 
               {/* Confirm password */}
               <div>
-                <PasswordField
-                  id="sec-confirm"
-                  label="Confirm New Password"
+                <span className={styles.secFieldTitle}>Confirm Password</span>
+                <FloatableInput
+                  type="password"
+                  label="Re-enter password"
                   value={form.confirm}
                   onChange={set("confirm")}
-                  placeholder="Re-enter your new password"
+                  error={errors.confirm}
                 />
-                {errors.confirm && (
-                  <p className={styles.secError}>{errors.confirm}</p>
-                )}
+
                 {form.confirm &&
                   form.next === form.confirm &&
                   !errors.confirm && (
@@ -272,7 +237,7 @@ export default function TabSecurity({ student }) {
                 loading={loading}
                 disabled={loading}
               >
-                Update Password
+                Change
               </AppButton>
             </div>
           </form>

@@ -80,25 +80,6 @@
   white-space: pre-line;
 }
 
-/* ── PDF button wrapper — overrides AppButton styles ── */
-.pdfButtonWrap button {
-  display: inline-flex !important;
-  align-items: center !important;
-  gap: 8px !important;
-  background-color: transparent !important;
-  color: #e65100 !important;
-  font-family: "Afacad", sans-serif !important;
-  font-size: clamp(0.85rem, 1.2vw, 0.95rem) !important;
-  font-weight: 600 !important;
-  padding: 8px 18px !important;
-  border: 2px solid #e65100;
-  border-radius: 6px !important;
-  cursor: pointer !important;
-  transition:
-    background-color 0.15s,
-    transform 0.1s !important;
-}
-
 .pdfButtonWrap button:hover {
   background-color: #bf360c !important;
   color: #fff !important;

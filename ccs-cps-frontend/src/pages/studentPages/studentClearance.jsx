@@ -73,7 +73,8 @@ export default function StudentClearance() {
       {/* Main Status Banner */}
       <span
         className="text-muted fst-italic d-flex justify-content-end mb-2"
-        style={{ fontSize: "0.75rem", fontWeight: "600" }}>
+        style={{ fontSize: "0.75rem", fontWeight: "600" }}
+      >
         NOTE: Updates in any part of the clearance will be reflected in not more
         than 30 minutes.
       </span>
@@ -95,7 +96,8 @@ export default function StudentClearance() {
                   item.isCleared
                     ? clearanceStyles.clearedItem
                     : clearanceStyles.pendingItem
-                }>
+                }
+              >
                 {item.isCleared ? (
                   <MdCheckCircle
                     size={18}
@@ -233,7 +235,7 @@ export default function StudentClearance() {
     <div className={layoutStyles.dashboardWrapper}>
       <SideBarNav activeNav={currentNav} onNavigate={setCurrentNav} />
       <div className={layoutStyles.rightColumn}>
-        <TopBarNav notifCount={3} onSignOut={handleSignOut} />
+        <TopBarNav onSignOut={handleSignOut} />
         <main className={layoutStyles.mainContent}>{clearanceUI}</main>
         <Footer />
       </div>

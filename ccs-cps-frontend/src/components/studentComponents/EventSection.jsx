@@ -11,12 +11,24 @@ const SAMPLE_EVENTS = [
   },
 ];
 
-export default function EventsSection({ events = SAMPLE_EVENTS, onShowMore, showMore = true }) {
+export default function EventsSection({
+  events = SAMPLE_EVENTS,
+  onShowMore,
+  showMore = true,
+}) {
   return (
     <div className={styles.eventsCard}>
       {events.length === 0 ? (
         <div className={styles.emptyState}>
-          <i className="bi bi-calendar-x" style={{ fontSize: 28, opacity: 0.3, display: "block", marginBottom: 8 }} />
+          <i
+            className="bi bi-calendar-x"
+            style={{
+              fontSize: 28,
+              opacity: 0.3,
+              display: "block",
+              marginBottom: 8,
+            }}
+          />
           No events available at the moment.
         </div>
       ) : (
@@ -24,14 +36,18 @@ export default function EventsSection({ events = SAMPLE_EVENTS, onShowMore, show
           <div key={event.id} className={styles.eventItem}>
             <div className={styles.eventTopRow}>
               <p className={styles.eventTitle}>{event.title}</p>
-              <span className={styles.eventMeta}>Created at: {event.createdAt}</span>
+              <span className={styles.eventMeta}>
+                Created at: {event.createdAt}
+              </span>
             </div>
 
             {/* Date + Status if present */}
             {event.date && (
               <p className={styles.eventDate}>
                 Date: {event.date} &nbsp;|&nbsp;
-                <span className={styles.eventStatus}>Status: {event.status}</span>
+                <span className={styles.eventStatus}>
+                  Status: {event.status}
+                </span>
               </p>
             )}
 
@@ -39,8 +55,15 @@ export default function EventsSection({ events = SAMPLE_EVENTS, onShowMore, show
 
             {event.attachment && (
               <div className={styles.pdfButtonWrap}>
-                <AppButton variant="primary" size="md" onClick={() => window.open(event.attachment.url, "_blank")}>
-                  <i className="bi bi-file-earmark-pdf-fill" style={{ marginRight: 6 }} />
+                <AppButton
+                  variant="primary"
+                  size="md"
+                  onClick={() => window.open(event.attachment.url, "_blank")}
+                >
+                  <i
+                    className="bi bi-file-earmark-pdf-fill"
+                    style={{ marginRight: 6 }}
+                  />
                   {event.attachment.name}
                 </AppButton>
               </div>
