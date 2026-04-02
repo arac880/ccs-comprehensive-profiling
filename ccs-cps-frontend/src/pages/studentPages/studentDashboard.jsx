@@ -82,7 +82,7 @@ export default function StudentDashboard() {
     <div className={styles.dashboardWrapper}>
       <SideBarNav activeNav={currentNav} onNavigate={setCurrentNav} />
       <div className={styles.rightColumn}>
-        <TopBarNav notifCount={3} onSignOut={handleSignOut} />
+        <TopBarNav  onSignOut={handleSignOut} />
         <main className={styles.mainContent}>
           <DashboardContent />
         </main>

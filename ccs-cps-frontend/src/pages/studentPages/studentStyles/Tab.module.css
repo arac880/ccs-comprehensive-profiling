@@ -534,6 +534,12 @@
   font-size: 0.85rem;
 }
 
+.emptyState {
+  font-size: 0.85rem;
+  color: #9ca3af;
+  padding: 0.75rem 0;
+}
+
 .emptyGreen {
   display: flex;
   align-items: center;
@@ -624,6 +630,14 @@
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
+}
+
+.secFieldTitle {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #e65100; /* matches theme */
+  margin-bottom: 10px;
+  display: block;
 }
 
 .secLabel {
@@ -736,41 +750,30 @@
 }
 
 /* ── Password requirements checklist ── */
-.secReqs {
+/* Password requirements checklist */
+.secRequirements {
   list-style: none;
+  margin: 8px 0 0 0;
   padding: 0;
-  margin: 0.6rem 0 0;
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.3rem 1rem;
+  flex-direction: column;
+  gap: 4px;
 }
 
-.secReqs li {
-  font-size: 0.7rem;
-  color: #9ca3af;
+.secRequirementItem {
   display: flex;
   align-items: center;
-  gap: 0.3rem;
+  gap: 7px;
+  font-size: 0.78rem;
   transition: color 0.2s;
 }
 
-/* Add a small bullet/dot before each requirement */
-.secReqs li::before {
-  content: "";
-  width: 6px;
-  height: 6px;
+.secRequirementDot {
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
-  background: #d1d5db;
   flex-shrink: 0;
   transition: background 0.2s;
-}
-
-/* Met requirement — turns green */
-.secReqs li.secReqMet {
-  color: #16a34a;
-}
-.secReqs li.secReqMet::before {
-  background: #16a34a;
 }
 
 /* ── Success banner ── */

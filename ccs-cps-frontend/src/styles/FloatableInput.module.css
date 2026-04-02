@@ -26,7 +26,9 @@
   border-radius: 6px;
   outline: none;
   box-sizing: border-box;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 /* 1. NEW: Hide the empty space placeholder required for the CSS trick */
@@ -87,7 +89,7 @@
 .input:-webkit-autofill:focus {
   -webkit-box-shadow: 0 0 0px 1000px #ffffff inset;
   box-shadow: 0 0 0px 1000px #ffffff inset;
-  -webkit-text-fill-color: #E65100;
+  -webkit-text-fill-color: #e65100;
   transition: background-color 5000s ease-in-out 0s;
 }
 
@@ -106,7 +108,7 @@
   border: none;
   padding: 0;
   cursor: pointer;
-  color: #E65100;
+  color: #e65100;
   display: flex;
   align-items: center;
   transition: color 0.2s ease;
@@ -123,4 +125,15 @@
   font-size: 0.75rem;
   color: #dc3545;
   padding-left: 2px;
+}
+
+/* Suppress browser native password reveal button (Edge/IE/Chrome) */
+.input::-ms-reveal,
+.input::-ms-clear {
+  display: none;
+}
+
+.input::-webkit-credentials-auto-fill-button {
+  visibility: hidden;
+  pointer-events: none;
 }
