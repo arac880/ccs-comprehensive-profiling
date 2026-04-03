@@ -17,22 +17,24 @@
 /* ── Expanded sidebar ── */
 .sidebar {
   width: clamp(230px, 22vw, 280px);
-  height: 100vh;
+  height: 100dvh; /* fix mobile + viewport issues */
   background-color: #ffffff;
   border-right: 1px solid #eeddd5;
   flex-shrink: 0;
+
   display: flex;
   flex-direction: column;
+
   position: sticky;
   top: 0;
-  overflow-y: auto;
+
+  overflow: hidden; 
   box-shadow: 4px 0 20px rgba(230, 81, 0, 0.06);
 }
 
-/* ── Collapsed icon-only strip ── */
 .sidebarCollapsed {
   width: clamp(60px, 6vw, 72px);
-  height: 100vh;
+  height: 100dvh;
   background-color: #ffffff;
   border-right: 1px solid #eeddd5;
   flex-shrink: 0;
@@ -41,7 +43,8 @@
   align-items: center;
   position: sticky;
   top: 0;
-  overflow-y: auto;
+  overflow: visible;
+  position: relative;
   box-shadow: 4px 0 20px rgba(230, 81, 0, 0.06);
 }
 
@@ -113,24 +116,50 @@
 /* Tooltip for collapsed items */
 .collapsedTooltip {
   position: absolute;
-  left: calc(100% + 12px);
-  background: #2d1a0e;
-  color: #fff;
-  font-size: 0.72rem;
+  left: calc(100% + 10px);
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.85); 
+  color: #ffffff;
+  font-size: 0.75rem;
   font-weight: 600;
-  padding: 5px 10px;
-  border-radius: 8px;
+  padding: 6px 12px;
+  border-radius: 6px;
   white-space: nowrap;
   pointer-events: none;
   opacity: 0;
-  transform: translateX(-4px);
-  transition: opacity var(--transition), transform var(--transition);
-  z-index: 999;
+  transition: opacity 0.18s ease, transform 0.18s ease;
+  z-index: 9999;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
 
+/* Show on hover */
 .collapsedNavItem:hover .collapsedTooltip {
   opacity: 1;
-  transform: translateX(0);
+  transform: translateY(-50%) translateX(0);
+}
+
+.collapsedTooltip::before {
+  content: '';
+  position: absolute;
+  left: -5px;            
+  top: 50%;
+  transform: translateY(-50%);
+  border-width: 5px;
+  border-style: solid;
+  border-color: transparent #333 transparent transparent;
+}
+
+
+.collapsedTooltip::after {
+  content: '';
+  position: absolute;
+  left: -6px;
+  top: 50%;
+  transform: translateY(-50%);
+  border-width: 6px;
+  border-style: solid;
+  border-color: transparent rgba(0, 0, 0, 0.85) transparent transparent;
 }
 
 /* ── Header ── */
@@ -287,15 +316,16 @@
 
 /* ── Nav wrapper ── */
 .navWrapper {
+  overflow: hidden; /* no scroll */
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
   background-color: var(--orange-dim);
   border: 1.5px solid var(--orange-border);
   border-radius: 14px;
   padding: 10px 8px 8px;
   margin: 0 12px;
-  flex-shrink: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
 }
 
 .navSectionLabel {
@@ -469,11 +499,14 @@
   margin: 0;
 }
 
-.mobileHamburger {
-  font-size: 1.4rem;
-  color: #ffffff;
+.mobileFloatingHamburger {
+  position: fixed;
+  top: 18px; 
+  left: 15px;
+  z-index: 1050;
   cursor: pointer;
-  display: block;
+  color: #ffffff; 
+  padding: 5px;
 }
 
 .mobileTopBarAvatar {
@@ -502,7 +535,7 @@
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.45);
-  z-index: 1040;
+z-index: 1030;
   opacity: 0;
   pointer-events: none;
   transition: opacity var(--transition);
@@ -523,12 +556,12 @@
   height: 100%;
   width: min(280px, 82vw);
   background-color: #ffffff;
-  z-index: 1050;
+  z-index: 1040;
   display: flex;
   flex-direction: column;
   box-shadow: 4px 0 24px rgba(0, 0, 0, 0.15);
   transform: translateX(-100%);
-  transition: transform 0.26s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   overflow-y: auto;
 }
 

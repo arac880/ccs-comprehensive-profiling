@@ -26,7 +26,6 @@ const DEFAULT_STUDENT = {
 
 const MOBILE_BREAKPOINT = 992;
 
-// ── Helper: read & shape the stored user (Logic kept intact!) ──
 function getStoredStudent() {
   try {
     const raw = localStorage.getItem("user");
@@ -35,7 +34,8 @@ function getStoredStudent() {
     return {
       name: `${u.firstName ?? ""} ${u.lastName ?? ""}`.trim() || "—",
       id: u.id ?? "—",
-      status: u.status ?? "—", // e.g., "Regular" or "Irregular"
+      type: u.type ?? "",      
+      status: u.status ?? "", 
       year: u.year ?? "—", 
       section: u.section ?? "—", 
       avatarUrl: u.avatarUrl ?? null,
@@ -49,6 +49,8 @@ export default function SideNavbar({
   activeNav = "Dashboard",
   onNavigate,
   student: studentProp,
+  drawerOpen: externalDrawerOpen,  // NEW: External control
+  onDrawerToggle,                  // NEW: Callback to parent
 }) {
   const navigate = useNavigate();
 
@@ -56,6 +58,13 @@ export default function SideNavbar({
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < MOBILE_BREAKPOINT);
+
+  // NEW: Sync with external drawer control
+  useEffect(() => {
+    if (externalDrawerOpen !== undefined) {
+      setDrawerOpen(externalDrawerOpen);
+    }
+  }, [externalDrawerOpen]);
 
   useEffect(() => {
     if (!studentProp) {
@@ -67,19 +76,31 @@ export default function SideNavbar({
     const onResize = () => {
       const mobile = window.innerWidth < MOBILE_BREAKPOINT;
       setIsMobile(mobile);
-      if (!mobile) setDrawerOpen(false);
+      if (!mobile) {
+        setDrawerOpen(false);
+        onDrawerToggle?.(false);
+      }
     };
     window.addEventListener("resize", onResize);
     return () => window.removeEventListener("resize", onResize);
-  }, []);
+  }, [onDrawerToggle]);
+
+  // NEW: Toggle function
+  const toggleDrawer = () => {
+    const newState = !drawerOpen;
+    setDrawerOpen(newState);
+    onDrawerToggle?.(newState);
+  };
 
   const go = (item) => {
     if (onNavigate) onNavigate(item.name);
-    if (isMobile) setDrawerOpen(false);
+    if (isMobile) {
+      setDrawerOpen(false);
+      onDrawerToggle?.(false);
+    }
     if (item.path) navigate(item.path);
   };
 
-  // ── Profile card (Updated with new UI design) ──
   const ProfileCard = () => (
     <div className={styles.profileCard}>
       <div className={styles.avatar}>
@@ -93,25 +114,27 @@ export default function SideNavbar({
       <p className={styles.studentId}>{student.id}</p>
       <hr className={styles.profileDivider} />
       
-      {/* Adapted the condensed meta rows for your specific local storage data */}
       <div className={styles.metaRow}>
         <span className={styles.metaChip}>
-          <span className={styles.metaKey}>Status</span> {student.status}
+          <span className={styles.metaKey}>Type:</span> {student.type}
+        </span>
+        <span className={styles.metaDot}>·</span>
+        <span className={styles.metaChip}>
+          <span className={styles.metaKey}>Status:</span> {student.status}
         </span>
       </div>
       <div className={styles.metaRow}>
         <span className={styles.metaChip}>
-          <span className={styles.metaKey}>Year</span> {student.year}
+          <span className={styles.metaKey}>Year:</span> {student.year}
         </span>
         <span className={styles.metaDot}>·</span>
         <span className={styles.metaChip}>
-          <span className={styles.metaKey}>Section</span> {student.section}
+          <span className={styles.metaKey}>Section:</span> {student.section}
         </span>
       </div>
     </div>
   );
-
-  // ── Nav list (Updated with new UI hover bars and active dots) ──
+  
   const NavList = () => (
     <div className={styles.navWrapper}>
       <span className={styles.navSectionLabel}>Navigation</span>
@@ -146,26 +169,21 @@ export default function SideNavbar({
     </div>
   );
 
-  // ── MOBILE LAYOUT ──
+// ── MOBILE LAYOUT ──
   if (isMobile) {
     return (
-      <>
-        <div className={styles.mobileTopBar}>
-          <FaBars className={styles.mobileHamburger} onClick={() => setDrawerOpen(true)} />
-          <span className={styles.mobileTopBarTitle}>CCS - Comprehensive Profiling System</span>
-          <div className={styles.mobileTopBarAvatar}>
-            {student.avatarUrl ? (
-              <img src={student.avatarUrl} alt={student.name} />
-            ) : (
-              <FaCircleUser style={{ color: "#fff", fontSize: "1rem" }} />
-            )}
-          </div>
-        </div>
-        <div className={`${styles.drawerBackdrop} ${drawerOpen ? styles.drawerBackdropShow : ""}`} onClick={() => setDrawerOpen(false)} />
+      <>        
+        <div 
+          className={`${styles.drawerBackdrop} ${drawerOpen ? styles.drawerBackdropShow : ""}`} 
+          onClick={toggleDrawer}  // FIXED: Now uses toggleDrawer
+        />
         <div className={`${styles.drawer} ${drawerOpen ? styles.drawerOpen : ""}`}>
           <div className={styles.drawerHeader}>
             <span className={styles.drawerTitle}>Student</span>
-            <FaXmark className={styles.closeIcon} onClick={() => setDrawerOpen(false)} />
+            <FaXmark 
+              className={styles.closeIcon} 
+              onClick={toggleDrawer}  // FIXED: Now uses toggleDrawer
+            />
           </div>
           <ProfileCard />
           <NavList />
@@ -173,9 +191,9 @@ export default function SideNavbar({
         </div>
       </>
     );
-  }
+  }  
 
-  // ── DESKTOP COLLAPSED (Added tooltips and refined spacing) ──
+  // ── DESKTOP COLLAPSED (unchanged)
   if (isCollapsed) {
     return (
       <div className={styles.sidebarCollapsed}>
@@ -204,7 +222,7 @@ export default function SideNavbar({
     );
   }
 
-  // ── DESKTOP EXPANDED ──
+  // ── DESKTOP EXPANDED 
   return (
     <div className={styles.sidebar}>
       <div className={styles.sidebarHeader}>

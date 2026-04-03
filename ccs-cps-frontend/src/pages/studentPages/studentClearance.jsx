@@ -11,22 +11,15 @@ import { MdOutlineCancel } from "react-icons/md"; // not-cleared circle
 import { MdCheckCircle } from "react-icons/md"; // cleared circle (summary list)
 import { MdCancel } from "react-icons/md"; // pending circle (summary list)
 
-// Layout Components
-import SideBarNav from "../../components/studentComponents/SideBarNav";
-import TopBarNav from "../../components/studentComponents/TopBarNav";
-
 // CSS Imports
-import layoutStyles from "./studentStyles/dashboard.module.css";
 import clearanceStyles from "./studentStyles/Clearance.module.css";
-import Footer from "../../components/Footer";
 
 const MOBILE_BREAKPOINT = 992;
 
 export default function StudentClearance() {
   const navigate = useNavigate();
-  const [currentNav, setCurrentNav] = useState("Clearance");
   const [isMobile, setIsMobile] = useState(
-    window.innerWidth < MOBILE_BREAKPOINT,
+    window.innerWidth < MOBILE_BREAKPOINT
   );
 
   useEffect(() => {
@@ -34,8 +27,6 @@ export default function StudentClearance() {
     window.addEventListener("resize", onResize);
     return () => window.removeEventListener("resize", onResize);
   }, []);
-
-  const handleSignOut = () => navigate("/");
 
   // Summary data for the top banner
   const summaryItems = [
@@ -58,8 +49,8 @@ export default function StudentClearance() {
     },
   ];
 
-  const clearanceUI = (
-    <div className={clearanceStyles.clearanceContainer}>
+  return (
+    <main className={clearanceStyles.clearanceContainer}>
       {/* Header Section */}
       <div className={clearanceStyles.pageHeader}>
         <div className={clearanceStyles.titleWrapper}>
@@ -219,26 +210,6 @@ export default function StudentClearance() {
           </div>
         </div>
       </div>
-    </div>
-  );
-
-  if (isMobile) {
-    return (
-      <>
-        <SideBarNav activeNav={currentNav} onNavigate={setCurrentNav} />
-        <main className={layoutStyles.mobileMain}>{clearanceUI}</main>
-      </>
-    );
-  }
-
-  return (
-    <div className={layoutStyles.dashboardWrapper}>
-      <SideBarNav activeNav={currentNav} onNavigate={setCurrentNav} />
-      <div className={layoutStyles.rightColumn}>
-        <TopBarNav  onSignOut={handleSignOut} />
-        <main className={layoutStyles.mainContent}>{clearanceUI}</main>
-        <Footer />
-      </div>
-    </div>
+    </main>
   );
 }

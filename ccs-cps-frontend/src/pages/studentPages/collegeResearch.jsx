@@ -1,8 +1,4 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import SideBarNav from "../../components/studentComponents/SideBarNav";
-import TopBarNav from "../../components/studentComponents/TopBarNav";
-import Footer from "../../components/Footer";
+import { useState } from "react";
 import SearchBar from "../../components/ui/SearchBar";
 import TitlePages from "../../components/ui/TitlePages";
 import ResearchCard from "../../components/studentComponents/ResearchCard";
@@ -10,13 +6,7 @@ import styles from "./studentStyles/collegeResearch.module.css";
 import { FaSearch } from "react-icons/fa";
 import { PiBookOpenTextFill } from "react-icons/pi";
 
-const MOBILE_BREAKPOINT = 992;
-
-// Google Drive PDF links format:
-// View:     https://drive.google.com/file/d/FILE_ID/view
-// Direct:   https://drive.google.com/uc?export=download&id=FILE_ID
-// Replace FILE_ID with the actual ID from your Google Drive share link.
-
+// Sample data (replace with backend later)
 const ALL_RESEARCH = [
   {
     id: 1,
@@ -93,94 +83,57 @@ const ALL_RESEARCH = [
 ];
 
 export default function CollegeResearch() {
-  const navigate = useNavigate();
   const [search, setSearch] = useState("");
-  const [isMobile, setIsMobile] = useState(
-    window.innerWidth < MOBILE_BREAKPOINT,
+
+  // Filter logic
+  const filteredResearch = ALL_RESEARCH.filter((research) =>
+    research.title.toLowerCase().includes(search.toLowerCase())
   );
 
-  useEffect(() => {
-    const onResize = () => setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
-    window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
-  }, []);
-
-  const handleSignOut = () => navigate("/");
-
-  const filtered = ALL_RESEARCH.filter(
-    (r) =>
-      search.trim() === "" ||
-      r.title.toLowerCase().includes(search.toLowerCase()),
-  );
-
-  /* ── Shared page body ───────────────────────────────────── */
-  const ResearchContent = () => (
-    <div className={styles.researchContainer}>
-      {/* White card */}
-      <div className={styles.researchCard}>
-        {/* Header row */}
-        <div className={styles.cardHeader}>
-          <TitlePages
-            icon={<PiBookOpenTextFill size={22} color="#ffffff" />}
-            title="College Research"
-            iconBg="#E65100"
-            textColor="#a34100"
-          />
-          <div className={styles.cardControls}>
-            <SearchBar
-              value={search}
-              onChange={setSearch}
-              placeholder="Search a research"
-            />
-          </div>
-        </div>
-
-        {/* Grid or empty state */}
-        {filtered.length > 0 ? (
-          <div className={styles.grid}>
-            {filtered.map((r) => (
-              <ResearchCard
-                key={r.id}
-                title={r.title}
-                uploadedAt={r.uploadedAt}
-                fileUrl={r.fileUrl}
-              />
-            ))}
-          </div>
-        ) : (
-          <div className={styles.empty}>
-            <FaSearch size={32} color="#e0b49a" />
-            <p>No research found.</p>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-
-  /* ── Mobile layout ──────────────────────────────────────── */
-  if (isMobile) {
-    return (
-      <>
-        <SideBarNav activeNav="CollegeResearch" />
-        <main className={styles.mobileMain}>
-          <ResearchContent />
-        </main>
-        <Footer />
-      </>
-    );
-  }
-
-  /* ── Desktop layout ─────────────────────────────────────── */
   return (
-    <div className={styles.dashboardWrapper}>
-      <SideBarNav activeNav="CollegeResearch" />
-      <div className={styles.rightColumn}>
-        <TopBarNav onSignOut={handleSignOut} />
-        <main className={styles.mainContent}>
-          <ResearchContent />
-        </main>
-        <Footer />
+    <main className={styles.pageWrapper}>
+      <div className={styles.researchContainer}>
+        <div className={styles.researchCard}>
+          
+          {/* Header */}
+          <div className={styles.cardHeader}>
+            <TitlePages
+              icon={<PiBookOpenTextFill size={22} color="#ffffff" />}
+              title="College Research"
+              iconBg="#E65100"
+              textColor="#a34100"
+            />
+
+            <div className={styles.cardControls}>
+              <SearchBar
+                value={search}
+                onChange={setSearch}
+                placeholder="Search a research"
+              />
+            </div>
+          </div>
+
+          {/* Content */}
+          {filteredResearch.length > 0 ? (
+            <div className={styles.grid}>
+              {filteredResearch.map((research) => (
+                <ResearchCard
+                  key={research.id}
+                  title={research.title}
+                  uploadedAt={research.uploadedAt}
+                  fileUrl={research.fileUrl}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className={styles.empty}>
+              <FaSearch size={32} color="#e0b49a" />
+              <p>No research found.</p>
+            </div>
+          )}
+
+        </div>
       </div>
-    </div>
+    </main>
   );
 }

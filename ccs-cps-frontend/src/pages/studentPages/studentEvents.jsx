@@ -1,13 +1,10 @@
 import { useState } from "react";
-import SideNavbar from "../../components/studentComponents/SideBarNav";
-import TopBarNav from "../../components/studentComponents/TopBarNav";
 import CalendarWidget from "../../components/ui/CalendarWidget";
 import CcsLinks from "../../components/studentComponents/CcsLinks";
 import EventSection from "../../components/studentComponents/EventSection";
 import SearchBar from "../../components/ui/SearchBar";
 import FilterDropdown from "../../components/ui/FilterDropdown";
 import TitlePages from "../../components/ui/TitlePages";
-import Footer from "../../components/Footer";
 import styles from "./studentStyles/event.module.css";
 import { FaCalendarAlt } from "react-icons/fa";
 
@@ -39,69 +36,54 @@ export default function StudentEvents() {
   const filtered = ALL_EVENTS.filter((ev) => {
     const matchFilter = filter === "All Events" || ev.status === filter;
     const matchSearch =
-      search.trim() === "" ||
-      ev.title.toLowerCase().includes(search.toLowerCase());
+      search.trim() === "" || ev.title.toLowerCase().includes(search.toLowerCase());
     return matchFilter && matchSearch;
   });
 
   return (
     <div className={styles.pageRoot}>
-      {/* ── Sidebar ── */}
-      <aside className={styles.sidebarArea}>
-        <SideNavbar activeNav="Events" />{" "}
-      </aside>
-
-      {/* ── Main column ── */}
-      <div className={styles.mainCol}>
-        <TopBarNav />
-
-        {/* Scrollable content area */}
-        <div className={styles.scrollArea}>
-          <div className={styles.contentRow}>
-            {/* ── Events column ── */}
-            <main className={styles.eventsCol}>
-              <div className={styles.eventsCard}>
-                {/* Card header: TitlePages left, controls right */}
-                <div className={styles.cardHeader}>
-                  <TitlePages
-                    icon={<FaCalendarAlt size={22} color="#ffffff" />}
-                    title="Events"
-                    iconBg="#E65100"
-                    textColor="#a34100"
+      <div className={styles.scrollArea}>
+        <div className={styles.contentRow}>
+          {/* ── Events column ── */}
+          <main className={styles.eventsCol}>
+            <div className={styles.eventsCard}>
+              {/* Card header: TitlePages left, controls right */}
+              <div className={styles.cardHeader}>
+                <TitlePages
+                  icon={<FaCalendarAlt size={22} color="#ffffff" />}
+                  title="Events"
+                  iconBg="#E65100"
+                  textColor="#a34100"
+                />
+                <div className={styles.cardControls}>
+                  <FilterDropdown
+                    value={filter}
+                    onChange={setFilter}
+                    options={["All Events", "Upcoming", "Past"]}
+                    label="SHOW EVENTS"
+                    placeholder="All Events"
                   />
-                  <div className={styles.cardControls}>
-                    <FilterDropdown
-                      value={filter}
-                      onChange={setFilter}
-                      options={["All Events", "Upcoming", "Past"]}
-                      label="SHOW EVENTS"
-                      placeholder="All Events"
-                    />
-                    <SearchBar
-                      value={search}
-                      onChange={setSearch}
-                      placeholder="Search an event"
-                    />
-                  </div>
+                  <SearchBar
+                    value={search}
+                    onChange={setSearch}
+                    placeholder="Search an event"
+                  />
                 </div>
-
-                {/* Events list — no Show More */}
-                <EventSection events={filtered} showMore={false} />
               </div>
-            </main>
 
-            {/* ── Right column ── */}
-            <aside className={styles.rightCol}>
-              <CalendarWidget />
-              <div className={styles.ccsLinksFixed}>
-                <CcsLinks />
-              </div>
-            </aside>
-          </div>
+              {/* Events list — no Show More */}
+              <EventSection events={filtered} showMore={false} />
+            </div>
+          </main>
+
+          {/* ── Right column ── */}
+          <aside className={styles.rightCol}>
+            <CalendarWidget />
+            <div className={styles.ccsLinksFixed}>
+              <CcsLinks />
+            </div>
+          </aside>
         </div>
-
-        {/* ── Footer ── */}
-        <Footer />
       </div>
     </div>
   );

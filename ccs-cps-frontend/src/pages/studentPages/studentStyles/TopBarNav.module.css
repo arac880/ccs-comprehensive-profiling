@@ -3,6 +3,9 @@
   background-color: #e65100;
   min-height: clamp(50px, 7vw, 65px);
   flex-shrink: 0;
+   position: sticky;
+  top: 0;
+  z-index: 1000;
 }
 
 /* ── Brand title ── */
@@ -67,6 +70,8 @@
   align-items: center;
   gap: clamp(10px, 2vw, 30px);
 }
+
+
 
 /* ══════════════════════════════════════════
    NEW — Profile trigger + dropdown
@@ -234,4 +239,16 @@
   font-size: 0.88rem;
   display: block;
   flex-shrink: 0;
+}
+
+/* MOBILE  */
+.hamburgerIcon {
+  cursor: pointer !important;
+  pointer-events: auto !important;
+  z-index: 1040;
+  transition: transform 0.2s ease;
+}
+
+.hamburgerIcon:hover {
+  transform: scale(1.1);
 }
