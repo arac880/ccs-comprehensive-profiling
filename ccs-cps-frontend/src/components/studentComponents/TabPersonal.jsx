@@ -1,6 +1,9 @@
 // components/studentComponents/TabPersonal.jsx
 import styles from "../../pages/studentPages/studentStyles/Tab.module.css";
 import EditButton from "../../components/ui/EditButton";
+import EditStudentModal from "../../components/studentComponents/EditStudentModal";
+
+import { useState } from "react";
 
 function Field({ label, value }) {
   return (
@@ -30,13 +33,13 @@ function SectionBlock({ title, children, action }) {
   );
 }
 export default function TabPersonal({ student }) {
+  const [isEditOpen, setIsEditOpen] = useState(false);
+
   return (
     <div>
       <SectionBlock
         title="Basic Information"
-        action={
-          <EditButton iconOnly onClick={() => console.log("Edit clicked")} />
-        }
+        action={<EditButton iconOnly onClick={() => setIsEditOpen(true)} />}
       >
         <Field label="First Name" value={student.firstName} />
         <Field label="Middle Initial" value={student.middleInitial} />
@@ -91,6 +94,12 @@ export default function TabPersonal({ student }) {
         <Field label="Contact Number" value={student.fatherContact} />
         <Field label="Email Address" value={student.fatherEmail} />
       </SectionBlock>
+
+      <EditStudentModal
+        isOpen={isEditOpen}
+        onClose={() => setIsEditOpen(false)}
+        student={student}
+      />
     </div>
   );
 }
