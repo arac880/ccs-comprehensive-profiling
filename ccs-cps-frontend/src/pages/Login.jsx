@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import FloatableInput from "../components/ui/FloatableInput";
 import AppButton from "../components/ui/AppButton";
+import AppToast from "../components/ui/AppToast";
 import styles from "../styles/Login.module.css";
 
 import ccsBanner from "../assets/CCS_Banner.png";
@@ -13,6 +14,11 @@ export default function Login({ onLoginSuccess, onForgotPassword }) {
   const [errors, setErrors] = useState({ id: "", password: "" });
   const [isLoading, setIsLoading] = useState(false);
   const [serverError, setServerError] = useState("");
+  const [toast, setToast] = useState({
+    isVisible: false,
+    message: "",
+    type: "success",
+  });
 
   function validate() {
     const newErrors = { id: "", password: "" };
@@ -32,7 +38,7 @@ export default function Login({ onLoginSuccess, onForgotPassword }) {
     return valid;
   }
 
-  async function handleLogin(e) {
+   async function handleLogin(e) {
     e.preventDefault();
     setServerError("");
 
@@ -49,28 +55,37 @@ export default function Login({ onLoginSuccess, onForgotPassword }) {
       const data = await res.json();
 
       if (!res.ok) {
-        setServerError(
-          data.message || "Invalid credentials. Please try again.",
-        );
+        setServerError(data.message || "Invalid credentials. Please try again.");
+        setIsLoading(false);
         return;
       }
 
-      // Save to localStorage
       localStorage.setItem("token", data.token);
       localStorage.setItem("role", data.role);
       localStorage.setItem("user", JSON.stringify(data.user));
 
       onLoginSuccess?.(data.user);
 
-      // Redirect based on role
-      if (data.role === "student") {
-        navigate("/student/dashboard");
-      } else {
-        navigate("/faculty/dashboard");
-      }
+      const roleLabel = data.role === "student" ? "Student" : "Faculty";
+
+      setIsLoading(false);
+
+      setToast({
+        isVisible: true,
+        message: `Login Successful!, Welcome ${roleLabel}.`,
+        type: "success",
+      });
+
+      setTimeout(() => {
+        if (data.role === "student") {
+          navigate("/student/dashboard");
+        } else {
+          navigate("/faculty/dashboard");
+        }
+      }, 3000);
+
     } catch (err) {
       setServerError("Cannot connect to server. Please try again.");
-    } finally {
       setIsLoading(false);
     }
   }
@@ -163,6 +178,13 @@ export default function Login({ onLoginSuccess, onForgotPassword }) {
           <div className={styles.heroOverlay} />
         </div>
       </div>
+      <AppToast
+        message={toast.message}
+        type={toast.type}
+        isVisible={toast.isVisible}
+        onClose={() => setToast((t) => ({ ...t, isVisible: false }))}
+        duration={3000}
+      />
     </div>
   );
 }
