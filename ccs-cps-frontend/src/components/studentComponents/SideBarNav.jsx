@@ -1,20 +1,18 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom"; // IMPORT ADDED
+import { useNavigate } from "react-router-dom";
 import styles from "../../pages/studentPages/studentStyles/SideBarNav.module.css";
 import ccsLogo from "../../assets/ccs_logo.png";
 import Footer from "../../components/Footer";
 
-// React Icons — Font Awesome 6
 import { RiDashboardHorizontalFill } from "react-icons/ri";
-import { FaCalendarDays } from "react-icons/fa6"; // Schedule
-import { FaCalendarCheck } from "react-icons/fa6"; // Events
-import { FaBookOpen } from "react-icons/fa6"; // College Research
-import { FaClipboardCheck } from "react-icons/fa6"; // Clearance
-import { FaBars } from "react-icons/fa6"; // Hamburger / menu toggle
-import { FaXmark } from "react-icons/fa6"; // Close drawer
-import { FaCircleUser } from "react-icons/fa6"; // Avatar fallback
+import { FaCalendarDays } from "react-icons/fa6";
+import { FaCalendarCheck } from "react-icons/fa6";
+import { FaBookOpen } from "react-icons/fa6";
+import { FaClipboardCheck } from "react-icons/fa6";
+import { FaBars } from "react-icons/fa6";
+import { FaXmark } from "react-icons/fa6";
+import { FaCircleUser } from "react-icons/fa6";
 
-// ADDED 'path' PROPERTY TO EACH ITEM based on your App.jsx
 const NAV_ITEMS = [
   {
     name: "Dashboard",
@@ -45,32 +43,65 @@ const NAV_ITEMS = [
     label: "College Research",
     Icon: FaBookOpen,
     path: "/student/research",
-  }, // No page created yet
+  },
 ];
 
+// Fallback if localStorage has nothing yet
 const DEFAULT_STUDENT = {
-  name: "Jessa V. Cariñaga",
-  id: "2001518",
-  type: "Regular",
-  status: "Enrolled",
-  year: "4th Year",
-  section: "4IT-D",
+  name: "—",
+  id: "—",
+  status: "—",
+  year: "—",
+  section: "—",
   avatarUrl: null,
 };
 
 const MOBILE_BREAKPOINT = 992;
 
+// ── Helper: read & shape the stored user ──────────────────────
+function getStoredStudent() {
+  try {
+    const raw = localStorage.getItem("user");
+    if (!raw) return DEFAULT_STUDENT;
+
+    const u = JSON.parse(raw);
+
+    return {
+      name: `${u.firstName ?? ""} ${u.lastName ?? ""}`.trim() || "—",
+      id: u.id ?? "—",
+      status: u.status ?? "—", // "Regular" or "Irregular"
+      year: u.year ?? "—", // "4th Year"
+      section: u.section ?? "—", // "D"
+      avatarUrl: u.avatarUrl ?? null,
+    };
+  } catch {
+    return DEFAULT_STUDENT;
+  }
+}
+
 export default function SideNavbar({
   activeNav = "Dashboard",
   onNavigate,
-  student = DEFAULT_STUDENT,
+  // Accept an override prop, but default to localStorage data
+  student: studentProp,
 }) {
-  const navigate = useNavigate(); // HOOK INITIALIZED
+  const navigate = useNavigate();
+
+  // Use prop if explicitly passed, otherwise pull from localStorage
+  const [student, setStudent] = useState(studentProp ?? getStoredStudent());
+
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(
     window.innerWidth < MOBILE_BREAKPOINT,
   );
+
+  // Re-read localStorage whenever the component mounts (e.g. after login redirect)
+  useEffect(() => {
+    if (!studentProp) {
+      setStudent(getStoredStudent());
+    }
+  }, [studentProp]);
 
   useEffect(() => {
     const onResize = () => {
@@ -82,15 +113,10 @@ export default function SideNavbar({
     return () => window.removeEventListener("resize", onResize);
   }, []);
 
-  // UPDATED GO FUNCTION
   const go = (item) => {
     if (onNavigate) onNavigate(item.name);
     if (isMobile) setDrawerOpen(false);
-
-    // Check if the route exists before navigating
-    if (item.path) {
-      navigate(item.path);
-    }
+    if (item.path) navigate(item.path);
   };
 
   // ── Profile card ─────────────────────────────────────────────
@@ -110,12 +136,9 @@ export default function SideNavbar({
       <p className={styles.studentName}>{student.name}</p>
       <p className={styles.studentId}>{student.id}</p>
       <hr className={styles.profileDivider} />
-      <p className={styles.studentMeta}>Type: {student.type}</p>
       <p className={styles.studentMeta}>Status: {student.status}</p>
-      <p className={styles.studentMeta}>Current Year Level: {student.year}</p>
-      <p className={styles.studentMeta}>
-        Section/s Enrolled: {student.section}
-      </p>
+      <p className={styles.studentMeta}>Year Level: {student.year}</p>
+      <p className={styles.studentMeta}>Section: {student.section}</p>
     </div>
   );
 
@@ -128,7 +151,7 @@ export default function SideNavbar({
           <div key={item.name}>
             <div
               className={`${styles.navItem} ${isActive ? styles.navItemActive : ""}`}
-              onClick={() => go(item)} // PASS ENTIRE ITEM INSTEAD OF JUST NAME
+              onClick={() => go(item)}
             >
               <item.Icon
                 className={`${styles.navIcon} ${isActive ? styles.navIconActive : ""}`}
@@ -151,7 +174,6 @@ export default function SideNavbar({
     </div>
   );
 
-  // ── CCS Logo watermark ────────────────────────────────────────
   const Logo = ({ collapsed = false }) => (
     <div className={collapsed ? styles.collapsedLogoWrap : styles.logoWrap}>
       <img
@@ -163,13 +185,10 @@ export default function SideNavbar({
     </div>
   );
 
-  // ============================================================
-  //  MOBILE LAYOUT
-  // ============================================================
+  // ── MOBILE ────────────────────────────────────────────────────
   if (isMobile) {
     return (
       <>
-        {/* Fixed orange top bar */}
         <div className={styles.mobileTopBar}>
           <FaBars
             className={styles.mobileHamburger}
@@ -187,13 +206,11 @@ export default function SideNavbar({
           </div>
         </div>
 
-        {/* Backdrop */}
         <div
           className={`${styles.drawerBackdrop} ${drawerOpen ? styles.drawerBackdropShow : ""}`}
           onClick={() => setDrawerOpen(false)}
         />
 
-        {/* Sliding drawer */}
         <div
           className={`${styles.drawer} ${drawerOpen ? styles.drawerOpen : ""}`}
         >
@@ -208,34 +225,11 @@ export default function SideNavbar({
           <NavList />
           <Logo />
         </div>
-
-        {/* Fixed bottom tab bar */}
-        {/* <div className={styles.bottomBar}>
-          {NAV_ITEMS.map((item) => {
-            const isActive = activeNav === item.name;
-            return (
-              <div
-                key={item.name}
-                className={`${styles.tabItem} ${isActive ? styles.tabItemActive : ""}`}
-                onClick={() => go(item)} // PASS ENTIRE ITEM
-              >
-                <item.Icon
-                  className={`${styles.tabIcon} ${isActive ? styles.tabIconActive : ""}`}
-                />
-                <span className={`${styles.tabLabel} ${isActive ? styles.tabLabelActive : ""}`}>
-                  {item.label}
-                </span>
-              </div>
-            );
-          })}
-        </div> */}
       </>
     );
   }
 
-  // ============================================================
-  //  DESKTOP COLLAPSED — icon-only strip
-  // ============================================================
+  // ── DESKTOP COLLAPSED ─────────────────────────────────────────
   if (isCollapsed) {
     return (
       <div className={styles.sidebarCollapsed}>
@@ -245,9 +239,7 @@ export default function SideNavbar({
         >
           <FaBars className={styles.menuIcon} />
         </div>
-
         <hr className={styles.collapsedDivider} />
-
         <nav className="d-flex flex-column align-items-center w-100 py-2">
           {NAV_ITEMS.map((item) => {
             const isActive = activeNav === item.name;
@@ -255,7 +247,7 @@ export default function SideNavbar({
               <div
                 key={item.name}
                 className={`${styles.collapsedNavItem} ${isActive ? styles.collapsedNavItemActive : ""}`}
-                onClick={() => go(item)} // PASS ENTIRE ITEM
+                onClick={() => go(item)}
                 title={item.label}
               >
                 <item.Icon
@@ -265,15 +257,12 @@ export default function SideNavbar({
             );
           })}
         </nav>
-
         <Logo collapsed />
       </div>
     );
   }
 
-  // ============================================================
-  //  DESKTOP EXPANDED — full sidebar
-  // ============================================================
+  // ── DESKTOP EXPANDED ──────────────────────────────────────────
   return (
     <div className={styles.sidebar}>
       <div className={styles.sidebarHeader}>
@@ -283,7 +272,6 @@ export default function SideNavbar({
           onClick={() => setIsCollapsed(true)}
         />
       </div>
-
       <ProfileCard />
       <NavList />
       <Logo />

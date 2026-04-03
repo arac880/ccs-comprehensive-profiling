@@ -10,41 +10,51 @@ const login = async (req, res) => {
     let user = null;
     let role = null;
 
-    // 1. Try student first
     user = await db.collection("students").findOne({ studentId: id });
     if (user) role = "student";
 
-    // 2. Try faculty
     if (!user) {
       user = await db.collection("faculty").findOne({ facultyId: id });
       if (user) role = user.isDean ? "dean" : "faculty";
     }
 
-    // 3. Not found
     if (!user) {
       return res.status(404).json({ message: "Account not found." });
     }
 
-    // 4. Check password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(401).json({ message: "Incorrect password." });
     }
 
-    // 5. Generate token
     const token = jwt.sign({ id: user._id, role }, process.env.JWT_SECRET, {
       expiresIn: "8h",
     });
 
-    res.json({
-      token,
-      role,
-      user: {
-        id: user.studentId || user.facultyId,
-        firstName: user.firstName,
-        lastName: user.lastName,
-      },
-    });
+    const userProfile =
+      role === "student"
+        ? {
+            id: user.studentId,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            program: user.program,
+            year: user.year,         // "4th Year"
+            section: user.section,   // "D"
+            status: user.status,     // "Regular"
+            email: user.email,
+            gender: user.gender,
+            address: user.address,
+            birthdate: user.birthdate,
+            age: user.age,
+          }
+        : {
+            id: user.facultyId,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            email: user.email,
+          };
+
+    res.json({ token, role, user: userProfile });
   } catch (err) {
     res.status(500).json({ message: "Server error.", error: err.message });
   }
