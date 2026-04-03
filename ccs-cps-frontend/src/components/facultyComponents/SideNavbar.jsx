@@ -2,6 +2,7 @@ import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "../../pages/facultyPages/facultyStyles/SideNavbar.module.css";
 import ccsLogo from "../../assets/ccs_logo.png";
+import LogoutModal from "../LogoutModal";
 
 const navItems = [
   {
@@ -41,10 +42,21 @@ const faculty = { name: "Miriam B. Mulawin", id: "2203375" };
 export default function SidebarNav({ activeNav = "Dashboard", onNavigate }) {
   const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
+  const [showLogout, setShowLogout] = useState(false);
   const [tooltip, setTooltip] = useState({ visible: false, label: "", y: 0 });
   const sidebarRef = useRef(null);
 
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    navigate("/login");
+  };
+
   const handleNav = (item) => {
+    if (item.name === "SignOut") {
+      setShowLogout(true);
+      return;
+    }
     onNavigate?.(item.name);
     navigate(item.path);
   };
@@ -167,6 +179,11 @@ export default function SidebarNav({ activeNav = "Dashboard", onNavigate }) {
           {tooltip.label}
         </div>
       )}
+      <LogoutModal
+        isOpen={showLogout}
+        onCancel={() => setShowLogout(false)}
+        onConfirm={handleLogout}
+      />
     </>
   );
 }

@@ -6,7 +6,7 @@
 
 /* --- Base --- */
 .btn {
- display: flex;
+  display: flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
@@ -14,9 +14,8 @@
   border-radius: 8px;
   font-weight: 600;
   font-size: 13px;
-  border: none !important;
   transition: all 0.2s ease;
-  white-space: nowrap;  
+  white-space: nowrap;
   /* Upgraded animation with a smooth, springy cubic-bezier */
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   user-select: none;
@@ -87,20 +86,21 @@
 }
 
 /* Ghost */
-.btn--ghost {
+.btn--border-only {
   background-color: transparent;
-  border-color: transparent;
+  border: 1px solid #e65100;
   color: #e65100;
 }
 
-.btn--ghost:hover:not(:disabled) {
+.btn--border-only:hover:not(:disabled) {
   background-color: rgba(
     230,
     81,
     0,
     0.1
   ); /* Slightly richer ghost background */
-  color: #cc4800;
+  color: #dc3545;
+  border: 1px solid #dc3545;
   transform: translateY(-1px);
 }
 
