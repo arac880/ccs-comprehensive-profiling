@@ -38,9 +38,10 @@ const login = async (req, res) => {
             firstName: user.firstName,
             lastName: user.lastName,
             program: user.program,
-            year: user.year,         // "4th Year"
-            section: user.section,   // "D"
-            status: user.status,     // "Regular"
+            year: user.year,
+            section: user.section,
+            type: user.type || "Regular",       // ADDED THIS
+            status: user.status || "Enrolled",  // ADDED THIS
             email: user.email,
             gender: user.gender,
             address: user.address,

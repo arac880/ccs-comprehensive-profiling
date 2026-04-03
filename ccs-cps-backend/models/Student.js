@@ -12,7 +12,11 @@ const studentSchema = new mongoose.Schema({
   year: String,
   section: String,
   email: String,
-  status: String,
+  
+  // ADDED THESE TWO:
+  type: { type: String, default: "Regular" }, 
+  status: { type: String, default: "Enrolled" },
+
   password: { type: String, default: null },
   role: { type: String, default: "student" },
 });

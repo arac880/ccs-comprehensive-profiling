@@ -1,5 +1,6 @@
 const { getDB } = require("../config/db");
 const { ObjectId } = require("mongodb");
+const bcrypt = require("bcryptjs");
 
 // @desc    Get all students
 // @route   GET /api/students
@@ -18,7 +19,22 @@ const getStudents = async (req, res) => {
 const addStudent = async (req, res) => {
   try {
     const db = getDB();
-    const newStudent = req.body;
+    
+    // --- UPDATED: Use birthdate (YYYY-MM-DD) as the default password ---
+    // If for some reason birthdate is missing, it falls back to studentId just to prevent a crash
+    const defaultPasswordString = req.body.birthdate || req.body.studentId; 
+    
+    const salt = await bcrypt.genSalt(10);
+    const defaultHashedPassword = await bcrypt.hash(defaultPasswordString, salt);
+
+    const newStudent = {
+      ...req.body,
+      password: defaultHashedPassword, // Saves the hashed birthdate
+      type: req.body.type || "Regular",
+      status: req.body.status || "Enrolled",
+      role: "student"
+    };
+
     const result = await db.collection("students").insertOne(newStudent);
     res.status(201).json({
       message: "Student added successfully",
@@ -40,9 +56,7 @@ const getStudentById = async (req, res) => {
       return res.status(400).json({ message: "Invalid student ID format" });
     }
 
-    const student = await db
-      .collection("students")
-      .findOne({ _id: new ObjectId(id) });
+    const student = await db.collection("students").findOne({ _id: new ObjectId(id) });
 
     if (!student) {
       return res.status(404).json({ message: "Student not found" });
@@ -65,7 +79,6 @@ const updateStudent = async (req, res) => {
       return res.status(400).json({ message: "Invalid student ID format" });
     }
 
-    // Remove _id from body if present — MongoDB won't allow updating the _id field
     const { _id, ...updateData } = req.body;
 
     const result = await db.collection("students").updateOne(

@@ -18,6 +18,8 @@ const initialFormState = {
   year: "",
   section: "",
   email: "",
+  type: "",
+  status: "",
 };
 
 const AddStudentModal = ({ isOpen, onClose }) => {
@@ -30,7 +32,6 @@ const AddStudentModal = ({ isOpen, onClose }) => {
   const [errorMessage, setErrorMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Toast State
   const [toast, setToast] = useState({
     isVisible: false,
     message: "",
@@ -90,6 +91,8 @@ const AddStudentModal = ({ isOpen, onClose }) => {
       "year",
       "section",
       "email",
+      "type",
+      "status",
     ];
 
     requiredFields.forEach((field) => {
@@ -115,7 +118,14 @@ const AddStudentModal = ({ isOpen, onClose }) => {
         "gender",
         "address",
       ];
-      const academicFields = ["studentId", "program", "year", "section"];
+      const academicFields = [
+        "studentId",
+        "program",
+        "year",
+        "section",
+        "type",
+        "status",
+      ];
 
       if (personalFields.some((field) => newErrors[field])) {
         setActiveTab("personal");
@@ -165,7 +175,7 @@ const AddStudentModal = ({ isOpen, onClose }) => {
       showToast("Student profile saved successfully!", "success");
 
       setTimeout(() => {
-        onClose(); 
+        onClose();
       }, 1000);
     } catch (error) {
       console.error("Submission error:", error);
@@ -283,9 +293,7 @@ const AddStudentModal = ({ isOpen, onClose }) => {
                 <input
                   type="date"
                   name="birthdate"
-                  value={
-                    formData.birthdate || ""
-                  } 
+                  value={formData.birthdate || ""}
                   onChange={handleChange}
                   max={todayString}
                   style={{ borderColor: errors.birthdate ? "#dc3545" : "" }}
@@ -438,6 +446,47 @@ const AddStudentModal = ({ isOpen, onClose }) => {
                   style={{ borderColor: errors.section ? "#dc3545" : "" }}
                 />
                 <ErrorText message={errors.section} />
+              </div>
+
+              <div className={styles.formGroup}>
+                <label>
+                  <i
+                    className="bi bi-person-badge"
+                    style={{ marginRight: "4px" }}
+                  />
+                  Type <RequiredMark />
+                </label>
+                <select
+                  name="type"
+                  value={formData.type}
+                  onChange={handleChange}
+                  style={{ borderColor: errors.type ? "#dc3545" : "" }}>
+                  <option value="">Select Type</option>
+                  <option value="Regular">Regular</option>
+                  <option value="Irregular">Irregular</option>
+                </select>
+                <ErrorText message={errors.type} />
+              </div>
+
+              <div className={styles.formGroup}>
+                <label>
+                  <i
+                    className="bi bi-activity"
+                    style={{ marginRight: "4px" }}
+                  />
+                  Status <RequiredMark />
+                </label>
+                <select
+                  name="status"
+                  value={formData.status}
+                  onChange={handleChange}
+                  style={{ borderColor: errors.status ? "#dc3545" : "" }}>
+                  <option value="">Select Status</option>
+                  <option value="Enrolled">Enrolled</option>
+                  <option value="LOA">LOA</option>
+                  <option value="Dropped">Dropped</option>
+                </select>
+                <ErrorText message={errors.status} />
               </div>
             </div>
           )}

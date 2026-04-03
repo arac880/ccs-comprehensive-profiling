@@ -6,7 +6,9 @@ import AddStudentModal from "../../components/facultyComponents/AddStudentModal"
 import AppButton from "../../components/ui/AppButton";
 import styles from "./facultyStyles/studentList.module.css";
 
-const STATUS_CLASS = { Regular: "badgeActive", Irregular: "badgeAtRisk" };
+// Updated badge classes for both Type and Status
+const TYPE_CLASS = { Regular: "badgeActive", Irregular: "badgeAtRisk" };
+const STATUS_CLASS = { Enrolled: "badgeActive", LOA: "badgeAtRisk", Dropped: "badgeAtRisk" };
 
 function getInitials(name) {
   if (!name) return "??";
@@ -45,7 +47,8 @@ const FacultyStudentList = () => {
     name: `${s.firstName || ""} ${s.lastName || ""}`.trim(),
     program: s.program || "—",
     yearSection: `${s.year || ""} - ${s.section || ""}`.replace(/^ - | - $/g, "").trim() || "—",
-    status: s.status || "Regular", 
+    type: s.type || "Regular",    // Added Type
+    status: s.status || "Enrolled", // Updated Status
   }));
 
   const filtered = formattedStudents.filter(
@@ -53,7 +56,9 @@ const FacultyStudentList = () => {
       s.name.toLowerCase().includes(query.toLowerCase()) ||
       s.displayId.toLowerCase().includes(query.toLowerCase()) ||
       s.program.toLowerCase().includes(query.toLowerCase()) ||
-      s.yearSection.toLowerCase().includes(query.toLowerCase())
+      s.yearSection.toLowerCase().includes(query.toLowerCase()) ||
+      s.type.toLowerCase().includes(query.toLowerCase()) ||
+      s.status.toLowerCase().includes(query.toLowerCase())
   );
 
   const handleRowClick = (mongoId) => {
@@ -86,15 +91,16 @@ const FacultyStudentList = () => {
                   <th>ID Number</th>
                   <th>Program</th>
                   <th>Year & Section</th>
+                  <th>Type</th>
                   <th>Status</th>
                   <th style={{ textAlign: "right" }}>Action</th>
                 </tr>
               </thead>
               <tbody>
                 {isLoading ? (
-                  <tr className={styles.emptyRow}><td colSpan={6}>Loading student data...</td></tr>
+                  <tr className={styles.emptyRow}><td colSpan={7}>Loading student data...</td></tr>
                 ) : filtered.length === 0 ? (
-                  <tr className={styles.emptyRow}><td colSpan={6}>No students found.</td></tr>
+                  <tr className={styles.emptyRow}><td colSpan={7}>No students found.</td></tr>
                 ) : (
                   filtered.map((s) => (
                     <tr key={s.id} className={styles.hoverRow}>
@@ -107,7 +113,21 @@ const FacultyStudentList = () => {
                       <td className={styles.subText}>{s.displayId}</td>
                       <td className={styles.subText}>{s.program}</td>
                       <td className={styles.subText}>{s.yearSection}</td>
-                      <td><span className={`${styles.badge} ${styles[STATUS_CLASS[s.status] || "badgeActive"]}`}>{s.status}</span></td>
+                      
+                      {/* Added Type Badge */}
+                      <td>
+                        <span className={`${styles.badge} ${styles[TYPE_CLASS[s.type] || "badgeActive"]}`}>
+                          {s.type}
+                        </span>
+                      </td>
+                      
+                      {/* Updated Status Badge */}
+                      <td>
+                        <span className={`${styles.badge} ${styles[STATUS_CLASS[s.status] || "badgeActive"]}`}>
+                          {s.status}
+                        </span>
+                      </td>
+                      
                       <td style={{ textAlign: "right" }}>
                         <button className={styles.viewBtn} onClick={() => handleRowClick(s.id)}>View <FiArrowRight size={14} /></button>
                       </td>
