@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Outlet, useLocation } from "react-router-dom";
+import { Outlet, useLocation, useNavigate } from "react-router-dom"; 
 import SideBarNav from "../studentComponents/SideBarNav";
 import TopNavbar from "../studentComponents/TopBarNav";
 import Footer from "../Footer";
@@ -8,6 +8,7 @@ import styles from "../../pages/studentPages/studentStyles/StudentLayout.module.
 const StudentLayout = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false); 
   const location = useLocation();
+  const navigate = useNavigate(); 
 
   const getActiveNav = () => {
     const path = location.pathname.toLowerCase();
@@ -23,6 +24,13 @@ const StudentLayout = () => {
     setIsDrawerOpen(open);
   };
 
+  const handleSignOut = () => {
+    console.log('Signing out...');
+    localStorage.removeItem('user');
+    sessionStorage.clear();
+    navigate('/login', { replace: true });
+  };
+
   return (
     <div className={styles.pageRoot}>
       <SideBarNav 
@@ -34,7 +42,7 @@ const StudentLayout = () => {
       <div className={styles.pageMain}>
         <TopNavbar 
           notifCount={0}  
-          onSignOut={() => console.log('sign out')}  
+          onSignOut={handleSignOut}     
           onMenuClick={() => setIsDrawerOpen(true)}  
         />
 

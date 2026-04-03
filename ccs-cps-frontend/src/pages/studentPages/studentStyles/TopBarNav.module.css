@@ -33,14 +33,38 @@
 /* ── Action icons ── */
 .actionIcon {
   font-size: clamp(1.15rem, 2vw, 1.5rem);
-  color: #ffffff;
-  cursor: pointer;
-  transition: opacity 0.16s ease;
+  color: #ffffff !important;  /* ✅ Force white */
+  cursor: pointer !important;
+  pointer-events: auto !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   display: block;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .actionIcon:hover {
-  opacity: 0.72;
+  opacity: 0.9 !important;
+  transform: scale(1.08) !important;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)) !important;
+}
+
+.actionIcon:active {
+  transform: scale(0.98) !important;
+}
+
+.iconBtn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+  pointer-events: auto !important;
+}
+
+.iconBtn:hover {
+  background: rgba(255,255,255,0.15) !important;
 }
 
 /* ── Notification bell wrapper ── */
