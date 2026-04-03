@@ -2,7 +2,13 @@
   min-height: 100vh;
   background-color: #fffaf6;
   display: flex;
-  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-family:
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -41,7 +47,7 @@
   width: 36px;
   height: 36px;
   background-color: #fff0e6;
-  color: #E65100;
+  color: #e65100;
   border-radius: 8px;
   flex-shrink: 0;
 }
@@ -70,12 +76,12 @@
 .searchIcon {
   position: absolute;
   left: 12px;
-  color: #9CA3AF;
+  color: #9ca3af;
   font-size: 14px;
 }
 
 .searchInput {
-  background: #FFFFFF;
+  background: #ffffff;
   border: 1px solid #e2e8f0;
   border-radius: 8px;
   padding: 9px 12px 9px 36px;
@@ -87,7 +93,7 @@
 
 .searchInput:focus {
   outline: none;
-  border-color: #E65100;
+  border-color: #e65100;
   box-shadow: 0 0 0 3px rgba(230, 81, 0, 0.08);
 }
 
@@ -105,8 +111,8 @@
   border-radius: 8px;
   font-weight: 600;
   font-size: 13px;
-  background-color: #E65100 !important;
-  color: #FFFFFF !important;
+  background-color: #e65100 !important;
+  color: #ffffff !important;
   border: none !important;
   transition: all 0.2s ease;
   white-space: nowrap;
@@ -119,10 +125,12 @@
 
 /* ── Table Card ── */
 .tableCard {
-  background: #FFFFFF;
+  background: #ffffff;
   border-radius: 12px;
   border: 1px solid #eef0f3;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.05),
+    0 2px 4px -1px rgba(0, 0, 0, 0.03);
   overflow: hidden;
 }
 
@@ -147,13 +155,13 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  border-bottom: 1px solid #E5E7EB;
+  border-bottom: 1px solid #e5e7eb;
   white-space: nowrap;
 }
 
 .table tbody td {
   padding: 12px 24px;
-  border-bottom: 1px solid #F3F4F6;
+  border-bottom: 1px solid #f3f4f6;
   vertical-align: middle;
 }
 
@@ -248,7 +256,7 @@
 
 .viewBtn:hover {
   color: #f3dccf;
-  background: #E65100;
+  background: #e65100;
   border-color: #fbd38d;
 }
 
@@ -256,7 +264,7 @@
 .emptyRow td {
   text-align: center;
   padding: 40px;
-  color: #6B7280;
+  color: #6b7280;
   font-size: 13px;
 }
 
@@ -366,8 +374,10 @@
 }
 
 .modalBody {
-  padding: 24px;
+  padding: 20px 24px;
   overflow-y: auto;
+  flex: 1; /* ← takes remaining space between header and footer */
+  -webkit-overflow-scrolling: touch; /* ← smooth scroll on iOS */
 }
 
 .formGrid {
@@ -390,33 +400,39 @@
   font-size: 12px;
   font-weight: 600;
   color: #444;
+  margin-bottom: 2px;
 }
 
 .formGroup input,
-.formGroup select {
+.formGroup select,
+.formGroup textarea {
   width: 100%;
-  padding: 12px 14px;
-  border: 2px solid #e8ddd5;
+  padding: 10px 14px;
+  border: 1.5px solid #e8ddd5;
   border-radius: 8px;
-  font-size: 13.5px;
+  font-size: 13px;
   font-weight: 500;
   color: #333;
   outline: none;
   background: #fdfaf7;
   transition: all 0.2s ease;
   box-sizing: border-box;
+  font-family: inherit;
+  line-height: 1.5;
 }
 
 .formGroup input:focus,
-.formGroup select:focus {
+.formGroup select:focus,
+.formGroup textarea:focus {
   border-color: #e65100;
   background: #ffffff;
-  box-shadow: 0 0 0 4px rgba(230, 81, 0, 0.15);
+  box-shadow: 0 0 0 3px rgba(230, 81, 0, 0.12);
 }
 
 .formGroup input::placeholder,
-.formGroup select::placeholder {
-  color: #aeb1b6;
+.formGroup select::placeholder,
+.formGroup textarea::placeholder {
+  color: #bbb;
 }
 
 .formGroup input:disabled {
@@ -427,6 +443,16 @@
   opacity: 1;
 }
 
+.formGroup textarea {
+  resize: vertical;
+  min-height: 90px;
+}
+
+.formGroup select {
+  appearance: auto;
+  cursor: pointer;
+}
+
 .modalFooter {
   display: flex;
   justify-content: flex-end;
@@ -435,7 +461,6 @@
   background-color: #fdf8f5;
   border-top: 1px solid #e8ddd5;
 }
-
 
 /* =============================================
    RESPONSIVE MEDIA QUERIES
@@ -470,7 +495,39 @@
     width: 100%;
   }
 
+  .modalOverlay {
+    align-items: flex-end; /* ← modal slides up from bottom on mobile */
+    padding: 0;
+  }
+
+  .modalContent {
+    max-width: 100%;
+    width: 100%;
+    max-height: 92vh; /* ← taller on mobile to show more content */
+    border-radius: 16px 16px 0 0; /* ← bottom sheet style */
+  }
+
+  .modalBody {
+    padding: 16px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .modalTabs {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; /* ← hide scrollbar on Firefox */
+  }
+
+  .modalTabs::-webkit-scrollbar {
+    display: none; /* ← hide scrollbar on Chrome/Safari */
+  }
+
   .formGrid {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr; /* ← single column on mobile */
+  }
+
+  .modalFooter {
+    padding: 12px 16px;
   }
 }
