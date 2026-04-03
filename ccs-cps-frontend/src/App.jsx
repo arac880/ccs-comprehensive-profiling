@@ -8,6 +8,9 @@ import {
 import Login from "./pages/Login";
 import ProtectedRoute from "./components/ProtectedRoute";
 
+// Layouts
+import FacultyLayout from "./components/facultyComponents/FacultyLayout";
+
 // Faculty pages
 import FacultyDashboard from "./pages/facultyPages/facultyDashboard";
 import FacultyStudentList from "./pages/facultyPages/FacultyStudentList";
@@ -30,47 +33,25 @@ function App() {
         {/* Auth */}
         <Route path="/login" element={<Login />} />
 
-        {/* Faculty Routes */}
+        {/* Faculty Routes  */}
         <Route
-          path="/faculty/dashboard"
+          path="/faculty"
           element={
             <ProtectedRoute allowedRoles={["faculty", "dean"]}>
-              <FacultyDashboard />
+              <FacultyLayout />
             </ProtectedRoute>
           }
-        />
-        <Route
-          path="/faculty/student-list"
-          element={
-            <ProtectedRoute allowedRoles={["faculty", "dean"]}>
-              <FacultyStudentList />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/faculty/schedule"
-          element={
-            <ProtectedRoute allowedRoles={["faculty", "dean"]}>
-              <FacultySchedule />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/faculty/events"
-          element={
-            <ProtectedRoute allowedRoles={["faculty", "dean"]}>
-              <FacultyEvents />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/faculty/student/:id"
-          element={
-            <ProtectedRoute allowedRoles={["faculty", "dean"]}>
-              <FacultyStudentProfile />
-            </ProtectedRoute>
-          }
-        />
+        >
+          {/* Default faculty page */}
+          <Route index element={<Navigate to="dashboard" replace />} />
+          
+          {/* Child Routes - injected into the FacultyLayout's <Outlet /> */}
+          <Route path="dashboard" element={<FacultyDashboard />} />
+          <Route path="student-list" element={<FacultyStudentList />} />
+          <Route path="schedule" element={<FacultySchedule />} />
+          <Route path="events" element={<FacultyEvents />} />
+          <Route path="student/:id" element={<FacultyStudentProfile />} />
+        </Route>
 
         {/* Student Routes */}
         <Route

@@ -1,0 +1,16 @@
+.pageRoot {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  background-color: #f8f9fa; 
+  overflow: hidden; 
+}
+
+.pageMain {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow-y: auto; 
+  background-color: transparent;
+}
