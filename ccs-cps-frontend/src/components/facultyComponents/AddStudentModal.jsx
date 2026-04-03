@@ -17,9 +17,10 @@ const initialFormState = {
   program: "",
   year: "",
   section: "",
-  email: "",
   type: "",
   status: "",
+  email: "",
+  phone: "", // Added Phone state
 };
 
 const AddStudentModal = ({ isOpen, onClose }) => {
@@ -64,16 +65,33 @@ const AddStudentModal = ({ isOpen, onClose }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    let nextValue = value;
+
+    // Restriction: Remove numbers from First and Last Name
+    if (name === "firstName" || name === "lastName") {
+      nextValue = value.replace(/[0-9]/g, "");
+    }
+
+    // Restriction: Only allow numbers in Phone
+    if (name === "phone") {
+      nextValue = value.replace(/[^0-9]/g, "");
+    }
+
     if (name === "birthdate") {
-      const newAge = calculateAge(value);
+      const newAge = calculateAge(nextValue);
       setFormData((prev) => ({
         ...prev,
-        birthdate: value,
+        birthdate: nextValue,
         age: newAge.toString(),
       }));
       setErrors((prev) => ({ ...prev, birthdate: "", age: "" }));
+    } else if (name === "type") {
+      // Clear the section if type changes to prevent invalid states
+      setFormData((prev) => ({ ...prev, type: nextValue, section: "" }));
+      if (errors.type)
+        setErrors((prev) => ({ ...prev, type: "", section: "" }));
     } else {
-      setFormData((prev) => ({ ...prev, [name]: value }));
+      setFormData((prev) => ({ ...prev, [name]: nextValue }));
       if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
     }
   };
@@ -90,9 +108,10 @@ const AddStudentModal = ({ isOpen, onClose }) => {
       "program",
       "year",
       "section",
-      "email",
       "type",
       "status",
+      "email",
+      "phone", // Added to required
     ];
 
     requiredFields.forEach((field) => {
@@ -104,8 +123,11 @@ const AddStudentModal = ({ isOpen, onClose }) => {
       }
     });
 
-    if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = "Please enter a valid email address";
+    // Stricter Email Validation (requires @ and a domain like .com, .net, etc.)
+    const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
+    if (formData.email && !emailRegex.test(formData.email)) {
+      newErrors.email =
+        "Please enter a valid email address (e.g., name@domain.com)";
     }
 
     setErrors(newErrors);
@@ -195,7 +217,14 @@ const AddStudentModal = ({ isOpen, onClose }) => {
 
   const ErrorText = ({ message }) =>
     message ? (
-      <span style={{ color: "#dc3545", fontSize: "11px", marginTop: "4px" }}>
+      <span
+        style={{
+          color: "#dc3545",
+          fontSize: "11px",
+          marginTop: "4px",
+          display: "block",
+        }}
+      >
         {message}
       </span>
     ) : null;
@@ -218,12 +247,14 @@ const AddStudentModal = ({ isOpen, onClose }) => {
         onClose={onClose}
         title="New Student Profile"
         icon="bi-person-plus-fill"
-        maxWidth="650px">
+        maxWidth="650px"
+      >
         <div className={styles.modalTabs}>
           <button
             className={`${styles.tabBtn} ${activeTab === "personal" ? styles.activeTab : ""}`}
             onClick={() => setActiveTab("personal")}
-            type="button">
+            type="button"
+          >
             <i
               className="bi bi-person-lines-fill"
               style={{ marginRight: "6px" }}
@@ -233,7 +264,8 @@ const AddStudentModal = ({ isOpen, onClose }) => {
           <button
             className={`${styles.tabBtn} ${activeTab === "academic" ? styles.activeTab : ""}`}
             onClick={() => setActiveTab("academic")}
-            type="button">
+            type="button"
+          >
             <i
               className="bi bi-mortarboard-fill"
               style={{ marginRight: "6px" }}
@@ -243,7 +275,8 @@ const AddStudentModal = ({ isOpen, onClose }) => {
           <button
             className={`${styles.tabBtn} ${activeTab === "contact" ? styles.activeTab : ""}`}
             onClick={() => setActiveTab("contact")}
-            type="button">
+            type="button"
+          >
             <i
               className="bi bi-telephone-fill"
               style={{ marginRight: "6px" }}
@@ -289,14 +322,26 @@ const AddStudentModal = ({ isOpen, onClose }) => {
               </div>
 
               <div className={styles.formGroup}>
-                <label>Birthdate</label>
+                <label>
+                  <i
+                    className="bi bi-calendar-date"
+                    style={{ marginRight: "4px" }}
+                  />
+                  Birthdate <RequiredMark />
+                </label>
                 <input
                   type="date"
                   name="birthdate"
                   value={formData.birthdate || ""}
                   onChange={handleChange}
                   max={todayString}
-                  style={{ borderColor: errors.birthdate ? "#dc3545" : "" }}
+                  onClick={(e) => {
+                    if (e.target.showPicker) e.target.showPicker();
+                  }}
+                  style={{
+                    borderColor: errors.birthdate ? "#dc3545" : "",
+                    cursor: "pointer",
+                  }}
                 />
                 <ErrorText message={errors.birthdate} />
               </div>
@@ -334,7 +379,8 @@ const AddStudentModal = ({ isOpen, onClose }) => {
                   name="gender"
                   value={formData.gender}
                   onChange={handleChange}
-                  style={{ borderColor: errors.gender ? "#dc3545" : "" }}>
+                  style={{ borderColor: errors.gender ? "#dc3545" : "" }}
+                >
                   <option value="">Select Gender</option>
                   <option value="Male">Male</option>
                   <option value="Female">Female</option>
@@ -386,6 +432,49 @@ const AddStudentModal = ({ isOpen, onClose }) => {
               <div className={styles.formGroup}>
                 <label>
                   <i
+                    className="bi bi-activity"
+                    style={{ marginRight: "4px" }}
+                  />
+                  Status <RequiredMark />
+                </label>
+                <select
+                  name="status"
+                  value={formData.status}
+                  onChange={handleChange}
+                  style={{ borderColor: errors.status ? "#dc3545" : "" }}
+                >
+                  <option value="">Select Status</option>
+                  <option value="Enrolled">Enrolled</option>
+                  <option value="LOA">LOA</option>
+                  <option value="Dropped">Dropped</option>
+                </select>
+                <ErrorText message={errors.status} />
+              </div>
+
+              <div className={styles.formGroup}>
+                <label>
+                  <i
+                    className="bi bi-person-badge"
+                    style={{ marginRight: "4px" }}
+                  />
+                  Type <RequiredMark />
+                </label>
+                <select
+                  name="type"
+                  value={formData.type}
+                  onChange={handleChange}
+                  style={{ borderColor: errors.type ? "#dc3545" : "" }}
+                >
+                  <option value="">Select Type</option>
+                  <option value="Regular">Regular</option>
+                  <option value="Irregular">Irregular</option>
+                </select>
+                <ErrorText message={errors.type} />
+              </div>
+
+              <div className={styles.formGroup}>
+                <label>
+                  <i
                     className="bi bi-journal-bookmark"
                     style={{ marginRight: "4px" }}
                   />
@@ -395,7 +484,8 @@ const AddStudentModal = ({ isOpen, onClose }) => {
                   name="program"
                   value={formData.program}
                   onChange={handleChange}
-                  style={{ borderColor: errors.program ? "#dc3545" : "" }}>
+                  style={{ borderColor: errors.program ? "#dc3545" : "" }}
+                >
                   <option value="">Select Program</option>
                   <option value="BS Computer Science">
                     BS Computer Science
@@ -419,7 +509,8 @@ const AddStudentModal = ({ isOpen, onClose }) => {
                   name="year"
                   value={formData.year}
                   onChange={handleChange}
-                  style={{ borderColor: errors.year ? "#dc3545" : "" }}>
+                  style={{ borderColor: errors.year ? "#dc3545" : "" }}
+                >
                   <option value="">Select Year</option>
                   <option value="1st Year">1st Year</option>
                   <option value="2nd Year">2nd Year</option>
@@ -437,56 +528,31 @@ const AddStudentModal = ({ isOpen, onClose }) => {
                   />
                   Section <RequiredMark />
                 </label>
-                <input
-                  type="text"
-                  name="section"
-                  value={formData.section}
-                  onChange={handleChange}
-                  placeholder="e.g. A"
-                  style={{ borderColor: errors.section ? "#dc3545" : "" }}
-                />
+                {formData.type === "Irregular" ? (
+                  <input
+                    type="text"
+                    name="section"
+                    value={formData.section}
+                    onChange={handleChange}
+                    placeholder="e.g. A, C (Type manually)"
+                    style={{ borderColor: errors.section ? "#dc3545" : "" }}
+                  />
+                ) : (
+                  <select
+                    name="section"
+                    value={formData.section}
+                    onChange={handleChange}
+                    style={{ borderColor: errors.section ? "#dc3545" : "" }}
+                  >
+                    <option value="">Select Section</option>
+                    <option value="A">A</option>
+                    <option value="B">B</option>
+                    <option value="C">C</option>
+                    <option value="D">D</option>
+                    <option value="E">E</option>
+                  </select>
+                )}
                 <ErrorText message={errors.section} />
-              </div>
-
-              <div className={styles.formGroup}>
-                <label>
-                  <i
-                    className="bi bi-person-badge"
-                    style={{ marginRight: "4px" }}
-                  />
-                  Type <RequiredMark />
-                </label>
-                <select
-                  name="type"
-                  value={formData.type}
-                  onChange={handleChange}
-                  style={{ borderColor: errors.type ? "#dc3545" : "" }}>
-                  <option value="">Select Type</option>
-                  <option value="Regular">Regular</option>
-                  <option value="Irregular">Irregular</option>
-                </select>
-                <ErrorText message={errors.type} />
-              </div>
-
-              <div className={styles.formGroup}>
-                <label>
-                  <i
-                    className="bi bi-activity"
-                    style={{ marginRight: "4px" }}
-                  />
-                  Status <RequiredMark />
-                </label>
-                <select
-                  name="status"
-                  value={formData.status}
-                  onChange={handleChange}
-                  style={{ borderColor: errors.status ? "#dc3545" : "" }}>
-                  <option value="">Select Status</option>
-                  <option value="Enrolled">Enrolled</option>
-                  <option value="LOA">LOA</option>
-                  <option value="Dropped">Dropped</option>
-                </select>
-                <ErrorText message={errors.status} />
               </div>
             </div>
           )}
@@ -512,6 +578,25 @@ const AddStudentModal = ({ isOpen, onClose }) => {
                 />
                 <ErrorText message={errors.email} />
               </div>
+
+              <div className={styles.formGroup}>
+                <label>
+                  <i
+                    className="bi bi-telephone"
+                    style={{ marginRight: "4px" }}
+                  />
+                  Phone Number <RequiredMark />
+                </label>
+                <input
+                  type="tel"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  placeholder="e.g. 09123456789"
+                  style={{ borderColor: errors.phone ? "#dc3545" : "" }}
+                />
+                <ErrorText message={errors.phone} />
+              </div>
             </div>
           )}
         </div>
@@ -520,7 +605,8 @@ const AddStudentModal = ({ isOpen, onClose }) => {
           <AppButton
             variant="secondary"
             onClick={onClose}
-            disabled={isSubmitting}>
+            disabled={isSubmitting}
+          >
             <i className="bi bi-x-circle" style={{ marginRight: "6px" }} />
             Cancel
           </AppButton>
@@ -528,7 +614,8 @@ const AddStudentModal = ({ isOpen, onClose }) => {
           <AppButton
             variant="primary"
             onClick={handleInitialSubmit}
-            disabled={isSubmitting}>
+            disabled={isSubmitting}
+          >
             <i className="bi bi-check2-circle" style={{ marginRight: "6px" }} />
             Save Student
           </AppButton>
