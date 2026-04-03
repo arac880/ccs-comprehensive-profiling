@@ -34,14 +34,15 @@ const login = async (req, res) => {
     const userProfile =
       role === "student"
         ? {
+            _id: user._id,
             id: user.studentId,
             firstName: user.firstName,
             lastName: user.lastName,
             program: user.program,
             year: user.year,
             section: user.section,
-            type: user.type || "Regular",       // ADDED THIS
-            status: user.status || "Enrolled",  // ADDED THIS
+            type: user.type || "Regular", // ADDED THIS
+            status: user.status || "Enrolled", // ADDED THIS
             email: user.email,
             gender: user.gender,
             address: user.address,
@@ -49,6 +50,7 @@ const login = async (req, res) => {
             age: user.age,
           }
         : {
+            _id: user._id,
             id: user.facultyId,
             firstName: user.firstName,
             lastName: user.lastName,

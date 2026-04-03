@@ -1,204 +1,81 @@
-/* profileCard.module.css */
-
-/* ── Outer card: true horizontal row ── */
-.card {
-  background: #fff;
-  border-radius: 14px;
-  border: 1px solid #e5e7eb;
-  padding: clamp(1.1rem, 2.5vw, 1.6rem) clamp(1.25rem, 3vw, 2rem);
+.heroCard {
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  padding: 20px;
   display: flex;
-  flex-direction: row;
   align-items: center;
-  gap: clamp(1.25rem, 3vw, 2rem);
-  width: 100%;
-  min-height: 110px;
+  gap: 20px;
 }
 
-/* ── LEFT block: avatar + name stacked ── */
-.leftBlock {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: clamp(0.85rem, 2vw, 1.25rem);
-}
-
-/* ── Avatar ── */
-.avatarWrap {
+/* Avatar */
+.heroAvatarWrap {
   position: relative;
-  width: clamp(72px, 9vw, 90px);
-  height: clamp(72px, 9vw, 90px);
 }
 
-.avatarDefault {
-  width: 100%;
-  height: 100%;
-  border-radius: clamp(12px, 1.5vw, 16px);
-  background: #fff3ed;
-  border: 2px solid #f5c8a8;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  box-shadow: 0 4px 14px rgba(230, 81, 0, 0.12);
-}
-
-/* Icon fills ~80% of the avatar box */
-.avatarIcon {
-  width: 78%;
-  height: 78%;
-}
-
-.avatarImg {
-  width: 100%;
-  height: 100%;
-  border-radius: clamp(12px, 1.5vw, 16px);
-  object-fit: cover;
-  border: 2px solid #f5c8a8;
-  box-shadow: 0 4px 14px rgba(230, 81, 0, 0.12);
-}
-
-/* Camera button — bottom-right corner of avatar */
-.camBtn {
-  position: absolute;
-  bottom: 0;
-  right: 0;
-
-  width: 28px;
-  height: 28px;
+.heroAvatar,
+.heroAvatarImg {
+  width: 72px;
+  height: 72px;
   border-radius: 50%;
+  object-fit: cover;
+}
 
-  background: #e65100;
-  border: 2px solid #fff;
-
+.heroAvatar {
+  background: #fdf0e8;
+  border: 2px solid #f0d8c8;
   display: flex;
   align-items: center;
   justify-content: center;
-
-  cursor: pointer;
-
-  z-index: 10; /* 🔥 THIS FIXES IT */
-}
-.camBtn:hover {
-  background: #bf360c;
-  transform: scale(1.12);
+  color: #e65100;
 }
 
+/* Edit button overlay */
 .editOverlay {
   position: absolute;
-  bottom: 0;
-  right: 0;
-  z-index: 10;
+  bottom: -4px;
+  right: -4px;
 }
 
-/* ── Name block ── */
-.nameBlock {
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
+/* Info */
+.heroInfo {
+  flex-grow: 1;
 }
 
-.studentName {
-  font-size: clamp(0.95rem, 2vw, 1.15rem);
+.heroName {
+  font-size: 20px;
   font-weight: 700;
-  color: #111827;
-  line-height: 1.25;
-  white-space: nowrap;
+  margin: 0 0 6px;
+  color: #1a1a1a;
 }
 
-.studentId {
-  font-size: clamp(0.75rem, 1.3vw, 0.85rem);
-  color: #6b7280;
-  font-weight: 500;
-  letter-spacing: 0.04em;
-}
-
-/* ── Vertical divider ── */
-.vDivider {
-  width: 1px;
-  height: clamp(50px, 7vw, 68px);
-  background: #e5e7eb;
-  flex-shrink: 0;
-}
-
-/* ── RIGHT block: info fields in a row ── */
-.rightBlock {
+.heroMeta {
   display: flex;
-  flex-direction: row;
-  align-items: center;
+  gap: 16px;
   flex-wrap: wrap;
-  gap: 0;
-  flex: 1;
-  min-width: 0;
 }
 
-.infoField {
+.heroMetaItem {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.3rem;
-  min-width: 80px;
-  padding: 0 clamp(0.75rem, 2vw, 1.4rem);
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  color: #666;
 }
 
-/* Last field: program — gets more space */
-.infoField:last-child {
-  flex: 1;
-  min-width: 160px;
+.heroMetaItem i {
+  color: #e65100;
 }
 
-.infoLabel {
-  font-size: clamp(0.58rem, 0.95vw, 0.66rem);
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: #9ca3af;
-  white-space: nowrap;
+/* Badges */
+.badgeWrap {
+  display: flex;
+  gap: 8px;
 }
 
-.infoValue {
-  font-size: clamp(0.8rem, 1.4vw, 0.92rem);
+.badge {
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
   font-weight: 600;
-  color: #1f2937;
-  line-height: 1.3;
-}
-
-.statusBadge {
-  border-radius: 999px;
-  padding: 0.22rem 0.8rem;
-  font-size: clamp(0.68rem, 1.1vw, 0.78rem);
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  display: inline-block;
-  white-space: nowrap;
-}
-
-/* ── Thin vertical separator between right fields ── */
-.infoSep {
-  width: 1px;
-  height: 36px;
-  background: #e5e7eb;
-  flex-shrink: 0;
-}
-
-/* ── Responsive: stack on small screens ── */
-@media (max-width: 640px) {
-  .card {
-    flex-direction: column;
-    align-items: flex-start;
-    min-height: unset;
-  }
-  .vDivider {
-    display: none;
-  }
-  .rightBlock {
-    width: 100%;
-    gap: 0.75rem;
-    flex-wrap: wrap;
-  }
-  .infoField {
-    padding: 0;
-  }
-  .infoSep {
-    display: none;
-  }
 }
