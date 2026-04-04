@@ -267,6 +267,8 @@
   border-radius: 10px;
   padding: 1rem 1.1rem;
   transition: box-shadow 0.2s;
+  display: flex;
+  flex-direction: column;
 }
 .card:hover {
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.07);
@@ -314,6 +316,21 @@
   color: #6b7280;
   line-height: 1.5;
   margin: 0.4rem 0 0;
+}
+
+.cardFooter {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: auto;
+  padding-top: 8px;
+}
+
+.cardDate {
+  font-size: 11px;
+  color: var(--color-text-tertiary);
+  text-align: right;
+  margin-top: auto;
+  padding-top: 8px;
 }
 
 /* ============================= */
