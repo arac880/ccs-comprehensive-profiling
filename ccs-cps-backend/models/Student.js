@@ -40,7 +40,9 @@ const studentSchema = new mongoose.Schema({
 
   skills: { type: Array, default: [] },
   activities: { type: Array, default: [] },
-  
+  organizations: { type: Array, default: [] },
+  sports: { type: Array, default: [] },
+
   password: { type: String, default: null },
   role: { type: String, default: "student" },
 });
