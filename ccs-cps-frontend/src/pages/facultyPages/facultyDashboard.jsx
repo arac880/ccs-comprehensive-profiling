@@ -200,14 +200,14 @@ const SCHEDULE = [
     day: "MWF",
   },
   {
-    subject: "Algorithm Design",
+    subject: "OOP",
     code: "CS 321",
     room: "Room 204",
     time: "9:30–11:00 AM",
     day: "TTh",
   },
   {
-    subject: "Software Engineering",
+    subject: "Intorduction to Programming",
     code: "CS 401",
     room: "Room 301",
     time: "1:00–2:30 PM",

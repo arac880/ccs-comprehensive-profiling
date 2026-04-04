@@ -44,9 +44,9 @@
   gap: 16px;
 }
 
-/* Replace the welcomeBanner flex-direction and justify-content */
+
 .welcomeBanner {
-  /* keep everything the same, just remove gap: 10px and flex-direction: column */
+
   background: linear-gradient(135deg, #7b1a00 0%, #c0390a 50%, #e65100 100%);
   border-radius: var(--radius);
   padding: 24px 28px;
@@ -55,10 +55,10 @@
   overflow: hidden;
   min-height: 150px;
   display: flex;
-  align-items: center;   /* vertically center the inner wrapper */
+  align-items: center;   
 }
 
-/* Add this new rule */
+
 .welcomeBannerInner {
   display: flex;
   align-items: center;
