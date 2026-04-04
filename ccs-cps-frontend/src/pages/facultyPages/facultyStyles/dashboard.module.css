@@ -1,255 +1,584 @@
-/* =============================================
-   Dashboard — CSS Module
-   ============================================= */
+@import url('https://fonts.googleapis.com/css2?family=Gabarito:wght@400;700;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
-.facultyDashboard {
-  min-height: 100vh;
-  background-color: #fdf5ef;
-  display: flex;
+:root {
+  --orange: #e65100;
+  --orange-light: #ff7d2e;
+  --orange-dim: #fff3ee;
+  --orange-border: #f5c4aa;
+  --orange-mid: #f0d8cc;
+  --surface: #ffffff;
+  --bg: #fdf5ef;
+  --text: #1a1a1a;
+  --text-muted: #888;
+  --radius: 14px;
+  --shadow: 0 2px 12px rgba(230,81,0,0.07);
+  --transition: 0.2s cubic-bezier(0.4,0,0.2,1);
 }
 
-.dashboardMain {
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
-  overflow: hidden;
-  height: 100vh;
-}
+* { font-family: "Plus Jakarta Sans", sans-serif; box-sizing: border-box; }
 
+/* ── Layout ── */
 .dashboardContent {
   display: flex;
   flex-grow: 1;
-  padding: 16px;
-  gap: 16px;
-  background-color: #fdf5ef;
+  padding: 20px 18px;
+  gap: 18px;
+  background-color: var(--bg);
   overflow-y: auto;
+  align-items: flex-start;
 }
 
-/* ── Left column ── */
 .dashboardLeft {
   display: flex;
   flex-direction: column;
   flex-grow: 1;
   gap: 16px;
+  min-width: 0;
 }
 
-/* ── Welcome Banner ── */
-.welcomeBanner {
-  background: linear-gradient(135deg, #7b1a00, #c0390a);
-  border-radius: 8px;
-  min-height: 140px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  text-align: center;
-  padding: 2rem;
-}
-
-.welcomeTitle {
-  font-size: 1.2rem;
-  margin: 0;
-}
-
-.welcomeCcs {
-  font-size: 2.2rem;
-  font-family: Gabarito, sans-serif;
-  font-weight: 900;
-}
-
-.welcomeSub {
-  font-size: 12px;
-  opacity: 0.9;
-  font-weight: 600;
-  margin-top: 4px;
-  margin-bottom: 0;
-}
-
-/* ── Cards ── */
-.dashboardCard {
-  background: white;
-  border-radius: 8px;
-  padding: 16px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
-}
-
-.cardTitle {
-  font-size: 15px;
-  font-weight: 700;
-  margin-bottom: 12px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: #1a1a1a;
-}
-
-.cardTitle i {
-  color: #e65100;
-  font-size: 16px;
-}
-
-.emptyNotice {
-  background-color: #fdf0e8;
-  color: #e65100;
-  text-align: center;
-  font-size: 13px;
-  padding: 12px;
-  border-radius: 6px;
-}
-
-.eventBlock {
-  height: 100px;
-  background-color: #fdf0e8;
-  border-radius: 6px;
-  margin-bottom: 10px;
-  border-left: 3px solid #e65100;
-}
-
-.eventBlock:last-child {
-  margin-bottom: 0;
-}
-
-/* ── Right — Calendar ── */
 .dashboardRight {
-  width: 210px;
+  width: 230px;
   flex-shrink: 0;
-}
-
-.calendarCard {
-  background: white;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
-}
-
-.calendarHeader {
-  background-color: #e65100;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 10px;
-}
-
-.calendarDayNum {
-  color: white;
-  font-size: 2rem;
-  font-weight: 900;
-  line-height: 1;
-  font-family: Gabarito, sans-serif;
-}
-
-.calendarDayInfo {
   display: flex;
   flex-direction: column;
-  font-size: 10px;
+  gap: 16px;
+}
+
+/* Replace the welcomeBanner flex-direction and justify-content */
+.welcomeBanner {
+  /* keep everything the same, just remove gap: 10px and flex-direction: column */
+  background: linear-gradient(135deg, #7b1a00 0%, #c0390a 50%, #e65100 100%);
+  border-radius: var(--radius);
+  padding: 24px 28px;
   color: white;
+  position: relative;
+  overflow: hidden;
+  min-height: 150px;
+  display: flex;
+  align-items: center;   /* vertically center the inner wrapper */
 }
 
-.dow {
-  font-weight: 700;
-}
-.moy {
-  opacity: 0.85;
-}
-
-.calendarExpand {
-  margin-left: auto;
-  background: none;
-  border: none;
-  color: white;
-  font-size: 14px;
-  cursor: pointer;
-  padding: 0;
-}
-
-/* ── Real Calendar Grid ── */
-.calendarBody {
-  padding: 8px 6px 10px;
-}
-
-.calendarNav {
+/* Add this new rule */
+.welcomeBannerInner {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 6px;
+  width: 100%;
+  position: relative;
+  z-index: 1;
+  gap: 16px;
 }
 
-.calendarNavBtn {
-  background: none;
-  border: none;
-  color: #e65100;
-  cursor: pointer;
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-size: 14px;
-  transition: background 0.15s;
+/* Decorative orbs */
+.welcomeOrb {
+  position: absolute;
+  top: -40px; right: -40px;
+  width: 160px; height: 160px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.07);
+  pointer-events: none;
+}
+.welcomeOrb2 {
+  position: absolute;
+  bottom: -50px; left: 30%;
+  width: 200px; height: 200px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.04);
+  pointer-events: none;
 }
 
-.calendarNavBtn:hover {
-  background: #fdf0e8;
+.welcomeText { position: relative; z-index: 1; }
+
+.welcomeGreet {
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: rgba(255,255,255,0.85);
+  margin: 0 0 2px;
+}
+.welcomeGreet strong { color: #ffffff; font-weight: 700; }
+
+.welcomeTitle {
+  font-size: clamp(1rem, 1.8vw, 1.2rem);
+  font-weight: 500;
+  margin: 0;
+  color: rgba(255,255,255,0.9);
+}
+.welcomeCcs {
+  font-family: "Gabarito", sans-serif;
+  font-size: clamp(1.8rem, 3vw, 2.4rem);
+  font-weight: 900;
+  color: #ffffff;
+  display: block;
+  line-height: 1;
+  letter-spacing: 0.01em;
+}
+.welcomeSub {
+  font-size: 0.7rem;
+  color: rgba(255,255,255,0.7);
+  margin: 2px 0 0;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
-.calendarMonthLabel {
-  font-size: 11px;
-  font-weight: 700;
-  color: #1a1a1a;
+/* Inline stats in banner */
+.welcomeStats {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  background: rgba(255,255,255,0.12);
+  border-radius: 10px;
+  padding: 10px 16px;
+  position: relative;
+  z-index: 1;
+  align-self: flex-start;
+  border: 1px solid rgba(255,255,255,0.18);
+}
+.welcomeStat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 20px 0 0;
+}
+.welcomeStat:last-child { padding-right: 0; }
+.welcomeStatNum {
+  font-family: "Gabarito", sans-serif;
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: #ffffff;
+  line-height: 1;
+}
+.welcomeStatLbl {
+  font-size: 0.62rem;
+  color: rgba(255,255,255,0.75);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-top: 2px;
+}
+.welcomeStatDiv {
+  width: 1px;
+  height: 32px;
+  background: rgba(255,255,255,0.25);
+  margin: 0 20px 0 0;
 }
 
-.calendarDowRow {
+/* ── Stat Cards Row ── */
+.statRow {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  margin-bottom: 2px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
 }
 
-.calendarDowCell {
-  text-align: center;
-  font-size: 9px;
-  font-weight: 700;
-  color: #aaa;
-  padding: 2px 0;
+.statCard {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--orange-border);
+  transition: transform var(--transition), box-shadow var(--transition);
+  overflow: hidden;
+  position: relative;
+}
+.statCard::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 4px;
+  background: var(--accent, var(--orange));
+  border-radius: 4px 0 0 4px;
+}
+.statCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(230,81,0,0.12);
 }
 
-.calendarGrid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 1px;
-}
-
-.calendarCellEmpty {
-  aspect-ratio: 1;
-}
-
-.calendarCell {
-  aspect-ratio: 1;
+.statIconWrap {
+  width: 40px; height: 40px;
+  border-radius: 10px;
+  background: var(--orange-dim);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 10px;
-  border-radius: 50%;
-  cursor: pointer;
-  color: #333;
-  transition:
-    background 0.12s,
-    color 0.12s;
-  user-select: none;
+  flex-shrink: 0;
+}
+.statIcon {
+  font-size: 1.1rem;
+  color: var(--accent, var(--orange));
 }
 
-.calendarCell:hover {
-  background-color: #fdf0e8;
-  color: #e65100;
+.statInfo { display: flex; flex-direction: column; }
+.statValue {
+  font-family: "Gabarito", sans-serif;
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: var(--text);
+  line-height: 1;
+}
+.statLabel {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-top: 2px;
+}
+.statSub {
+  font-size: 0.62rem;
+  color: var(--accent, var(--orange));
+  font-weight: 600;
+  margin-top: 2px;
 }
 
-.calendarCellSunday {
-  color: #c0390a;
+/* ── Mid Row: 2 cards side by side ── */
+.midRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
 }
 
-.calendarCellToday {
-  background-color: #e65100 !important;
-  color: white !important;
+/* ── Base Card ── */
+.dashboardCard {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 16px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--orange-border);
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.cardTitle {
+  font-size: 0.88rem;
   font-weight: 700;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+.cardTitleIcon {
+  width: 28px; height: 28px;
+  border-radius: 8px;
+  background: var(--orange-dim);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.cardTitleIcon i { color: var(--orange); font-size: 0.85rem; }
+
+.cardBadge {
+  font-size: 0.62rem;
+  font-weight: 700;
+  background: var(--orange);
+  color: #fff;
+  border-radius: 999px;
+  padding: 2px 8px;
+}
+.cardLink {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--orange);
+  cursor: pointer;
+  transition: opacity var(--transition);
+}
+.cardLink:hover { opacity: 0.7; }
+
+/* ── Announcements ── */
+.announcementList { display: flex; flex-direction: column; gap: 8px; }
+
+.announcementItem {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  background: var(--orange-dim);
+  border: 1px solid var(--orange-mid);
+  border-radius: 10px;
+  padding: 10px 12px;
+  transition: border-color var(--transition), transform var(--transition);
+  cursor: pointer;
+}
+.announcementItem:hover {
+  border-color: var(--orange);
+  transform: translateX(2px);
+}
+.announcementUrgent {
+  border-color: var(--orange) !important;
+  background: #fff8f4;
+}
+.announcementLeft { display: flex; flex-direction: column; gap: 3px; }
+.announcementTag {
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: var(--orange);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.announcementTitle {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0;
+  line-height: 1.3;
+}
+.announcementDate { font-size: 0.65rem; color: var(--text-muted); }
+.urgentPip {
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: var(--orange);
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
 }
 
-.calendarCellToday:hover {
-  background-color: #c0390a !important;
+/* ── Schedule ── */
+.scheduleList { display: flex; flex-direction: column; gap: 8px; }
+.scheduleItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--orange-dim);
+  border: 1px solid var(--orange-mid);
+  border-radius: 10px;
+  padding: 10px 12px;
+  transition: border-color var(--transition);
+}
+.scheduleItem:hover { border-color: var(--orange); }
+.scheduleAccent {
+  width: 4px;
+  height: 36px;
+  background: var(--orange);
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+.scheduleInfo { flex: 1; min-width: 0; }
+.scheduleSubject {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.scheduleMeta { font-size: 0.65rem; color: var(--text-muted); margin: 0; }
+.scheduleTime { text-align: right; flex-shrink: 0; }
+.scheduleTimeText { font-size: 0.68rem; font-weight: 700; color: var(--orange); display: block; }
+.scheduleDay { font-size: 0.6rem; color: var(--text-muted); }
+
+/* ── Student Table ── */
+.studentTable { display: flex; flex-direction: column; gap: 0; }
+.studentTableHead {
+  display: grid;
+  grid-template-columns: 2fr 1.2fr 0.6fr 0.6fr 1fr;
+  padding: 6px 10px;
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border-bottom: 1px solid var(--orange-mid);
+  margin-bottom: 4px;
+}
+.studentRow {
+  display: grid;
+  grid-template-columns: 2fr 1.2fr 0.6fr 0.6fr 1fr;
+  align-items: center;
+  padding: 9px 10px;
+  border-radius: 10px;
+  transition: background var(--transition);
+  cursor: pointer;
+}
+.studentRow:hover { background: var(--orange-dim); }
+.studentName {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.studentAvatar {
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  background: var(--orange-dim);
+  border: 1.5px solid var(--orange-border);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  font-size: 0.8rem;
+  color: var(--orange);
+}
+.studentMeta { font-size: 0.72rem; color: var(--text-muted); }
+.statusBadge {
+  font-size: 0.6rem;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 3px 8px;
+  display: inline-block;
+  text-align: center;
+}
+.statusRegular { background: #e8f5e9; color: #2e7d32; }
+.statusIrregular { background: #fff3e0; color: #b45309; }
+
+/* ── Calendar Card ── */
+.calendarCard {
+  background: var(--surface);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--orange-border);
+}
+.calendarHeader {
+  background: linear-gradient(135deg, #c0390a, var(--orange));
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+}
+.calendarDayNum {
+  font-family: "Gabarito", sans-serif;
+  color: white;
+  font-size: 2.2rem;
+  font-weight: 900;
+  line-height: 1;
+}
+.calendarDayInfo { display: flex; flex-direction: column; font-size: 10px; color: white; }
+.dow { font-weight: 700; }
+.moy { opacity: 0.85; }
+.calendarExpand {
+  margin-left: auto;
+  background: rgba(255,255,255,0.15);
+  border: none;
+  color: white;
+  font-size: 12px;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 6px;
+  transition: background var(--transition);
+}
+.calendarExpand:hover { background: rgba(255,255,255,0.28); }
+
+.calendarBody { padding: 8px 6px 10px; }
+.calendarNav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+.calendarNavBtn {
+  background: none; border: none; color: var(--orange);
+  cursor: pointer; padding: 2px 6px; border-radius: 4px;
+  font-size: 14px; transition: background var(--transition);
+}
+.calendarNavBtn:hover { background: var(--orange-dim); }
+.calendarMonthLabel { font-size: 11px; font-weight: 700; color: var(--text); }
+.calendarDowRow { display: grid; grid-template-columns: repeat(7, 1fr); margin-bottom: 2px; }
+.calendarDowCell { text-align: center; font-size: 9px; font-weight: 700; color: #bbb; padding: 2px 0; }
+.calendarGrid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; }
+.calendarCellEmpty { aspect-ratio: 1; }
+.calendarCell {
+  aspect-ratio: 1;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  font-size: 10px; border-radius: 50%;
+  cursor: pointer; color: #333;
+  transition: background var(--transition), color var(--transition);
+  user-select: none; position: relative;
+}
+.calendarCell:hover { background: var(--orange-dim); color: var(--orange); }
+.calendarCellSunday { color: #c0390a; }
+.calendarCellToday { background: var(--orange) !important; color: white !important; font-weight: 700; }
+.calendarCellToday:hover { background: #c0390a !important; }
+.calendarCellEvent { font-weight: 700; }
+.eventDot {
+  width: 4px; height: 4px; border-radius: 50%;
+  background: var(--orange);
+  position: absolute; bottom: 1px;
+}
+
+/* ── Events Card ── */
+.eventsCard { margin: 0; }
+.eventList { display: flex; flex-direction: column; gap: 8px; }
+.eventItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: var(--orange-dim);
+  border: 1px solid var(--orange-mid);
+  border-left: 3px solid var(--ev-color, var(--orange));
+  transition: transform var(--transition);
+  cursor: pointer;
+}
+.eventItem:hover { transform: translateX(2px); }
+.eventIconWrap {
+  width: 28px; height: 28px;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.7);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  font-size: 0.82rem;
+}
+.eventInfo { min-width: 0; }
+.eventTitle { font-size: 0.72rem; font-weight: 700; color: var(--text); margin: 0 0 2px; line-height: 1.3; }
+.eventMeta { font-size: 0.62rem; color: var(--text-muted); margin: 0; }
+
+/* ── Quick Actions ── */
+.quickGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.quickBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 8px;
+  border-radius: 10px;
+  background: var(--orange-dim);
+  border: 1.5px solid var(--orange-border);
+  cursor: pointer;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--orange);
+  transition: background var(--transition), border-color var(--transition), transform var(--transition);
+  font-family: "Plus Jakarta Sans", sans-serif;
+}
+.quickBtn:hover {
+  background: var(--orange);
+  border-color: var(--orange);
+  color: #ffffff;
+  transform: translateY(-2px);
+}
+.quickBtn:hover .quickBtnIcon { color: #ffffff; }
+.quickBtnIcon { font-size: 1.1rem; color: var(--orange); transition: color var(--transition); }
+
+/* ── Responsive ── */
+@media (max-width: 1100px) {
+  .statRow { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 900px) {
+  .dashboardContent { flex-direction: column; }
+  .dashboardRight { width: 100%; flex-direction: row; flex-wrap: wrap; }
+  .calendarCard { flex: 1; min-width: 220px; }
+  .eventsCard { flex: 1; min-width: 220px; }
+  .quickCard { width: 100%; }
+  .midRow { grid-template-columns: 1fr; }
+}
+@media (max-width: 600px) {
+  .statRow { grid-template-columns: 1fr 1fr; }
+  .studentTableHead, .studentRow { grid-template-columns: 2fr 1fr 1fr; }
+  .studentTableHead span:nth-child(2),
+  .studentTableHead span:nth-child(3),
+  .studentRow span:nth-child(2),
+  .studentRow span:nth-child(3) { display: none; }
 }
