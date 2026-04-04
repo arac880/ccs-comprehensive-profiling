@@ -28,7 +28,7 @@ const getAutoOrg = (program = "") => {
   if (p.includes("information technology"))
     return "SITES - Society of Information Technology Students";
   if (p.includes("computer science"))
-    return "ACCS - Association of Computer and Computing Students";
+    return "ACCS - Association of Computer Science Students";
   return null;
 };
 
