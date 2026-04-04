@@ -1,5 +1,5 @@
 // components/studentComponents/TabAcademic.jsx
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 import styles from "../../pages/studentPages/studentStyles/Tab.module.css";
 
 function gradeClass(g) {
@@ -22,7 +22,7 @@ function gradeClass(g) {
 
 function SemBlock({ sem }) {
   const [open, setOpen] = useState(true);
-  const totalUnits = sem.subjects.reduce((acc, s) => acc + s.units, 0);
+  const totalUnits = sem.subjects.reduce((acc, s) => acc + (Number(s.units) || 0), 0);
 
   return (
     <div style={{ marginBottom: "1.25rem" }}>
@@ -66,9 +66,11 @@ function SemBlock({ sem }) {
             >
               {sem.yearLevel} — {sem.semester}
             </span>
-            <span className={`${styles.badge} ${styles.badgeOrange}`}>
-              {sem.section}
-            </span>
+            {sem.section && (
+              <span className={`${styles.badge} ${styles.badgeOrange}`}>
+                {sem.section}
+              </span>
+            )}
           </div>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: "1.5rem" }}>
@@ -111,6 +113,13 @@ function SemBlock({ sem }) {
           <button
             className={styles.semToggleBtn}
             onClick={() => setOpen(!open)}
+            style={{
+              background: "transparent",
+              border: "none",
+              color: "#E65100",
+              cursor: "pointer",
+              fontSize: "1rem"
+            }}
           >
             {open ? "▲" : "▼"}
           </button>
@@ -126,8 +135,8 @@ function SemBlock({ sem }) {
           <table className={styles.table}>
             <thead>
               <tr>
-                <th>Course Code</th>
-                <th>Course Name</th>
+                <th style={{ textAlign: "left" }}>Course Code</th>
+                <th style={{ textAlign: "left" }}>Course Name</th>
                 <th style={{ textAlign: "center" }}>Units</th>
                 <th style={{ textAlign: "center" }}>Grade</th>
                 <th style={{ textAlign: "center" }}>Remarks</th>
@@ -165,16 +174,88 @@ function SemBlock({ sem }) {
   );
 }
 
-export default function TabAcademic({ history }) {
-  // Group by school year for display
-  const years = [...new Set(history.map((h) => h.schoolYear))];
+export default function TabAcademic() {
+  const [history, setHistory] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const user = JSON.parse(localStorage.getItem("user"));
+  const id = user?._id;
+
+  // 1. Fetch data from database on mount
+  useEffect(() => {
+    const fetchHistory = async () => {
+      if (!id) {
+        setLoading(false);
+        return;
+      }
+      try {
+        const res = await fetch(`http://localhost:5000/api/students/${id}`);
+        if (!res.ok) throw new Error("Failed to fetch student");
+        const data = await res.json();
+        setHistory(data.academicHistory || []);
+      } catch (err) {
+        console.error("Error fetching academic history:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchHistory();
+  }, [id]);
+
+  // 2. Group the flat database array into semesters dynamically
+  const groupedHistory = useMemo(() => {
+    if (!history.length) return [];
+
+    const map = {};
+
+    history.forEach((record) => {
+      // Create a unique key for each semester group
+      const key = `${record.schoolYear}||${record.yearLevel}||${record.semester}`;
+      
+      if (!map[key]) {
+        map[key] = {
+          schoolYear: record.schoolYear || "Unknown Year",
+          yearLevel: record.yearLevel || "Unknown Level",
+          semester: record.semester || "Unknown Semester",
+          section: record.section || "",
+          subjects: [],
+        };
+      }
+
+      // Map the DB schema fields to what SemBlock expects
+      map[key].subjects.push({
+        code: record.courseCode,
+        name: record.courseName,
+        units: record.units,
+        grade: record.grade,
+        remarks: record.remarks,
+      });
+    });
+
+    // Convert map to array and calculate GWA for each group
+    return Object.values(map).map((group) => {
+      const numericGrades = group.subjects
+        .map((s) => parseFloat(s.grade))
+        .filter((g) => !isNaN(g));
+      
+      const gwa = numericGrades.length > 0
+        ? (numericGrades.reduce((sum, g) => sum + g, 0) / numericGrades.length).toFixed(2)
+        : "—";
+
+      return { ...group, gwa };
+    }).sort((a, b) => b.schoolYear.localeCompare(a.schoolYear)); // Sort newest first
+  }, [history]);
+
+  if (loading) {
+    return <div className={styles.section}>Loading academic history...</div>;
+  }
 
   return (
     <div>
       <div className={styles.section}>
         <div className={styles.sectionTitle}>Academic Records</div>
 
-        {/* Legend */}
+        {/* Static Legend */}
         <div
           style={{
             display: "flex",
@@ -193,36 +274,16 @@ export default function TabAcademic({ history }) {
           </div>
 
           <div style={{ display: "flex", flexWrap: "wrap", gap: "0.8rem" }}>
-            <span>
-              <b>1.00</b> (96–100)
-            </span>
-            <span>
-              <b>1.25</b> (92–95)
-            </span>
-            <span>
-              <b>1.50</b> (88–91)
-            </span>
-            <span>
-              <b>1.75</b> (84–87)
-            </span>
-            <span>
-              <b>2.00</b> (80–83)
-            </span>
-            <span>
-              <b>2.25</b> (75–79)
-            </span>
-            <span>
-              <b>2.50</b> (70–74)
-            </span>
-            <span>
-              <b>2.75</b> (65–69)
-            </span>
-            <span>
-              <b>3.00</b> (60–64)
-            </span>
-            <span>
-              <b>5.00</b> (0–59)
-            </span>
+            <span><b>1.00</b> (96–100)</span>
+            <span><b>1.25</b> (92–95)</span>
+            <span><b>1.50</b> (88–91)</span>
+            <span><b>1.75</b> (84–87)</span>
+            <span><b>2.00</b> (80–83)</span>
+            <span><b>2.25</b> (75–79)</span>
+            <span><b>2.50</b> (70–74)</span>
+            <span><b>2.75</b> (65–69)</span>
+            <span><b>3.00</b> (60–64)</span>
+            <span><b>5.00</b> (0–59)</span>
           </div>
 
           <div style={{ marginTop: "0.3rem", color: "#6b7280" }}>
@@ -231,9 +292,14 @@ export default function TabAcademic({ history }) {
           </div>
         </div>
 
-        {history.map((sem, idx) => (
-          <SemBlock key={idx} sem={sem} />
-        ))}
+        {/* Dynamic Semester Blocks */}
+        {groupedHistory.length === 0 ? (
+          <p className={styles.empty}>No academic records found.</p>
+        ) : (
+          groupedHistory.map((sem, idx) => (
+            <SemBlock key={idx} sem={sem} />
+          ))
+        )}
       </div>
     </div>
   );
