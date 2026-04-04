@@ -39,6 +39,8 @@ const studentSchema = new mongoose.Schema({
   guardianEmail: String, // ← ADD
 
   skills: { type: Array, default: [] },
+  activities: { type: Array, default: [] },
+  
   password: { type: String, default: null },
   role: { type: String, default: "student" },
 });
