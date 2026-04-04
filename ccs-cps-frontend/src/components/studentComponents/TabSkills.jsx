@@ -5,6 +5,8 @@ import AppModal from "../ui/Modal";
 import AppButton from "../ui/AppButton";
 import AddButton from "../../components/ui/AddButton";
 import DeleteButton from "../../components/ui/DeleteButton";
+import AppToast from "../../components/ui/AppToast";
+import ConfirmModal from "../../components/ui/ConfirmModal";
 
 const EMPTY_FORM = {
   name: "",
@@ -21,13 +23,13 @@ const CATEGORIES = [
   "Other",
 ];
 
-function SkillModal({ isOpen, onClose, onSave, initialData }) {
+/* ───────────── Skill Modal ───────────── */
+function SkillModal({ isOpen, onClose, onConfirmOpen, initialData }) {
   const [formData, setFormData] = useState(EMPTY_FORM);
 
   useEffect(() => {
     if (initialData) {
       const { index: _index, ...rest } = initialData;
-      // if the saved category isn't in the predefined list, treat it as "Other"
       const isCustom = rest.category && !CATEGORIES.includes(rest.category);
       setFormData({
         ...rest,
@@ -45,13 +47,22 @@ function SkillModal({ isOpen, onClose, onSave, initialData }) {
   };
 
   const handleSubmit = () => {
+    if (!formData.name.trim()) {
+      alert("Please enter a skill name.");
+      return;
+    }
+    if (!formData.category) {
+      alert("Please select a category.");
+      return;
+    }
+
     const finalCategory =
       formData.category === "Other"
         ? formData.customCategory.trim() || "Other"
         : formData.category;
 
-    onSave({ name: formData.name, category: finalCategory });
-    onClose();
+    // Pass data up to parent to show confirm modal
+    onConfirmOpen({ name: formData.name.trim(), category: finalCategory });
   };
 
   if (!isOpen) return null;
@@ -60,7 +71,7 @@ function SkillModal({ isOpen, onClose, onSave, initialData }) {
     <AppModal
       isOpen={isOpen}
       onClose={onClose}
-      title={initialData ? "Edit Skill" : "Add Skill"}
+      title="Add Skill"
       maxWidth="450px"
     >
       <div className={formStyles.modalBody}>
@@ -108,46 +119,112 @@ function SkillModal({ isOpen, onClose, onSave, initialData }) {
           Cancel
         </AppButton>
         <AppButton variant="primary" onClick={handleSubmit}>
-          Save
+          Add Skill
         </AppButton>
       </div>
     </AppModal>
   );
 }
 
-export default function TabSkills({ skills = [] }) {
+/* ───────────── Main Component ───────────── */
+export default function TabSkills() {
+  const [skillList, setSkillList] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedSkill, setSelectedSkill] = useState(null);
-  const [editIndex, setEditIndex] = useState(null);
-  const [skillList, setSkillList] = useState(skills);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [pendingSkill, setPendingSkill] = useState(null);
+  const [saving, setSaving] = useState(false);
+  const [toast, setToast] = useState({
+    isVisible: false,
+    message: "",
+    type: "success",
+  });
 
-  const categories = [...new Set(skillList.map((s) => s.category))];
+  const user = JSON.parse(localStorage.getItem("user"));
+  const id = user?._id;
 
-  const handleAdd = () => {
-    setSelectedSkill(null);
-    setEditIndex(null);
-    setIsModalOpen(true);
+  /* ── Fetch skills on mount ── */
+  useEffect(() => {
+    const fetchSkills = async () => {
+      if (!id) { setLoading(false); return; }
+
+      try {
+        const res = await fetch(`http://localhost:5000/api/students/${id}`);
+        if (!res.ok) throw new Error("Failed to fetch student");
+        const data = await res.json();
+        setSkillList(data.skills || []);
+      } catch (err) {
+        console.error("Error fetching skills:", err);
+        setSkillList([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSkills();
+  }, []);
+
+  /* ── Open confirm modal with pending skill data ── */
+  const handleConfirmOpen = (skillData) => {
+    setPendingSkill(skillData);
+    setIsConfirmOpen(true);
   };
 
-  const handleEdit = (skill, index) => {
-    setSelectedSkill(skill);
-    setEditIndex(index);
-    setIsModalOpen(true);
-  };
+  /* ── Confirmed — save to MongoDB ── */
+  const handleConfirmAdd = async () => {
+    if (!pendingSkill || !id) return;
 
-  const handleSave = (data) => {
-    if (editIndex !== null) {
-      const updated = [...skillList];
-      updated[editIndex] = data;
-      setSkillList(updated);
-    } else {
-      setSkillList([...skillList, data]);
+    const updatedSkills = [...skillList, pendingSkill];
+
+    setSaving(true);
+    try {
+      const res = await fetch(`http://localhost:5000/api/students/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ skills: updatedSkills }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.message || "Failed to save skill");
+      }
+
+      // Update localStorage
+      const updatedUser = { ...user, skills: updatedSkills };
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+
+      // Update UI
+      setSkillList(updatedSkills);
+
+      // Close both modals
+      setIsConfirmOpen(false);
+      setIsModalOpen(false);
+      setPendingSkill(null);
+
+      // Show toast
+      setToast({
+        isVisible: true,
+        message: "Skill added successfully.",
+        type: "success",
+      });
+    } catch (err) {
+      console.error("Save skill error:", err);
+      setIsConfirmOpen(false);
+      setToast({
+        isVisible: true,
+        message: `Error: ${err.message}`,
+        type: "error",
+      });
+    } finally {
+      setSaving(false);
     }
   };
 
-  const handleDelete = (index) => {
-    setSkillList(skillList.filter((_, i) => i !== index));
-  };
+  const categories = [...new Set(skillList.map((s) => s.category))];
+
+  if (loading) {
+    return <div className={tabStyles.section}>Loading skills...</div>;
+  }
 
   return (
     <div>
@@ -155,7 +232,11 @@ export default function TabSkills({ skills = [] }) {
         <div className={tabStyles.sectionHeader}>
           <div className={tabStyles.sectionTitle}>Skills</div>
           <div className={tabStyles.headerActions}>
-            <AddButton title="Add Skill" onClick={handleAdd} />
+            <AddButton
+              title="Add Skill"
+              onClick={() => setIsModalOpen(true)}
+              disabled={saving}
+            />
           </div>
         </div>
 
@@ -166,7 +247,6 @@ export default function TabSkills({ skills = [] }) {
             {categories.map((cat) => (
               <div key={cat} className={tabStyles.skillColumn}>
                 <div className={tabStyles.skillCat}>{cat}</div>
-
                 <ul className={tabStyles.skillList}>
                   {skillList
                     .filter((s) => s.category === cat)
@@ -180,10 +260,8 @@ export default function TabSkills({ skills = [] }) {
                             </span>
                           </div>
                           <div className={tabStyles.skillActions}>
-                            <DeleteButton
-                              iconOnly
-                              onClick={() => handleDelete(globalIndex)}
-                            />
+                            {/* Delete button kept but no function yet */}
+                            <DeleteButton iconOnly />
                           </div>
                         </li>
                       );
@@ -195,11 +273,30 @@ export default function TabSkills({ skills = [] }) {
         )}
       </div>
 
+      {/* Skill Modal */}
       <SkillModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onSave={handleSave}
-        initialData={selectedSkill}
+        onConfirmOpen={handleConfirmOpen}
+        initialData={null}
+      />
+
+      {/* Confirm Add Modal */}
+      <ConfirmModal
+        isOpen={isConfirmOpen}
+        onClose={() => setIsConfirmOpen(false)}
+        onConfirm={handleConfirmAdd}
+        title="Add Skill"
+        message={`Are you sure you want to add "${pendingSkill?.name}" under "${pendingSkill?.category}"?`}
+        isProcessing={saving}
+      />
+
+      {/* Toast */}
+      <AppToast
+        isVisible={toast.isVisible}
+        message={toast.message}
+        type={toast.type}
+        onClose={() => setToast((prev) => ({ ...prev, isVisible: false }))}
       />
     </div>
   );

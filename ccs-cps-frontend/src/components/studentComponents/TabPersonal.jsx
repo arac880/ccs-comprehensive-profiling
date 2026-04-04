@@ -1,15 +1,14 @@
-// components/studentComponents/TabPersonal.jsx
 import { useState, useEffect } from "react";
 import styles from "../../pages/studentPages/studentStyles/Tab.module.css";
 import EditButton from "../../components/ui/EditButton";
 import EditStudentModal from "../../components/studentComponents/EditStudentModal";
+import AppToast from "../../components/ui/AppToast";
 
 /* ───────────── Helpers ───────────── */
 function Field({ label, value }) {
   return (
     <div className={styles.infoField}>
       <span className={styles.infoLabel}>{label}</span>
-      {/* Display empty string if no value */}
       <span className={styles.infoValue}>{value ?? ""}</span>
     </div>
   );
@@ -28,7 +27,6 @@ function SectionBlock({ title, children, action }) {
         <div className={styles.sectionTitle}>{title}</div>
         {action && <div>{action}</div>}
       </div>
-
       <div className={styles.infoGrid}>{children}</div>
     </div>
   );
@@ -36,30 +34,31 @@ function SectionBlock({ title, children, action }) {
 
 /* ───────────── Component ───────────── */
 export default function TabPersonal() {
-  const [student, setStudent] = useState(null);
+  const user = JSON.parse(localStorage.getItem("user"));
+  const [student, setStudent] = useState(user || null);
   const [isEditOpen, setIsEditOpen] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!user);
+  const [toast, setToast] = useState({
+    isVisible: false,
+    message: "",
+    type: "success",
+  });
 
   useEffect(() => {
     const fetchStudent = async () => {
-      const user = JSON.parse(localStorage.getItem("user"));
-
-      if (!user?._id) {
+      const id = user?._id;
+      if (!id) {
         setLoading(false);
         return;
       }
 
       try {
-        const res = await fetch(
-          `http://localhost:5000/api/students/${user._id}`,
-        );
+        const res = await fetch(`http://localhost:5000/api/students/${id}`);
         if (!res.ok) throw new Error("Failed to fetch student");
-
         const data = await res.json();
         setStudent(data);
       } catch (err) {
         console.error("Error fetching student:", err);
-        setStudent(null);
       } finally {
         setLoading(false);
       }
@@ -68,15 +67,23 @@ export default function TabPersonal() {
     fetchStudent();
   }, []);
 
-  if (loading) {
-    return <div className={styles.section}>Loading student data...</div>;
-  }
+  const handleSave = (updatedData) => {
+    setStudent((prev) => ({ ...prev, ...updatedData }));
 
-  if (!student) {
+    // Show toast here in TabPersonal after modal closes
+    setToast({
+      isVisible: true,
+      message: "Successfully updated Personal Info.",
+      type: "success",
+    });
+  };
+
+  if (loading)
+    return <div className={styles.section}>Loading student data...</div>;
+  if (!student)
     return (
       <div className={styles.section}>Unable to load student information.</div>
     );
-  }
 
   return (
     <div>
@@ -149,6 +156,15 @@ export default function TabPersonal() {
         isOpen={isEditOpen}
         onClose={() => setIsEditOpen(false)}
         student={student}
+        onSave={handleSave}
+      />
+
+      {/* ── Toast — lives here so it survives modal close ── */}
+      <AppToast
+        isVisible={toast.isVisible}
+        message={toast.message}
+        type={toast.type}
+        onClose={() => setToast((prev) => ({ ...prev, isVisible: false }))}
       />
     </div>
   );
