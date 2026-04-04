@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import Footer from "../../components/Footer";
 import styles from "./facultyStyles/dashboard.module.css";
 
 /* ── Mini Calendar ── */
@@ -505,7 +504,6 @@ const FacultyDashboard = () => {
           </div>
         </div>
       </div>
-      <Footer version="v1.0.1" />
     </>
   );
 };

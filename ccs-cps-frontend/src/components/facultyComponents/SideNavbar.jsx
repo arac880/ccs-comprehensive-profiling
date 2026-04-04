@@ -40,10 +40,19 @@ const navItems = [
   },
 ];
 
-const faculty = { name: "Miriam B. Mulawin", id: "2203375" };
-
 export default function SidebarNav({ activeNav = "Dashboard", onNavigate }) {
   const navigate = useNavigate();
+
+  // ✅ Get logged-in faculty from localStorage
+  const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
+  const faculty = {
+    name:
+      `${storedUser.firstName || ""} ${storedUser.lastName || ""}`.trim() ||
+      "Faculty",
+    id: storedUser.id || "—",
+    isDean: storedUser.isDean || false,
+  };
+
   const [collapsed, setCollapsed] = useState(
     window.innerWidth < TABLET_BREAKPOINT,
   );
@@ -51,12 +60,9 @@ export default function SidebarNav({ activeNav = "Dashboard", onNavigate }) {
   const [tooltip, setTooltip] = useState({ visible: false, label: "", y: 0 });
   const sidebarRef = useRef(null);
 
-  // Auto-collapse on tablet resize
   useEffect(() => {
     const onResize = () => {
-      if (window.innerWidth < TABLET_BREAKPOINT) {
-        setCollapsed(true);
-      }
+      if (window.innerWidth < TABLET_BREAKPOINT) setCollapsed(true);
     };
     window.addEventListener("resize", onResize);
     return () => window.removeEventListener("resize", onResize);
@@ -65,6 +71,7 @@ export default function SidebarNav({ activeNav = "Dashboard", onNavigate }) {
   const handleLogout = () => {
     localStorage.removeItem("user");
     localStorage.removeItem("token");
+    localStorage.removeItem("role");
     navigate("/login");
   };
 
@@ -94,7 +101,6 @@ export default function SidebarNav({ activeNav = "Dashboard", onNavigate }) {
         {/* ── Header ── */}
         <div className={styles.header}>
           {!collapsed && <span className={styles.brandName}>Faculty</span>}
-          {/* Same hamburger button style as student sidebar */}
           <div
             className={styles.hamburgerBtn}
             onClick={() => {
@@ -120,6 +126,10 @@ export default function SidebarNav({ activeNav = "Dashboard", onNavigate }) {
               <div className={styles.profileInfo}>
                 <p className={styles.profileName}>{faculty.name}</p>
                 <p className={styles.profileId}>{faculty.id}</p>
+                {/* ✅ Dean badge */}
+                {faculty.isDean && (
+                  <span className={styles.deanBadge}>Dean</span>
+                )}
               </div>
               <hr className={styles.profileDivider} />
             </div>
@@ -175,7 +185,7 @@ export default function SidebarNav({ activeNav = "Dashboard", onNavigate }) {
         </div>
       </div>
 
-      {/* Portal tooltip for collapsed mode */}
+      {/* Portal tooltip */}
       {tooltip.visible && (
         <div
           style={{

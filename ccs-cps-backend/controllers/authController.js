@@ -53,8 +53,10 @@ const login = async (req, res) => {
             _id: user._id,
             id: user.facultyId,
             firstName: user.firstName,
+            middleName: user.middleName || "",
             lastName: user.lastName,
             email: user.email,
+            isDean: user.isDean || false,
           };
 
     res.json({ token, role, user: userProfile });

@@ -14,7 +14,8 @@ const STATUS_CLASS = {
   Dropped: "badgeDropped",
 };
 
-const FILTERS = ["All", "Regular", "Irregular", "Enrolled", "LOA", "Dropped"];
+const TYPE_FILTERS = ["All Types", "Regular", "Irregular"];
+const STATUS_FILTERS = ["All Status", "Enrolled", "LOA", "Dropped"];
 
 function getInitials(name) {
   if (!name) return "??";
@@ -29,13 +30,18 @@ function getInitials(name) {
 const FacultyStudentList = () => {
   const navigate = useNavigate();
   const [query, setQuery] = useState("");
-  const [activeFilter, setActiveFilter] = useState("All");
+  const [activeType, setActiveType] = useState("All Types");
+  const [activeStatus, setActiveStatus] = useState("All Status");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [students, setStudents] = useState([]);
+  const [skillCategory, setSkillCategory] = useState("");
+  const [skillName, setSkillName] = useState("");
+  const [activityCategory, setActivityCategory] = useState("");
+  const [activityTitle, setActivityTitle] = useState("");
   const [isLoading, setIsLoading] = useState(true);
-
-  // Delete modal state
-  const [deleteTarget, setDeleteTarget] = useState(null); // { id, name }
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 10;
+  const [deleteTarget, setDeleteTarget] = useState(null);
 
   const fetchStudents = async () => {
     try {
@@ -52,11 +58,23 @@ const FacultyStudentList = () => {
   };
 
   useEffect(() => {
+    setCurrentPage(1);
+  }, [
+    query,
+    activeType,
+    activeStatus,
+    skillCategory,
+    skillName,
+    activityCategory,
+    activityTitle,
+  ]);
+
+  useEffect(() => {
     fetchStudents();
   }, []);
 
   const handleDeleteClick = (e, student) => {
-    e.stopPropagation(); // prevent row navigation
+    e.stopPropagation();
     setDeleteTarget({ id: student.id, name: student.name });
   };
 
@@ -69,7 +87,7 @@ const FacultyStudentList = () => {
       );
       if (!response.ok) throw new Error("Failed to delete student");
       setDeleteTarget(null);
-      fetchStudents(); // refresh list
+      fetchStudents();
     } catch (error) {
       console.error("Error deleting student:", error);
     }
@@ -86,20 +104,84 @@ const FacultyStudentList = () => {
       "—",
     type: s.type || "Regular",
     status: s.status || "Enrolled",
+    skills: s.skills || [],
+    activities: s.activities || [],
   }));
 
   const filtered = formattedStudents.filter((s) => {
-    const matchFilter =
-      activeFilter === "All" ||
-      s.type === activeFilter ||
-      s.status === activeFilter;
+    const matchType = activeType === "All Types" || s.type === activeType;
+    const matchStatus =
+      activeStatus === "All Status" || s.status === activeStatus;
     const matchSearch =
       !query ||
       [s.name, s.displayId, s.program, s.yearSection, s.type, s.status].some(
         (v) => v.toLowerCase().includes(query.toLowerCase()),
       );
-    return matchFilter && matchSearch;
+    const matchSkillCategory =
+      !skillCategory || s.skills.some((sk) => sk.category === skillCategory);
+    const matchSkillName =
+      !skillName || s.skills.some((sk) => sk.name === skillName);
+    const matchActivityCategory =
+      !activityCategory ||
+      s.activities.some((a) => a.category === activityCategory);
+    const matchActivityTitle =
+      !activityTitle || s.activities.some((a) => a.title === activityTitle);
+    return (
+      matchType &&
+      matchStatus &&
+      matchSearch &&
+      matchSkillCategory &&
+      matchSkillName &&
+      matchActivityCategory &&
+      matchActivityTitle
+    );
   });
+
+  const allSkillCategories = [
+    ...new Set(
+      students
+        .flatMap((s) => (s.skills || []).map((sk) => sk.category))
+        .filter(Boolean),
+    ),
+  ].sort();
+
+  const allSkillNames = [
+    ...new Set(
+      students
+        .flatMap((s) =>
+          (s.skills || [])
+            .filter((sk) => !skillCategory || sk.category === skillCategory)
+            .map((sk) => sk.name),
+        )
+        .filter(Boolean),
+    ),
+  ].sort();
+
+  const allActivityCategories = [
+    ...new Set(
+      students
+        .flatMap((s) => (s.activities || []).map((a) => a.category))
+        .filter(Boolean),
+    ),
+  ].sort();
+
+  const allActivityTitles = [
+    ...new Set(
+      students
+        .flatMap((s) =>
+          (s.activities || [])
+            .filter((a) => !activityCategory || a.category === activityCategory)
+            .map((a) => a.title),
+        )
+        .filter(Boolean),
+    ),
+  ].sort();
+
+  const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
+  const paginated = filtered.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE,
+  );
 
   const totalCount = formattedStudents.length;
   const regularCount = formattedStudents.filter(
@@ -111,6 +193,14 @@ const FacultyStudentList = () => {
   const pendingCount = formattedStudents.filter(
     (s) => s.status === "LOA" || s.status === "Dropped",
   ).length;
+
+  const hasActiveFilters =
+    activeType !== "All Types" ||
+    activeStatus !== "All Status" ||
+    skillCategory ||
+    skillName ||
+    activityCategory ||
+    activityTitle;
 
   return (
     <>
@@ -180,17 +270,126 @@ const FacultyStudentList = () => {
           </div>
         </div>
 
-        {/* ── Filter Buttons ── */}
-        <div className={styles.filterRow}>
-          {FILTERS.map((f) => (
-            <button
-              key={f}
-              className={`${styles.filterBtn} ${activeFilter === f ? styles.filterBtnActive : ""}`}
-              onClick={() => setActiveFilter(f)}
+        {/* ── Filter Rows ── */}
+        <div className={styles.filterSection}>
+          {/* Type */}
+          <div className={styles.filterGroup}>
+            <span className={styles.filterGroupLabel}>Type</span>
+            <div className={styles.filterRow}>
+              {TYPE_FILTERS.map((f) => (
+                <button
+                  key={f}
+                  className={`${styles.filterBtn} ${activeType === f ? styles.filterBtnActive : ""}`}
+                  onClick={() => setActiveType(f)}
+                >
+                  {f}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className={styles.filterDivider} />
+
+          {/* Status */}
+          <div className={styles.filterGroup}>
+            <span className={styles.filterGroupLabel}>Status</span>
+            <div className={styles.filterRow}>
+              {STATUS_FILTERS.map((f) => (
+                <button
+                  key={f}
+                  className={`${styles.filterBtn} ${activeStatus === f ? styles.filterBtnActive : ""}`}
+                  onClick={() => setActiveStatus(f)}
+                >
+                  {f === "All Status" ? "All" : f}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className={styles.filterDivider} />
+
+          {/* Skills */}
+          <div className={styles.filterGroup}>
+            <span className={styles.filterGroupLabel}>Skill</span>
+            <select
+              className={`${styles.filterSelect} ${skillCategory ? styles.filterSelectActive : ""}`}
+              value={skillCategory}
+              onChange={(e) => {
+                setSkillCategory(e.target.value);
+                setSkillName("");
+              }}
             >
-              {f}
+              <option value="">All Categories</option>
+              {allSkillCategories.map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
+            </select>
+            <select
+              className={`${styles.filterSelect} ${skillName ? styles.filterSelectActive : ""}`}
+              value={skillName}
+              onChange={(e) => setSkillName(e.target.value)}
+            >
+              <option value="">All Skills</option>
+              {allSkillNames.map((n) => (
+                <option key={n} value={n}>
+                  {n}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className={styles.filterDivider} />
+
+          {/* Activities */}
+          <div className={styles.filterGroup}>
+            <span className={styles.filterGroupLabel}>Activity</span>
+            <select
+              className={`${styles.filterSelect} ${activityCategory ? styles.filterSelectActive : ""}`}
+              value={activityCategory}
+              onChange={(e) => {
+                setActivityCategory(e.target.value);
+                setActivityTitle("");
+              }}
+            >
+              <option value="">All Categories</option>
+              {allActivityCategories.map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
+            </select>
+            <select
+              className={`${styles.filterSelect} ${activityTitle ? styles.filterSelectActive : ""}`}
+              value={activityTitle}
+              onChange={(e) => setActivityTitle(e.target.value)}
+            >
+              <option value="">All Activities</option>
+              {allActivityTitles.map((t) => (
+                <option key={t} value={t}>
+                  {t}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Clear all */}
+          {hasActiveFilters && (
+            <button
+              className={styles.clearAllBtn}
+              onClick={() => {
+                setActiveType("All Types");
+                setActiveStatus("All Status");
+                setSkillCategory("");
+                setSkillName("");
+                setActivityCategory("");
+                setActivityTitle("");
+              }}
+            >
+              ✕ Clear Filters
             </button>
-          ))}
+          )}
         </div>
 
         {/* ── Table ── */}
@@ -218,7 +417,7 @@ const FacultyStudentList = () => {
                     <td colSpan={7}>No students found.</td>
                   </tr>
                 ) : (
-                  filtered.map((s) => (
+                  paginated.map((s) => (
                     <tr
                       key={s.id}
                       className={styles.hoverRow}
@@ -251,7 +450,6 @@ const FacultyStudentList = () => {
                       </td>
                       <td style={{ textAlign: "right" }}>
                         <div className={styles.actionBtns}>
-                          {/* View button */}
                           <button
                             className={styles.viewBtn}
                             onClick={(e) => {
@@ -261,8 +459,6 @@ const FacultyStudentList = () => {
                           >
                             View <FiArrowRight size={13} />
                           </button>
-
-                          {/* Delete button */}
                           <button
                             className={styles.deleteBtn}
                             onClick={(e) => handleDeleteClick(e, s)}
@@ -282,20 +478,44 @@ const FacultyStudentList = () => {
           {/* ── Footer ── */}
           <div className={styles.tableFooter}>
             <span className={styles.tableFooterText}>
-              Showing {filtered.length} of {totalCount} students
+              Showing {Math.min(currentPage * ITEMS_PER_PAGE, filtered.length)}{" "}
+              of {filtered.length} students
             </span>
-            <div className={styles.pagination}>
-              <button className={`${styles.pageBtn} ${styles.pageBtnActive}`}>
-                1
-              </button>
-              <button className={styles.pageBtn}>2</button>
-              <button className={styles.pageBtn}>›</button>
-            </div>
+            {totalPages > 1 && (
+              <div className={styles.pagination}>
+                <button
+                  className={styles.pageBtn}
+                  onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+                  disabled={currentPage === 1}
+                >
+                  ‹
+                </button>
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                  (page) => (
+                    <button
+                      key={page}
+                      className={`${styles.pageBtn} ${currentPage === page ? styles.pageBtnActive : ""}`}
+                      onClick={() => setCurrentPage(page)}
+                    >
+                      {page}
+                    </button>
+                  ),
+                )}
+                <button
+                  className={styles.pageBtn}
+                  onClick={() =>
+                    setCurrentPage((p) => Math.min(p + 1, totalPages))
+                  }
+                  disabled={currentPage === totalPages}
+                >
+                  ›
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
 
-      {/* ── Add Student Modal — unchanged ── */}
       <AddStudentModal
         isOpen={isModalOpen}
         onClose={() => {
@@ -303,8 +523,6 @@ const FacultyStudentList = () => {
           fetchStudents();
         }}
       />
-
-      {/* ── Delete Confirmation Modal ── */}
       <ConfirmationModal
         isOpen={!!deleteTarget}
         studentName={deleteTarget?.name}
