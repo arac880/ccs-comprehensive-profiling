@@ -1,14 +1,39 @@
-@import url("https://fonts.googleapis.com/css2?family=Afacad:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Freeman&family=ADLaM+Display&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Afacad:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Freeman&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap");
+
+/* ═══════════════════════════════════════════════
+   CSS TOKENS
+   ═══════════════════════════════════════════════ */
+:root {
+  --orange:       #E65100;
+  --orange-light: #FF6D00;
+  --orange-pale:  #FFF3E0;
+  --orange-muted: #FFB74D;
+  --cream:        #FDF6F0;
+  --white:        #FFFFFF;
+  --warm-gray:    #F5EDE5;
+  --border:       #EDD8CA;
+  --shadow:       rgba(230, 81, 0, 0.10);
+  --text-dark:    #2D1F15;
+  --text-mid:     #7A4F35;
+  --text-muted:   #B07050;
+  --text-soft:    #C8956D;
+  --radius-sm:    10px;
+  --radius-md:    16px;
+  --radius-lg:    20px;
+  --font-body:    'Plus Jakarta Sans', sans-serif;
+  --font-display: 'Freeman', sans-serif;
+  --font-ui:      'Afacad', sans-serif;
+}
 
 /* ═══════════════════════════════════════════════
    PAGE SHELL
    ═══════════════════════════════════════════════ */
 .dashboardWrapper {
   min-height: 100vh;
-  background-color: #f5ece6;
+  background-color: var(--cream);
   display: flex;
   flex-direction: row;
-  font-family: "Afacad", sans-serif;
+  font-family: var(--font-body);
 }
 
 .rightColumn {
@@ -20,20 +45,17 @@
 }
 
 .mainContent {
-  background-color: #f5ece6;
+  background-color: var(--cream);
   flex: 1;
   overflow-y: auto;
   padding: clamp(14px, 2vw, 22px) clamp(14px, 2.4vw, 24px);
 }
 
 .mobileMain {
-  padding-top: 70px;
-  padding-bottom: 68px;
-  padding-left: 14px;
-  padding-right: 14px;
+  padding: 70px 14px 68px;
   min-height: 100vh;
-  background-color: #f5ece6;
-  font-family: "Afacad", sans-serif;
+  background-color: var(--cream);
+  font-family: var(--font-body);
 }
 
 /* ═══════════════════════════════════════════════
@@ -42,68 +64,61 @@
 .dashLayout {
   display: flex;
   flex-direction: column;
-  gap: clamp(12px, 1.6vw, 18px);
+  gap: clamp(14px, 1.8vw, 20px);
+  animation: fadeUp 0.4s ease both;
 }
 
-/* ══════════════════════════════════════════════════
-   ROW 1 — WelcomeBanner | CalendarWidget
-   
-   CalendarWidget has a natural/fixed height driven
-   by its own content. We must NOT stretch it.
-   
-   Solution:
-   - calendarCell: shrink-wrap to CalendarWidget's size
-   - topRow: align-items:stretch so welcomeCell row
-     height = calendarCell height
-   - welcomeCell fills that height via flex:1
-   ══════════════════════════════════════════════════ */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+/* ── Stats row ── */
+.statsRow {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  animation: fadeUp 0.4s 0.08s ease both;
+}
+
+/* ── Row 1: WelcomeBanner | CalendarWidget ── */
 .topRow {
   display: grid;
   grid-template-columns: 1fr 280px;
   gap: clamp(12px, 1.6vw, 18px);
-  align-items: stretch;   /* both cells same height — grid default */
+  align-items: stretch;
+  animation: fadeUp 0.4s 0.16s ease both;
 }
 
-/* welcomeCell: flex so its child (WelcomeBanner) fills full height */
 .welcomeCell {
   display: flex;
   flex-direction: column;
 }
 
-/* WelcomeBanner root stretches to fill welcomeCell */
 .welcomeCell > * {
   flex: 1;
   width: 100%;
   box-sizing: border-box;
 }
 
-/* calendarCell: DO NOT force height — let CalendarWidget size itself */
 .calendarCell {
   display: flex;
   flex-direction: column;
-  align-self: stretch;    /* stretch within the row */
+  align-self: stretch;
 }
 
-/* CalendarWidget root: width only, never touch height */
 .calendarCell > * {
   width: 100%;
   box-sizing: border-box;
-  /* NO flex:1, NO height:100% — CalendarWidget owns its own height */
 }
 
-/* ══════════════════════════════════════════════════
-   ROW 2 — EventsSection | CCSLinks
-
-   eventsCell drives the row height (content-based).
-   linksCell stretches to match via grid stretch.
-   CCSLinks root fills linksCell via flex:1.
-   ══════════════════════════════════════════════════ */
+/* ── Row 2: EventsSection | CCSLinks ── */
 .bottomRow {
   display: grid;
   grid-template-columns: 1fr 280px;
   gap: clamp(12px, 1.6vw, 18px);
-  align-items: stretch;
-  margin-top: 4px;
+  align-items: start;
+  animation: fadeUp 0.4s 0.24s ease both;
 }
 
 .eventsCell {
@@ -124,25 +139,109 @@
   padding-bottom: 4px;
 }
 
-/* linksCell stretches to full row height via grid stretch */
 .linksCell {
   display: flex;
   flex-direction: column;
 }
 
-/* CCSLinks root fills the entire linksCell height */
 .linksCell > * {
   flex: 1;
   width: 100%;
-  height: 100%;
   box-sizing: border-box;
 }
 
 /* ═══════════════════════════════════════════════
-   RESPONSIVE — Bootstrap breakpoints
+   STAT CARDS
    ═══════════════════════════════════════════════ */
+.statCard {
+  background: var(--white);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: box-shadow 0.18s, transform 0.18s;
+}
 
-/* lg 992 px — single column */
+.statCard:hover {
+  box-shadow: 0 4px 18px var(--shadow);
+  transform: translateY(-2px);
+}
+
+.statCardTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.statLabel {
+  font-family: var(--font-ui);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.statValue {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  color: var(--orange);
+  line-height: 1.1;
+}
+
+.statSub {
+  font-family: var(--font-ui);
+  font-size: 0.75rem;
+  color: var(--text-soft);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.statIcon {
+  width: 32px;
+  height: 32px;
+  background: var(--orange-pale);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: var(--orange);
+}
+
+/* ═══════════════════════════════════════════════
+   SHOW MORE BUTTON
+   ═══════════════════════════════════════════════ */
+.showMoreBtn {
+  background: none;
+  border: 1.5px dashed var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px;
+  width: 100%;
+  cursor: pointer;
+  font-family: var(--font-ui);
+  font-size: 0.87rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.showMoreBtn:hover {
+  border-color: var(--orange);
+  color: var(--orange);
+  background: var(--orange-pale);
+}
+
+/* ═══════════════════════════════════════════════
+   RESPONSIVE
+   ═══════════════════════════════════════════════ */
 @media (max-width: 991.98px) {
   .topRow,
   .bottomRow {
@@ -155,20 +254,215 @@
     height: auto;
     flex: unset;
   }
+
+  .statsRow {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
-/* md 768 px */
 @media (max-width: 767.98px) {
   .mainContent {
     padding: 14px;
   }
 }
 
-/* sm 576 px */
 @media (max-width: 575.98px) {
   .dashLayout,
   .topRow,
-  .bottomRow {
+  .bottomRow,
+  .statsRow {
     gap: 10px;
+  }
+}
+
+/* ═══════════════════════════════════════════════
+   ROW 1: HERO
+   ═══════════════════════════════════════════════ */
+.heroRow {
+  display: block; /* Banner naturally takes full width */
+  width: 100%;
+  animation: fadeUp 0.4s 0.08s ease both;
+}
+
+/* ═══════════════════════════════════════════════
+   ROW 2: WIDGETS
+   ═══════════════════════════════════════════════ */
+.widgetsRow {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* Split perfectly in half */
+  gap: clamp(14px, 1.8vw, 20px);
+  animation: fadeUp 0.4s 0.16s ease both;
+}
+
+.widgetCard {
+  background: var(--white);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 12px rgba(230, 81, 0, 0.04);
+}
+
+.widgetHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  border-bottom: 1px dashed var(--border);
+  padding-bottom: 10px;
+}
+
+.widgetTitleWrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.widgetIcon {
+  color: var(--orange);
+  font-size: 1.1rem;
+}
+
+.widgetTitle {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  color: var(--text-dark);
+  font-size: 1rem;
+}
+
+.widgetAction {
+  font-family: var(--font-ui);
+  font-size: 0.8rem;
+  color: var(--orange);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  font-weight: 600;
+}
+
+.widgetBody {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* ── Specific Widget Inner Styles ── */
+
+/* Schedule Widget */
+.scheduleWidget {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.timeBlock {
+  display: flex;
+  flex-direction: column;
+  border-right: 2px solid var(--orange-pale);
+  padding-right: 16px;
+}
+
+.timeHighlight {
+  font-family: var(--font-display);
+  color: var(--orange);
+  font-size: 1.3rem;
+  line-height: 1;
+}
+
+.timeEnd {
+  font-family: var(--font-ui);
+  font-size: 0.75rem;
+  color: var(--text-soft);
+  margin-top: 4px;
+}
+
+.classBlock {
+  display: flex;
+  flex-direction: column;
+}
+
+.subject {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  color: var(--text-dark);
+  font-size: 1.05rem;
+}
+
+.instructor {
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+/* ═══════════════════════════════════════════════
+   CLEARANCE DISPLAY (DASHBOARD ALIGNED)
+   ═══════════════════════════════════════════════ */
+
+.clearanceDisplay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+  border-radius: var(--radius-sm);
+  text-align: center;
+  gap: 8px;
+  /* Adds a tiny transition so testing the toggle looks smooth */
+  transition: background-color 0.3s ease, border-color 0.3s ease; 
+}
+
+/* ── Not Cleared: Uses your native Orange dashboard tokens ── */
+.notCleared {
+  background-color: var(--orange-pale);
+  border: 1.5px dashed var(--orange-muted);
+}
+
+.notCleared .statusTitle,
+.notCleared svg {
+  color: var(--orange);
+}
+
+/* ── Cleared: Uses a warm, muted green to complement the Cream theme ── */
+.cleared {
+  background-color: #F4F8F4; 
+  border: 1.5px dashed #A5D6A7;
+}
+
+.cleared .statusTitle,
+.cleared svg {
+  color: #388E3C;
+}
+
+/* ── Inner Content Formatting ── */
+.statusMain {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.statusTitle {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  margin-top: 2px; /* Visual alignment fix for Freeman font */
+}
+
+.statusDesc {
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+  color: var(--text-mid); /* Ties the description back to your text tokens */
+  font-weight: 500;
+  margin: 0;
+}
+
+/* ═══════════════════════════════════════════════
+   RESPONSIVE UPDATES
+   ═══════════════════════════════════════════════ */
+@media (max-width: 991.98px) {
+  .widgetsRow {
+    grid-template-columns: 1fr; /* Stacks the two widgets on mobile */
   }
 }

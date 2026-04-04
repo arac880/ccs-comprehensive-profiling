@@ -1,71 +1,166 @@
-@import url("https://fonts.googleapis.com/css2?family=Afacad:wght@400;600;700&family=Freeman&family=ADLaM+Display&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Afacad:wght@400;600;700&family=Freeman&family=Plus+Jakarta+Sans:wght@500;600&display=swap");
 
-/* ── Outer card ──────────────────────────────────────────────────────────── */
+/* ── Outer card ── */
 .card {
-  background-color: #ffffff;
-  border-radius: 16px;
-  padding: clamp(30px, 5vw, 45px) clamp(5px, 5vw, 20px);
-  text-align: center;
-  box-shadow: 0 2px 16px rgba(230, 81, 0, 0.06);
+  background: #ffffff;
+  border-radius: 20px;
+  padding: clamp(24px, 4vw, 36px) clamp(20px, 4vw, 36px);
+  border: 1px solid #EDD8CA;
+  display: flex;
+  align-items: center;
+  gap: clamp(16px, 3vw, 28px);
+  position: relative;
+  overflow: hidden;
   width: 100%;
   box-sizing: border-box;
-  margin-bottom: clamp(14px, 2.5vw, 24px);
+  transition: box-shadow 0.2s;
 }
 
-/* ── Heading row: "Welcome  to  the  CCS" all on one line ───────────────── */
+.card:hover {
+  box-shadow: 0 6px 28px rgba(230, 81, 0, 0.10);
+}
+
+/* Decorative blobs */
+.card::before {
+  content: '';
+  position: absolute;
+  top: -40px;
+  right: -40px;
+  width: 200px;
+  height: 200px;
+  background: #FFF3E0;
+  border-radius: 50%;
+  opacity: 0.8;
+  pointer-events: none;
+}
+
+.card::after {
+  content: '';
+  position: absolute;
+  bottom: -50px;
+  right: 80px;
+  width: 140px;
+  height: 140px;
+  background: #FFE0CC;
+  border-radius: 50%;
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+/* ── Text side ── */
+.textBlock {
+  flex: 1;
+  z-index: 1;
+  min-width: 0;
+}
+
+.greeting {
+  font-family: 'Afacad', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #B07050;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+/* ── Heading row ── */
 .headingRow {
   display: flex;
   align-items: baseline;
-  justify-content: center;
   flex-wrap: wrap;
   gap: 0 clamp(6px, 1vw, 12px);
   margin: 0 0 clamp(4px, 0.8vw, 8px);
 }
 
-/* "Welcome to the" — muted warm brown, lighter weight */
 .headingText {
-  font-family: "Afacad", sans-serif;
-  font-size: clamp(1.80rem, 3vw, 2.80rem);
+  font-family: 'Afacad', sans-serif;
+  font-size: clamp(1.6rem, 3vw, 2.5rem);
   font-weight: 600;
-  color: #b07050;
+  color: #7A4F35;
   letter-spacing: 0.01em;
   white-space: nowrap;
 }
 
-/* "CCS" — large, bold, orange, Freeman italic */
 .accentCCS {
-  font-family: "Freeman", sans-serif;
-  font-size: clamp(2rem, 4.5vw, 3.5rem);
-  color: #e65100;
-  font-weight: bold;
-  letter-spacing: -0.01em;
+  font-family: 'Freeman', sans-serif;
+  font-size: clamp(2rem, 4.5vw, 3.2rem);
+  color: #E65100;
   line-height: 1;
+  letter-spacing: -0.01em;
 }
 
-/* ── Subtitle ─────────────────────────────────────────────────────────────── */
+/* ── Subtitle ── */
 .sub {
-  font-family: "Afacad", sans-serif;
-  font-size: clamp(1rem, 1.5vw, 1.5rem);
+  font-family: 'Afacad', sans-serif;
+  font-size: clamp(0.95rem, 1.4vw, 1.2rem);
   font-weight: 700;
-  color: #e65100;
-  letter-spacing: 0.06em;
-  margin: 0;
-  text-transform: none;
+  color: #C8956D;
+  letter-spacing: 0.05em;
+  margin: 0 0 12px;
 }
 
-/* ── Responsive tweaks ───────────────────────────────────────────────────── */
-@media (max-width: 480px) {
-  .headingRow {
-    gap: 0 6px;
+/* ── Badge ── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #FFF3E0;
+  border: 1px solid #FFCC80;
+  border-radius: 8px;
+  padding: 5px 13px;
+  font-family: 'Afacad', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #E65100;
+}
+
+/* ── Illustration side ── */
+.illustBlock {
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.iconTile {
+  width: 64px;
+  height: 64px;
+  background: #E65100;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  color: #fff;
+  transition: transform 0.2s;
+}
+
+.card:hover .iconTile {
+  transform: rotate(-4deg) scale(1.06);
+}
+
+.iconCaption {
+  font-family: 'Afacad', sans-serif;
+  font-size: 0.72rem;
+  color: #B07050;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* ── Responsive ── */
+@media (max-width: 600px) {
+  .illustBlock {
+    display: none;
   }
+
   .headingText {
-    font-size: clamp(1.2rem, 6vw, 1.6rem);
+    font-size: clamp(1.25rem, 6vw, 1.7rem);
   }
+
   .accentCCS {
     font-size: clamp(1.6rem, 8vw, 2.2rem);
-  }
-  .sub {
-    font-size: clamp(0.75rem, 3.5vw, 0.9rem);
-    letter-spacing: 0.04em;
   }
 }

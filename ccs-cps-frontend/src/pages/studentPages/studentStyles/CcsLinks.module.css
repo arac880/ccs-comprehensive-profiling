@@ -1,6 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Afacad:wght@400;600;700&display=swap");
 
-/* ── Wrapper — holds title + card ── */
+/* ── Wrapper ── */
 .wrapper {
   display: flex;
   flex-direction: column;
@@ -8,26 +8,17 @@
   height: 100%;
 }
 
-/* ── Outer card ── */
+/* ── Card ── */
 .linksCard {
-  background-color: #ffffff;
-  border-radius: 14px;
-  padding: 16px;
-  box-shadow: 0 2px 12px rgba(230, 81, 0, 0.05);
+  background: #ffffff;
+  border-radius: 20px;
+  border: 1px solid #EDD8CA;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   flex: 1;
   box-sizing: border-box;
   width: 100%;
-}
-
-/* Title sits outside the card */
-.sectionTitle {
-  font-family: "Afacad", sans-serif;
-  font-size: clamp(1rem, 1.5vw, 1.5rem);
-  font-weight: 700;
-  color: #b86e46;
-  margin: 0 0 8px 4px;
 }
 
 /* ── Links list ── */
@@ -42,10 +33,10 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px 10px;
+  padding: 13px 16px;
   text-decoration: none;
-  border-bottom: 1px solid #f1e1da;
-  transition: background-color 0.15s;
+  border-bottom: 1px solid #EDD8CA;
+  transition: background 0.13s;
 }
 
 .linkItem:last-child {
@@ -53,24 +44,29 @@
 }
 
 .linkItem:hover {
-  background-color: #fff3ee;
-  border-radius: 8px;
+  background: #FFF3E0;
 }
 
-/* ── Platform icon circle ── */
-.iconCircle {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background-color: #e65100;
+/* ── Platform icon tile ── */
+.iconTile {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: #E65100;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  transition: background 0.15s, transform 0.15s;
+}
+
+.linkItem:hover .iconTile {
+  background: #FF6D00;
+  transform: scale(1.06);
 }
 
 .platformIcon {
-  font-size: 1.15rem;
+  font-size: 17px;
   color: #ffffff;
 }
 
@@ -79,13 +75,14 @@
   display: flex;
   flex-direction: column;
   min-width: 0;
+  flex: 1;
 }
 
 .linkName {
-  font-family: "Afacad", sans-serif;
-  font-size: clamp(1rem, 1.5vw, 1rem);
+  font-family: 'Afacad', sans-serif;
+  font-size: 0.92rem;
   font-weight: 700;
-  color: #e65100;
+  color: #E65100;
   margin: 0;
   line-height: 1.2;
   white-space: nowrap;
@@ -94,8 +91,20 @@
 }
 
 .linkSub {
-  font-family: "Afacad", sans-serif;
-  font-size: clamp(0.65rem, 1vw, 0.75rem);
-  color: #9e9e9e;
+  font-family: 'Afacad', sans-serif;
+  font-size: 0.73rem;
+  color: #B07050;
   line-height: 1.3;
+}
+
+/* ── Arrow icon ── */
+.arrowIcon {
+  font-size: 13px;
+  color: #C8956D;
+  flex-shrink: 0;
+  transition: transform 0.15s;
+}
+
+.linkItem:hover .arrowIcon {
+  transform: translate(2px, -2px);
 }
