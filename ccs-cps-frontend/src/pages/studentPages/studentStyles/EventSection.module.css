@@ -1,25 +1,58 @@
-@import url("https://fonts.googleapis.com/css2?family=Afacad:wght@400;500;600;700&family=Freeman&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Afacad:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Freeman&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap");
 
-/* ── Outer Wrapper ── */
+:root {
+  --orange: #E65100;
+  --orange-light: #FF6D00;
+  --orange-pale: #FFF3E0;
+  --orange-muted: #FFB74D;
+  --cream: #FDF6F0;
+  --white: #FFFFFF;
+  --warm-gray: #F5EDE5;
+  --border: #EDD8CA;
+  --shadow: rgba(230, 81, 0, 0.10);
+  --text-dark: #2D1F15;
+  --text-mid: #7A4F35;
+  --text-muted: #B07050;
+  --text-soft: #C8956D;
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 20px;
+  --font-body: 'Plus Jakarta Sans', sans-serif;
+  --font-display: 'Freeman', sans-serif;
+  --font-ui: 'Afacad', sans-serif;
+}
+
 .eventsCard {
-  background-color: #ffffff;
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  border: 1px solid #f0e6e1;
+  background-color: var(--white);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  overflow: hidden; 
 }
 
 .eventsContainer {
   padding: 24px;
+ background-color: white;
+
+}
+
+.actionBar {
+  background-color: var(--orange);
+  border-top: 1px solid var(--border);
+  border-radius: 0; 
+  padding: 14px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  text-decoration: none;
 }
 
 /* ── Timeline List ── */
 .timelineList {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 0;
 }
 
 /* ── Individual Event Layout ── */
@@ -27,36 +60,54 @@
   display: flex;
   gap: 20px;
   align-items: flex-start;
+  padding: 24px 0;
+  border-bottom: 1px dashed var(--border);
+  transition: background-color 0.2s ease;
+  position: relative;
+}
+
+.eventItem:last-child {
+  border-bottom: none;
+  padding-bottom: 8px;
+}
+
+.eventItem:first-child {
+  padding-top: 8px;
 }
 
 /* ── Date Block (Left Side) ── */
 .dateBlock {
-  background-color: #fff4ee;
-  border-left: 4px solid #e65100;
-  border-radius: 8px;
-  padding: 12px 16px;
+  background-color: var(--orange-pale);
+  border-left: 4px solid var(--orange);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-width: 70px;
+  min-width: 68px;
   flex-shrink: 0;
-  box-shadow: 0 2px 8px rgba(230, 81, 0, 0.05);
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.eventItem:hover .dateBlock {
+  background-color: #FFE0B2;
+  transform: scale(1.03);
 }
 
 .dateMonth {
-  font-family: "Afacad", sans-serif;
-  font-size: 0.85rem;
+  font-family: var(--font-ui);
+  font-size: 0.75rem;
   font-weight: 700;
-  color: #e65100;
+  color: var(--orange);
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.12em;
 }
 
 .dateDay {
-  font-family: "Freeman", sans-serif;
-  font-size: 1.8rem;
-  color: #a34100;
+  font-family: var(--font-display);
+  font-size: 1.9rem;
+  color: var(--orange);
   line-height: 1;
   margin-top: 2px;
 }
@@ -66,7 +117,8 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  padding-top: 4px;
+  padding-top: 2px;
+  min-width: 0;
 }
 
 .eventHeader {
@@ -78,80 +130,157 @@
 }
 
 .eventTitle {
-  font-family: "Afacad", sans-serif;
-  font-size: clamp(1.1rem, 1.5vw, 1.25rem);
+  font-family: var(--font-ui);
+  font-size: clamp(1.05rem, 1.4vw, 1.2rem);
   font-weight: 700;
-  color: #333333;
+  color: var(--text-dark);
   margin: 0;
   line-height: 1.3;
 }
 
+/* ── Status Badge Variants ── */
 .eventBadge {
-  background-color: #e65100;
-  color: #ffffff;
-  font-family: "Afacad", sans-serif;
-  font-size: 0.7rem;
+  font-family: var(--font-ui);
+  font-size: 0.68rem;
   font-weight: 700;
   padding: 4px 10px;
-  border-radius: 20px;
+  border-radius: var(--radius-lg);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.badgeUpcoming {
+  background-color: var(--orange);
+  color: var(--white);
+}
+
+.badgePast {
+  background-color: var(--warm-gray);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+}
+
+.badgeOngoing {
+  background-color: #E8F5E9;
+  color: #2E7D32;
+  border: 1px solid #A5D6A7;
+}
+
+/* ── Meta row ── */
+.eventMeta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+
+.metaDot {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background-color: var(--text-soft);
   flex-shrink: 0;
 }
 
-.eventMeta {
-  font-family: "Afacad", sans-serif;
-  font-size: 0.85rem;
-  color: #888888;
-  margin-bottom: 12px;
-}
-
+/* ── Body text ── */
 .eventBody {
-  font-family: "Afacad", sans-serif;
+  font-family: var(--font-ui);
   font-size: 0.95rem;
-  color: #555555;
-  line-height: 1.6;
+  color: var(--text-mid);
+  line-height: 1.65;
   margin: 0 0 16px 0;
   white-space: pre-line;
 }
 
-/* ── Attachment Button ── */
-.attachmentWrap {
+/* Collapsed / expanded body */
+.eventBodyCollapsed {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ── Read more toggle ── */
+.readMoreBtn {
+  background: none;
+  border: none;
+  padding: 0;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--orange);
+  cursor: pointer;
+  letter-spacing: 0.03em;
+  transition: opacity 0.15s ease;
+}
+
+.readMoreBtn:hover {
+  opacity: 0.75;
+}
+
+/* ── Bottom row: attachment + date ── */
+.eventFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
   margin-top: auto;
 }
 
+/* ── Attachment Button ── */
 .attachmentBtn {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  background-color: #f8f9fa;
-  border: 1px solid #e0e0e0;
-  color: #444444;
-  font-family: "Afacad", sans-serif;
-  font-size: 0.85rem;
+  gap: 6px;
+  background-color: var(--warm-gray);
+  border: 1px solid var(--border);
+  color: var(--text-mid);
+  font-family: var(--font-ui);
+  font-size: 0.82rem;
   font-weight: 600;
-  padding: 8px 16px;
+  padding: 6px 12px;
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s ease;
+  max-width: 260px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .attachmentBtn i {
-  color: #d32f2f; /* Standard PDF red */
-  font-size: 1.1rem;
+  color: #d32f2f;
+  font-size: 1rem;
+  flex-shrink: 0;
 }
 
 .attachmentBtn:hover {
-  background-color: #fff4ee;
-  border-color: #e65100;
-  color: #e65100;
+  background-color: var(--orange-pale);
+  border-color: var(--orange-muted);
+  color: var(--orange);
 }
 
-/* ── Action Bar (Bottom Footer) ── */
+.eventDate {
+  font-family: var(--font-ui);
+  font-size: 0.8rem;
+  color: var(--text-soft);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
 .actionBar {
-  background-color: #fffaf8;
-  border-top: 1px solid #f0e6e1;
-  padding: 16px 24px;
+  background-color: var(--orange);
+  border-top: 1px solid var(--border);
+  border-radius: 0 0 var(--radius-md) var(--radius-md); 
+  padding: 14px 24px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -160,20 +289,20 @@
 }
 
 .actionBar:hover {
-  background-color: #fdede5;
+  background-color: var(--orange-light);
 }
 
 .actionText {
-  font-family: "Afacad", sans-serif;
-  font-size: 0.95rem;
+  font-family: var(--font-ui);
+  font-size: 0.88rem;
   font-weight: 700;
-  color: #e65100;
+  color: var(--white);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.07em;
 }
 
 .actionIcon {
-  color: #e65100;
+  color: var(--white);
   font-size: 1.2rem;
   transition: transform 0.2s ease;
 }
@@ -185,8 +314,42 @@
 /* ── Empty State ── */
 .emptyState {
   text-align: center;
-  padding: 40px 0;
-  color: #999999;
-  font-family: "Afacad", sans-serif;
+  padding: 60px 0 48px;
+  color: var(--text-muted);
+  font-family: var(--font-ui);
   font-weight: 500;
+}
+
+.emptyState p {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+/* ── Responsive ── */
+@media (max-width: 575.98px) {
+  .eventsContainer {
+    padding: 16px;
+  }
+
+  .eventItem {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .dateBlock {
+    flex-direction: row;
+    gap: 8px;
+    padding: 8px 14px;
+    min-width: unset;
+    width: fit-content;
+  }
+
+  .dateDay {
+    font-size: 1.3rem;
+  }
+
+  .eventFooter {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }

@@ -1,73 +1,151 @@
-import AppButton from "../../components/ui/AppButton";
+import { useState } from "react";
+import { Link } from "react-router-dom";
 import styles from "../../pages/studentPages/studentStyles/EventSection.module.css";
-import { BsArrowRight } from "react-icons/bs"; 
+import { BsArrowRight } from "react-icons/bs";
+
+function parseDateParts(dateStr) {
+  if (!dateStr) return { month: "—", day: "—" };
+  const d = new Date(dateStr);
+  if (isNaN(d)) return { month: "—", day: "—" };
+  return {
+    month: d.toLocaleString("en-US", { month: "short" }).toUpperCase(),
+    day: String(d.getDate()).padStart(2, "0"),
+  };
+}
+
+function getBadgeClass(status) {
+  if (!status) return "";
+  const s = status.toLowerCase();
+  if (s === "upcoming") return styles.badgeUpcoming;
+  if (s === "past") return styles.badgePast;
+  if (s === "ongoing") return styles.badgeOngoing;
+  return styles.badgeUpcoming;
+}
+
+function EventItem({ event }) {
+  const [expanded, setExpanded] = useState(false);
+
+  const { month, day } =
+    event.month && event.day
+      ? { month: event.month, day: event.day }
+      : parseDateParts(event.date);
+
+  const body = event.body || "";
+  const isLong = body.length > 280 || body.split("\n").length > 3;
+
+  return (
+    <div className={styles.eventItem}>
+      <div className={styles.dateBlock}>
+        <span className={styles.dateMonth}>{month}</span>
+        <span className={styles.dateDay}>{day}</span>
+      </div>
+
+      <div className={styles.eventContent}>
+        <div className={styles.eventHeader}>
+          <h3 className={styles.eventTitle}>{event.title}</h3>
+          {event.status && (
+            <span
+              className={`${styles.eventBadge} ${getBadgeClass(event.status)}`}>
+              {event.status}
+            </span>
+          )}
+        </div>
+
+        <div className={styles.eventMeta}>
+          <span>Posted: {event.createdAt}</span>
+          {event.date && (
+            <>
+              <span className={styles.metaDot} />
+              <span>{event.date}</span>
+            </>
+          )}
+        </div>
+
+        <p
+          className={`${styles.eventBody} ${isLong && !expanded ? styles.eventBodyCollapsed : ""}`}>
+          {body}
+        </p>
+
+        {isLong && (
+          <button
+            className={styles.readMoreBtn}
+            onClick={() => setExpanded((v) => !v)}>
+            {expanded ? "Show less ↑" : "Read more ↓"}
+          </button>
+        )}
+
+        <div className={styles.eventFooter}>
+          {event.attachment ? (
+            <button
+              className={styles.attachmentBtn}
+              onClick={() => window.open(event.attachment.url, "_blank")}>
+              <i className="bi bi-file-earmark-pdf-fill" />
+              {event.attachment.name}
+            </button>
+          ) : (
+            <span />
+          )}
+          {event.date && (
+            <span className={styles.eventDate}>
+              <i className="bi bi-calendar3" style={{ marginRight: 5 }} />
+              {event.date}
+            </span>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 const SAMPLE_EVENTS = [
   {
     id: 1,
-    title: "CSG- Meeting on January 12, 2025",
+    title: "CSG — Meeting on January 12, 2025",
     createdAt: "March 2, 2026, 3:45 PM",
     month: "JAN",
     day: "12",
+    date: "April 10, 2026",
     body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem vitae justo at sapien facilisis bibendum. Integer vehicula, lorem a hendrerit varius, risus elit ultrices neque, at dignissim libero sapien nec erat.\n\nCurabitur non lorem vel orci pulvinar tincidunt. Nulla facilisi. Vestibulum ante ipsum primis in faucibus orci.",
     attachment: { name: "CSG-Meeting.pdf", url: "#" },
-    status: "Upcoming"
+    status: "Upcoming",
   },
 ];
 
-export default function EventsSection({ events = SAMPLE_EVENTS, onShowMore, showMore = true }) {
+export default function EventsSection({
+  events = SAMPLE_EVENTS,
+  onShowMore,
+  showMore = true,
+}) {
   return (
     <div className={styles.eventsCard}>
       <div className={styles.eventsContainer}>
         {events.length === 0 ? (
           <div className={styles.emptyState}>
-            <i className="bi bi-calendar-x" style={{ fontSize: 32, opacity: 0.2, display: "block", marginBottom: 12 }} />
-            <p>No upcoming events.</p>
+            <i
+              className="bi bi-calendar-x"
+              style={{
+                fontSize: 36,
+                opacity: 0.18,
+                display: "block",
+                marginBottom: 14,
+              }}
+            />
+            <p>No events found.</p>
           </div>
         ) : (
           <div className={styles.timelineList}>
             {events.map((event) => (
-              <div key={event.id} className={styles.eventItem}>
-                
-                {/* Visual Date Block */}
-                <div className={styles.dateBlock}>
-                  <span className={styles.dateMonth}>{event.month}</span>
-                  <span className={styles.dateDay}>{event.day}</span>
-                </div>
-
-                {/* Event Content */}
-                <div className={styles.eventContent}>
-                  <div className={styles.eventHeader}>
-                    <h3 className={styles.eventTitle}>{event.title}</h3>
-                    {event.status && (
-                      <span className={styles.eventBadge}>{event.status}</span>
-                    )}
-                  </div>
-                  
-                  <span className={styles.eventMeta}>Posted: {event.createdAt}</span>
-                  <p className={styles.eventBody}>{event.body}</p>
-
-                  {event.attachment && (
-                    <div className={styles.attachmentWrap}>
-                      <button className={styles.attachmentBtn} onClick={() => window.open(event.attachment.url, "_blank")}>
-                        <i className="bi bi-file-earmark-pdf-fill" />
-                        {event.attachment.name}
-                      </button>
-                    </div>
-                  )}
-                </div>
-              </div>
+              <EventItem key={event.id} event={event} />
             ))}
           </div>
         )}
       </div>
 
-      {/* Sleek Bottom Action Bar */}
       {showMore && (
-        <div className={styles.actionBar} onClick={onShowMore}>
+        <Link to="/student/events" className={styles.actionBar}>
           <span className={styles.actionText}>View All Events</span>
           <BsArrowRight className={styles.actionIcon} />
-        </div>
+        </Link>
       )}
     </div>
   );

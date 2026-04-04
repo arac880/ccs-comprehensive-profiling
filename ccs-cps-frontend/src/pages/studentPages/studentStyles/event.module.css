@@ -1,28 +1,36 @@
-@import url("https://fonts.googleapis.com/css2?family=Afacad:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Afacad:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Freeman&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap");
+
+:root {
+  --orange:       #E65100;
+  --orange-light: #FF6D00;
+  --orange-pale:  #FFF3E0;
+  --orange-muted: #FFB74D;
+  --cream:        #FDF6F0;
+  --white:        #FFFFFF;
+  --warm-gray:    #F5EDE5;
+  --border:       #EDD8CA;
+  --shadow:       rgba(230, 81, 0, 0.10);
+  --text-dark:    #2D1F15;
+  --text-mid:     #7A4F35;
+  --text-muted:   #B07050;
+  --text-soft:    #C8956D;
+  --radius-sm:    10px;
+  --radius-md:    16px;
+  --radius-lg:    20px;
+  --font-body:    'Plus Jakarta Sans', sans-serif;
+  --font-display: 'Freeman', sans-serif;
+  --font-ui:      'Afacad', sans-serif;
+}
 
 /* ── Page root ── */
 .pageRoot {
   display: flex;
   min-height: 100vh;
-  background-color: #f5ece6;
-  font-family: "Afacad", sans-serif;
+  background-color: var(--cream);
+  font-family: var(--font-body);
 }
 
-/* ── Sidebar area ── */
-.sidebarArea {
-  flex-shrink: 0;
-}
-
-/* ── Main column ── */
-.mainCol {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-  min-height: 100vh;
-}
-
-/* ── Scrollable area below topbar ── */
+/* ── Scrollable area ── */
 .scrollArea {
   flex: 1;
   display: flex;
@@ -30,41 +38,140 @@
   overflow-y: auto;
   padding: clamp(14px, 2vw, 22px) clamp(14px, 2.4vw, 24px);
   gap: clamp(12px, 1.6vw, 18px);
+  animation: fadeUp 0.4s ease both;
 }
 
-/* ── Content row: events + right panel ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Content row ── */
 .contentRow {
   display: grid;
   grid-template-columns: 1fr 280px;
   gap: clamp(12px, 1.6vw, 18px);
-  align-items: stretch;
-  flex: 1;
+  align-items: start;
 }
 
-/* ── Events column ── */
 .eventsCol {
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
-/* ── Events card ── */
-.eventsCard {
-  background: #ffffff;
-  border-radius: 14px;
-  padding: clamp(14px, 2vw, 20px);
-  box-shadow: 0 2px 12px rgba(230, 81, 0, 0.05);
+.pageHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
 }
 
-/* ── Card header: TitlePages left, controls right ── */
+.pageTitleWrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.pageTitleIcon {
+  background-color: var(--orange);
+  border-radius: 8px;
+  width: 42px;
+  height: 42px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 4px 12px rgba(230, 81, 0, 0.20);
+  flex-shrink: 0;
+}
+
+.pageTitle {
+  margin: 0;
+  color: var(--text-mid);
+  font-size: 1.8rem;
+  font-weight: 700;
+  font-family: var(--font-ui);
+}
+
+/* ── Summary pills — total / upcoming / past ── */
+.statsStrip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.statPill {
+  font-family: var(--font-ui);
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: 20px;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+
+.statPillNeutral {
+  background: var(--warm-gray);
+  color: var(--text-mid);
+  border: 1px solid var(--border);
+}
+
+.statPillOrange {
+  background: var(--orange-pale);
+  color: var(--orange);
+  border: 1px solid var(--orange-muted);
+}
+
+/* ══════════════════════════════════════════════
+   EVENTS CARD
+   ══════════════════════════════════════════════ */
+
+/* ── Card header ── */
 .cardHeader {
   display: flex;
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 10px;
-  margin-bottom: 16px;
+  padding: 14px 20px;
+  /* border-bottom: 1px dashed var(--border); */
+  background-color: transparent;
 }
 
-/* ── Filter + Search grouped right ── */
+.cardHeaderLeft {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cardHeaderIcon {
+  color: var(--orange);
+  display: flex;
+  align-items: center;
+}
+
+.cardHeaderTitle {
+  font-family: var(--font-ui);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+.cardHeaderCount {
+  font-family: var(--font-ui);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--orange);
+  background: var(--orange-pale);
+  border: 1px solid var(--orange-muted);
+  padding: 2px 8px;
+  border-radius: 20px;
+}
+
+/* ── Controls ── */
 .cardControls {
   display: flex;
   align-items: center;
@@ -72,17 +179,26 @@
   flex-wrap: wrap;
 }
 
-/* ── Right column: matches dashboard's 280px + gap ── */
+/* ── Results label ── */
+.resultsLabel {
+  font-family: var(--font-ui);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  padding: 10px 20px 0;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* ── Right column ── */
 .rightCol {
   width: 280px;
   display: flex;
   flex-direction: column;
-  gap: clamp(12px, 1.6vw, 18px); /* same gap as dashboard bottomRow */
-  height:100%;
+  gap: clamp(12px, 1.6vw, 18px);
 }
 
 .ccsLinksFixed {
-  height: 60%;
   display: flex;
 }
 
@@ -92,44 +208,42 @@
 
 /* ══ RESPONSIVE ══════════════════════════════════════ */
 
-/* lg — stack to single column */
 @media (max-width: 991.98px) {
   .contentRow {
     grid-template-columns: 1fr;
-    align-items: start;
   }
+
   .rightCol {
     width: 100%;
     flex-direction: row;
     flex-wrap: wrap;
   }
+
   .rightCol > * {
     flex: 1;
     min-width: 240px;
   }
 }
 
-/* md */
 @media (max-width: 767.98px) {
-  .scrollArea {
-    padding: 14px;
-  }
+  .scrollArea { padding: 14px; }
+
   .cardHeader {
     flex-direction: column;
     align-items: flex-start;
   }
-  .cardControls {
-    width: 100%;
+
+  .cardControls { width: 100%; }
+
+  .pageHeader {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }
 
-/* sm */
 @media (max-width: 575.98px) {
   .contentRow,
-  .rightCol {
-    gap: 10px;
-  }
-  .rightCol {
-    flex-direction: column;
-  }
+  .rightCol { gap: 10px; }
+
+  .rightCol { flex-direction: column; }
 }
