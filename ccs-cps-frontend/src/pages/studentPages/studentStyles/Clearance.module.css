@@ -1,18 +1,24 @@
-@import url("https://fonts.googleapis.com/css2?family=Afacad:wght@400;600;700&family=Freeman&family=ADLaM+Display&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Afacad:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Freeman&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap");
 
 .clearanceContainer {
-  background: #ffffff;
-    border-radius: 14px;
-    padding: clamp(14px, 2vw, 20px);
-    box-shadow: 0 2px 12px rgba(230, 81, 0, 0.05);
+  background-color: #FDF6F0; 
+  min-height: 100vh;
+  padding: clamp(14px, 2vw, 22px) clamp(14px, 2.4vw, 24px);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  animation: fadeUp 0.4s ease both;
 }
 
-/* Header Section */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+/* ── Header Section ── */
 .pageHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 28px;
+  margin-bottom: 24px;
   flex-wrap: wrap;
   gap: 16px;
 }
@@ -24,46 +30,46 @@
 }
 
 .iconBox {
-  background-color: #e65100;
-  border-radius: 6px;
-  width: 40px;
-  height: 40px;
+  background-color: #E65100;
+  border-radius: 8px;
+  width: 42px;
+  height: 42px;
   display: flex;
   justify-content: center;
   align-items: center;
+  box-shadow: 0 4px 12px rgba(230, 81, 0, 0.15);
 }
 
 .pageTitle {
   margin: 0;
-  color: #a34100;
-  font-size: 1.7rem;
+  color: #7A4F35; 
+  font-size: 1.8rem;
   font-weight: 700;
-  letter-spacing: -0.5px;
+  font-family: "Afacad", sans-serif;
 }
 
 .headerNote {
+  font-family: "Afacad", sans-serif;
   font-size: 0.85rem;
   font-weight: 600;
-  color: #e67e22;
-  background: #fff3e0;
+  color: #B07050; 
+  background: #FFF3E0; 
   padding: 8px 16px;
   border-radius: 20px;
-  border: 1px solid #ffd8a8;
+  border: 1px dashed #EDD8CA; 
 }
 
-/* Status Banner */
+/* ── Main Status Banner ── */
 .statusBanner {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: #fff1f1;
-  border: 1px solid #f08791;
-  border-left: 6px solid #d32f2f;
-  border-radius: 10px;
+  justify-content: center; 
+  background-color: #fff7ea; 
+  border: 1.5px dashed #FFB74D; 
+  border-radius: 16px;
   padding: 24px 32px;
-  margin-bottom: 40px;
+  margin-bottom: 32px;
   gap: 32px;
-  box-shadow: 0 4px 12px rgba(211, 47, 47, 0.203);
+  box-shadow: 0 4px 12px rgba(230, 81, 0, 0.04);
 }
 
 .statusLeft {
@@ -71,28 +77,41 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-width: 140px;
+  min-width: 180px;
+  text-align: center;
+}
+
+.statusIconWrap {
+  margin-bottom: 8px;
 }
 
 .statusMainText {
-  color: #d32f2f;
-  font-weight: 800;
-  margin-top: 14px;
-  font-size: 1.2rem;
+  color: #E65100; 
+  font-family: "Freeman", sans-serif;
+  font-size: 1.6rem;
+  letter-spacing: 0.02em;
+  line-height: 1;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+}
+
+.statusSubText {
+  font-family: "Afacad", sans-serif;
+  color: #B07050;
+  font-size: 0.9rem;
+  margin-top: 6px;
+  font-weight: 600;
 }
 
 .statusDivider {
   width: 0; 
-  border-left: 2px dashed #fad2d2; 
+  border-left: 2px dashed #FFB74D; 
   align-self: stretch; 
-  margin: 12px 0; 
 }
 
 .statusRight {
   display: flex;
   align-items: center;
+  /* flex: 1; <-- REMOVED this so it stops stretching */
 }
 
 .summaryList {
@@ -108,209 +127,262 @@
   display: flex;
   align-items: flex-start;
   gap: 12px;
+  font-family: "Afacad", sans-serif;
   font-size: 0.95rem;
   line-height: 1.5;
 }
 
-.listIcon {
-  flex-shrink: 0;
-  margin-top: 2px;
-}
+.listIcon { flex-shrink: 0; margin-top: 2px; }
+.clearedItem span { color: #388E3C; font-weight: 600; }
+.clearedItem .listIcon { color: #4CAF50; }
+.pendingItem span { color: #E65100; font-weight: 600; }
+.pendingItem .listIcon { color: #E65100; }
 
-.clearedItem span {
-  color: #2e7d32;
-  font-weight: 500;
-}
 
-.pendingItem span {
-  color: #34495e;
-  font-weight: 500;
-}
-
-/* Clearance Details */
+/* ── Timeline Pathway Styles ── */
 .sectionTitle {
-  color: #a34100;
-  font-size: 1.3rem;
+  color: #7A4F35;
+  font-family: "Afacad", sans-serif;
+  font-size: 1.2rem;
   font-weight: 700;
-  margin-bottom: 20px;
-  letter-spacing: 0.5px;
+  margin-bottom: 24px;
   text-transform: uppercase;
 }
 
-.detailCard {
-  background: #fff7f3;
-  border-radius: 10px;
-  overflow: hidden;
-  margin-bottom: 20px;
-  border: 1px solid #e0e0e0;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.04);
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
+.timelineWrapper {
+  display: flex;
+  flex-direction: column;
 }
 
-.detailCard:hover {
+.timelineRow {
+  display: flex;
+  gap: 24px;
+}
+
+.timelineNodeBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 48px;
+  flex-shrink: 0;
+}
+
+.timelineNode {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2; /* Keeps node above the line */
+}
+
+.nodeCleared {
+  background-color: #E8F5E9;
+  color: #388E3C;
+  border: 4px solid #FDF6F0; /* Blends with background */
+  box-shadow: 0 0 0 2px #A5D6A7;
+}
+
+.nodePending {
+  background-color: #FFF3E0;
+  color: #E65100;
+  border: 4px solid #FDF6F0; 
+  box-shadow: 0 0 0 2px #FFB74D;
+}
+
+.timelineLine {
+  width: 3px;
+  flex: 1;
+  background: repeating-linear-gradient(
+    to bottom,
+    #EDD8CA,
+    #EDD8CA 6px,
+    transparent 6px,
+    transparent 12px
+  );
+  margin-top: 4px;
+  margin-bottom: 4px;
+}
+
+.timelineContent {
+  flex: 1;
+  padding-bottom: 40px; /* Space between cards */
+}
+
+
+/* ── Identical Dashboard Widget Cards ── */
+.widgetCard {
+  background: #FFFFFF;
+  border-radius: 16px;
+  border: 1px solid #EDD8CA;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 12px rgba(230, 81, 0, 0.04);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.widgetCard:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 6px 16px rgba(230, 81, 0, 0.08);
 }
 
-.cardHeader {
-  background-color: #e65100;
-  color: #ffffff;
-  padding: 14px 20px;
+.widgetHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 0.95rem;
-  font-weight: 700;
-  letter-spacing: 0.5px;
+  padding: 16px 24px;
+  border-bottom: 1px dashed #EDD8CA;
 }
 
-.headerTitle {
+.widgetTitleWrap {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
-.pesoSign {
-  font-weight: 800;
-  font-size: 1.2rem;
-  line-height: 1;
-}
-
-.department {
-  font-size: 0.85rem;
-  font-weight: 600;
-  background: rgba(255, 255, 255, 0.2);
-  padding: 4px 10px;
-  border-radius: 12px;
-}
-
-/* Card Body */
-.cardBodyCenter {
-  padding: 36px 24px;
+.widgetIcon {
+  background: #FFF3E0;
+  color: #E65100;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
   display: flex;
-  flex-direction: column;
-  align-items: center;
   justify-content: center;
-  text-align: center;
+  align-items: center;
+  font-size: 1rem;
 }
 
-/* Typography & Status Colors */
-.statusFailText {
-  color: #d32f2f;
-  margin: 0 0 8px 0;
-  font-size: 1.2rem;
+.widgetTitle {
+  font-family: "Afacad", sans-serif;
   font-weight: 700;
-  letter-spacing: 0.5px;
+  color: #2D1F15;
+  font-size: 1.1rem;
+}
+
+.departmentBadge {
+  font-family: "Afacad", sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #e25e1c;
+  background: #fcf0ea;
+  padding: 4px 12px;
+  border-radius: 10px;
+  border: 1px solid #e25e1cb4;
+}
+
+/* Horizontal alignment for body */
+.widgetBody {
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.bodyLeft {
+  flex: 1;
+}
+
+.statusFailText {
+  color: #E65100;
+  margin: 0 0 6px 0;
+  font-family: "Freeman", sans-serif;
+  font-size: 1.4rem;
+  letter-spacing: 0.02em;
 }
 
 .statusPassText {
-  color: #2e7d32;
-  margin: 0;
-  font-size: 1.2rem;
-  font-weight: 700;
-  letter-spacing: 0.5px;
+  color: #388E3C;
+  margin: 0 0 6px 0;
+  font-family: "Freeman", sans-serif;
+  font-size: 1.4rem;
+  letter-spacing: 0.02em;
 }
 
 .subtext {
+  font-family: "Afacad", sans-serif;
   font-size: 0.95rem;
-  color: #546e7a;
-  max-width: 800px;
-  margin: 0 auto 20px auto;
+  color: #7A4F35;
+  margin: 0;
   line-height: 1.5;
 }
 
-/* Centered Missing Items List */
 .missingItemsWrapper {
   display: flex;
   flex-direction: column;
-  align-items: flex-start; 
-  gap: 12px;
-  background: #ffeaeaa9;
-  padding: 16px 24px;
+  gap: 10px;
+  background: #FFF3E0;
+  padding: 16px 20px;
   border-radius: 8px;
-  border: 1px solid #ffd1d8;
+  border: 1px dashed #FFB74D;
+  width: 45%;
 }
 
 .missingItem {
   display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 0.95rem;
-  color: #b71c1c;
-  font-weight: 600;
-}
-
-/* Extra Details Styling */
-.extraDetails {
-  margin-top: 16px;
-  display: flex;
-  flex-direction: column;
+  align-items: flex-start;
   gap: 8px;
-}
-
-.successText {
-  color: #388e3c;
+  font-family: "Afacad", sans-serif;
+  font-size: 0.9rem;
+  color: #E65100;
   font-weight: 600;
-  font-size: 0.95rem;
-  margin: 0;
+  line-height: 1.3;
 }
-
-.neutralText {
-  color: #455a64;
-  font-weight: 500;
-  font-size: 0.95rem;
-  margin: 0 0 6px 0;
-}
-
-.mutedText {
-  color: #90a4ae;
-  font-size: 0.85rem;
-  font-style: italic;
-  margin: 5px;
-}
+.missingItem svg { flex-shrink: 0; margin-top: 2px;}
 
 .extraDetailsRow {
-  margin-top: 20px;
   display: flex;
-  gap: 16px;
+  gap: 12px;
   flex-wrap: wrap;
-  justify-content: center;
+  justify-content: flex-end;
+  width: 45%;
 }
 
 .successTag {
-  background-color: #e8f5e9;
-  color: #2e7d32;
+  background-color: #F4F8F4;
+  color: #2E7D32;
   padding: 6px 14px;
-  border-radius: 20px;
+  border-radius: 6px;
+  font-family: "Afacad", sans-serif;
   font-size: 0.9rem;
   font-weight: 600;
-  border: 1px solid #c8e6c9;
+  border: 1px dashed #A5D6A7;
 }
 
-/* Mobile Responsiveness */
-@media (max-width: 768px) {
+/* ── Mobile Responsiveness ── */
+@media (max-width: 991.98px) {
   .statusBanner {
     flex-direction: column;
     padding: 20px;
     gap: 20px;
   }
-
   .statusDivider {
     width: 100%;
     height: 0;
     border-left: none; 
-    border-top: 2px dashed #f7d1d1; 
-    margin: 0;
+    border-top: 2px dashed #FFB74D; 
   }
-
-  .statusLeft {
-    min-width: auto;
+  .timelineRow {
+    gap: 12px;
   }
-
-  .headerNote {
-    text-align: center;
+  .timelineNodeBox {
+    width: 32px;
+  }
+  .timelineNode {
+    width: 32px;
+    height: 32px;
+  }
+  .timelineNode svg {
+    width: 18px;
+    height: 18px;
+  }
+  .widgetBody {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .missingItemsWrapper, .extraDetailsRow {
     width: 100%;
+    justify-content: flex-start;
   }
 }

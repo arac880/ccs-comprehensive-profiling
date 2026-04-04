@@ -1,26 +1,14 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { FaPercent, FaBook, FaFileLines } from "react-icons/fa6";
+import { FaPesoSign, FaClipboardCheck } from "react-icons/fa6";
+import { MdOutlineCancel, MdCheckCircle, MdCancel } from "react-icons/md"; 
 
-// React Icons
-import { FaPercent } from "react-icons/fa";
-import { FaPesoSign } from "react-icons/fa6";
-import { FaBook } from "react-icons/fa6";
-import { FaFileLines } from "react-icons/fa6";
-import { FaClipboardCheck } from "react-icons/fa6"; // Clearance
-import { MdOutlineCancel } from "react-icons/md"; // not-cleared circle
-import { MdCheckCircle } from "react-icons/md"; // cleared circle (summary list)
-import { MdCancel } from "react-icons/md"; // pending circle (summary list)
-
-// CSS Imports
-import clearanceStyles from "./studentStyles/Clearance.module.css";
+import styles from "./studentStyles/Clearance.module.css";
 
 const MOBILE_BREAKPOINT = 992;
 
 export default function StudentClearance() {
-  const navigate = useNavigate();
-  const [isMobile, setIsMobile] = useState(
-    window.innerWidth < MOBILE_BREAKPOINT
-  );
+  const [isMobile, setIsMobile] = useState(window.innerWidth < MOBILE_BREAKPOINT);
 
   useEffect(() => {
     const onResize = () => setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
@@ -28,79 +16,51 @@ export default function StudentClearance() {
     return () => window.removeEventListener("resize", onResize);
   }, []);
 
-  // Summary data for the top banner
   const summaryItems = [
-    {
-      isCleared: false,
-      text: "Your grades for Second Semester A.Y. 2025-2026 have not all been submitted by your instructor/s yet.",
-    },
+    { isCleared: false, text: "Your grades for Second Semester have not all been submitted." },
     { isCleared: true, text: "You have fully settled your account balance." },
-    {
-      isCleared: true,
-      text: "You have no records of pending book/s borrowed from the University Library.",
-    },
-    {
-      isCleared: true,
-      text: "You do not have any on-hold records with any department.",
-    },
-    {
-      isCleared: false,
-      text: "You have not evaluated all of your instructor/s for Second Semester A.Y. 2025-2026.",
-    },
+    { isCleared: true, text: "You have no records of pending book/s borrowed." },
+    { isCleared: true, text: "You do not have any on-hold records." },
+    { isCleared: false, text: "You have not evaluated all of your instructor/s." },
   ];
 
   return (
-    <main className={clearanceStyles.clearanceContainer}>
-      {/* Header Section */}
-      <div className={clearanceStyles.pageHeader}>
-        <div className={clearanceStyles.titleWrapper}>
-          <div className={clearanceStyles.iconBox}>
-            <FaClipboardCheck size={22} color="#ffffff" />
+    <main className={styles.clearanceContainer}>
+      
+      {/* ── Page Header ── */}
+      <div className={styles.pageHeader}>
+        <div className={styles.titleWrapper}>
+          <div className={styles.iconBox}>
+            <FaClipboardCheck size={20} color="#ffffff" />
           </div>
-          <h2 className={clearanceStyles.pageTitle}>Clearance</h2>
+          <h2 className={styles.pageTitle}>Overall Clearance</h2>
         </div>
+        <span className={styles.headerNote}>
+          <i className="bi bi-clock-history" style={{ marginRight: "6px" }}></i>
+          Updates reflect within 30 minutes
+        </span>
       </div>
 
-      {/* Main Status Banner */}
-      <span
-        className="text-muted fst-italic d-flex justify-content-end mb-2"
-        style={{ fontSize: "0.75rem", fontWeight: "600" }}
-      >
-        NOTE: Updates in any part of the clearance will be reflected in not more
-        than 30 minutes.
-      </span>
-
-      <div className={clearanceStyles.statusBanner}>
-        <div className={clearanceStyles.statusLeft}>
-          <MdOutlineCancel size={64} color="#d32f2f" />
-          <span className={clearanceStyles.statusMainText}>
-            Not yet cleared
-          </span>
+      {/* ── Main Status Banner ── */}
+      <div className={styles.statusBanner}>
+        <div className={styles.statusLeft}>
+          <div className={styles.statusIconWrap}>
+            <MdOutlineCancel size={48} color="#E65100" />
+          </div>
+          <span className={styles.statusMainText}>Not Yet Cleared</span>
+          <span className={styles.statusSubText}>Action required on pending items.</span>
         </div>
-        <div className={clearanceStyles.statusDivider}></div>
-        <div className={clearanceStyles.statusRight}>
-          <ul className={clearanceStyles.summaryList}>
+        
+        <div className={styles.statusDivider}></div>
+        
+        <div className={styles.statusRight}>
+          <ul className={styles.summaryList}>
             {summaryItems.map((item, idx) => (
-              <li
-                key={idx}
-                className={
-                  item.isCleared
-                    ? clearanceStyles.clearedItem
-                    : clearanceStyles.pendingItem
-                }
-              >
+              <li key={idx} className={item.isCleared ? styles.clearedItem : styles.pendingItem}>
                 {item.isCleared ? (
-                  <MdCheckCircle
-                    size={18}
-                    color="#2e7d32"
-                    className={clearanceStyles.listIcon}
-                  />
+                  <MdCheckCircle size={18} className={styles.listIcon} />
                 ) : (
-                  <MdCancel
-                    size={18}
-                    color="#d32f2f"
-                    className={clearanceStyles.listIcon}
-                  />
+                  <MdCancel size={18} className={styles.listIcon} />
                 )}
                 <span>{item.text}</span>
               </li>
@@ -109,106 +69,139 @@ export default function StudentClearance() {
         </div>
       </div>
 
-      <h3 className={clearanceStyles.sectionTitle}>Clearance Details</h3>
+      <h3 className={styles.sectionTitle}>The Clearance Pathway</h3>
 
-      {/* GRADE STATUS */}
-      <div className={clearanceStyles.detailCard}>
-        <div className={clearanceStyles.cardHeader}>
-          <div className={clearanceStyles.headerTitle}>
-            <FaPercent size={18} color="white" />
-            GRADE STATUS
-          </div>
-          <div className={clearanceStyles.department}>CCS OFFICE</div>
-        </div>
-        <div className={clearanceStyles.cardBodyCenter}>
-          <h4 className={clearanceStyles.statusFailText}>NOT YET COMPLETE</h4>
-          <p className={clearanceStyles.subtext}>
-            Your grades for Second Semester A.Y. 2025-2026 have not all been
-            submitted by your instructor/s yet.
-          </p>
-          <div className={clearanceStyles.missingItemsWrapper}>
-            <div className={clearanceStyles.missingItem}>
-              <MdCancel size={16} color="#d32f2f" />
-              <span>ITP113 - IT Practicum (400 hours)</span>
+      {/* ── Vertical Timeline Journey ── */}
+      <div className={styles.timelineWrapper}>
+        
+        {/* STOP 1: GRADE STATUS */}
+        <div className={styles.timelineRow}>
+          <div className={styles.timelineNodeBox}>
+            <div className={`${styles.timelineNode} ${styles.nodePending}`}>
+              <MdCancel size={24} />
             </div>
-            <div className={clearanceStyles.missingItem}>
-              <MdCancel size={16} color="#d32f2f" />
-              <span>ITEW6 - Web Development Frameworks</span>
+            <div className={styles.timelineLine}></div>
+          </div>
+          
+          <div className={styles.timelineContent}>
+            <div className={styles.widgetCard}>
+              <div className={styles.widgetHeader}>
+                <div className={styles.widgetTitleWrap}>
+                  <div className={styles.widgetIcon}><FaPercent /></div>
+                  <span className={styles.widgetTitle}>Grade Status</span>
+                </div>
+                <div className={styles.departmentBadge}>CCS OFFICE</div>
+              </div>
+              <div className={styles.widgetBody}>
+                <div className={styles.bodyLeft}>
+                  <h4 className={styles.statusFailText}>NOT YET COMPLETE</h4>
+                  <p className={styles.subtext}>Grades for the current semester have not all been submitted.</p>
+                </div>
+                <div className={styles.missingItemsWrapper}>
+                  <div className={styles.missingItem}>
+                    <MdCancel size={16} /><span>ITP113 - IT Practicum (400 hours)</span>
+                  </div>
+                  <div className={styles.missingItem}>
+                    <MdCancel size={16} /><span>ITEW6 - Web Development Frameworks</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* ACCOUNT STATUS */}
-      <div className={clearanceStyles.detailCard}>
-        <div className={clearanceStyles.cardHeader}>
-          <div className={clearanceStyles.headerTitle}>
-            <FaPesoSign size={18} color="white" />
-            ACCOUNT STATUS
+        {/* STOP 2: ACCOUNT STATUS */}
+        <div className={styles.timelineRow}>
+          <div className={styles.timelineNodeBox}>
+            <div className={`${styles.timelineNode} ${styles.nodeCleared}`}>
+              <MdCheckCircle size={24} />
+            </div>
+            <div className={styles.timelineLine}></div>
           </div>
-          <div className={clearanceStyles.department}>OUR</div>
-        </div>
-        <div className={clearanceStyles.cardBodyCenter}>
-          <h4 className={clearanceStyles.statusPassText}>
-            REMAINING BALANCE: ₱0.00
-          </h4>
-          <div className={clearanceStyles.extraDetails}>
-            <p className={clearanceStyles.successText}>
-              ✓ Tuition Fee: Fully Settled
-            </p>
-            <p className={clearanceStyles.successText}>
-              ✓ Miscellaneous Fee: Fully Settled
-            </p>
-            <p className={clearanceStyles.mutedText}>
-              Go to the Office of the University Registrar if you have unsettled
-              balance.{" "}
-            </p>
+          
+          <div className={styles.timelineContent}>
+            <div className={styles.widgetCard}>
+              <div className={styles.widgetHeader}>
+                <div className={styles.widgetTitleWrap}>
+                  <div className={styles.widgetIcon}><FaPesoSign /></div>
+                  <span className={styles.widgetTitle}>Account Status</span>
+                </div>
+                <div className={styles.departmentBadge}>OUR</div>
+              </div>
+              <div className={styles.widgetBody}>
+                <div className={styles.bodyLeft}>
+                  <h4 className={styles.statusPassText}>REMAINING BALANCE: ₱0.00</h4>
+                  <p className={styles.subtext}>All financial obligations have been met for this semester.</p>
+                </div>
+                <div className={styles.extraDetailsRow}>
+                  <span className={styles.successTag}>✓ Tuition Fee Settled</span>
+                  <span className={styles.successTag}>✓ Misc Fee Settled</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* BOOK-BORROWING STATUS */}
-      <div className={clearanceStyles.detailCard}>
-        <div className={clearanceStyles.cardHeader}>
-          <div className={clearanceStyles.headerTitle}>
-            <FaBook size={18} color="white" />
-            BOOK-BORROWING STATUS
+        {/* STOP 3: LIBRARY */}
+        <div className={styles.timelineRow}>
+          <div className={styles.timelineNodeBox}>
+            <div className={`${styles.timelineNode} ${styles.nodeCleared}`}>
+              <MdCheckCircle size={24} />
+            </div>
+            <div className={styles.timelineLine}></div>
           </div>
-          <div className={clearanceStyles.department}>LIBRARY</div>
-        </div>
-        <div className={clearanceStyles.cardBodyCenter}>
-          <h4 className={clearanceStyles.statusPassText}>CLEARED</h4>
-          <div className={clearanceStyles.extraDetails}>
-            <p className={clearanceStyles.neutralText}>
-              No unreturned books or outstanding fines.
-            </p>
+          
+          <div className={styles.timelineContent}>
+            <div className={styles.widgetCard}>
+              <div className={styles.widgetHeader}>
+                <div className={styles.widgetTitleWrap}>
+                  <div className={styles.widgetIcon}><FaBook /></div>
+                  <span className={styles.widgetTitle}>Library Status</span>
+                </div>
+                <div className={styles.departmentBadge}>LIBRARY</div>
+              </div>
+              <div className={styles.widgetBody}>
+                <div className={styles.bodyLeft}>
+                  <h4 className={styles.statusPassText}>CLEARED</h4>
+                  <p className={styles.subtext}>No unreturned books or outstanding fines.</p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* REQUIREMENT STATUS */}
-      <div className={clearanceStyles.detailCard}>
-        <div className={clearanceStyles.cardHeader}>
-          <div className={clearanceStyles.headerTitle}>
-            <FaFileLines size={18} color="white" />
-            REQUIREMENT STATUS
+        {/* STOP 4: REQUIREMENTS (Last item, no trailing line) */}
+        <div className={styles.timelineRow}>
+          <div className={styles.timelineNodeBox}>
+            <div className={`${styles.timelineNode} ${styles.nodeCleared}`}>
+              <MdCheckCircle size={24} />
+            </div>
           </div>
-          <div className={clearanceStyles.department}>OUR</div>
-        </div>
-        <div className={clearanceStyles.cardBodyCenter}>
-          <h4 className={clearanceStyles.statusPassText}>
-            ALL REQUIREMENTS SUBMITTED
-          </h4>
-          <div className={clearanceStyles.extraDetailsRow}>
-            <span className={clearanceStyles.successTag}>✓ Form 138</span>
-            <span className={clearanceStyles.successTag}>
-              ✓ PSA Birth Certificate
-            </span>
-            <span className={clearanceStyles.successTag}>
-              ✓ Good Moral Character
-            </span>
+          
+          <div className={styles.timelineContent}>
+            <div className={styles.widgetCard}>
+              <div className={styles.widgetHeader}>
+                <div className={styles.widgetTitleWrap}>
+                  <div className={styles.widgetIcon}><FaFileLines /></div>
+                  <span className={styles.widgetTitle}>Requirements</span>
+                </div>
+                <div className={styles.departmentBadge}>OUR</div>
+              </div>
+              <div className={styles.widgetBody}>
+                <div className={styles.bodyLeft}>
+                  <h4 className={styles.statusPassText}>ALL SUBMITTED</h4>
+                  <p className={styles.subtext}>All hardcopy documents have been submitted and verified.</p>
+                </div>
+                <div className={styles.extraDetailsRow}>
+                  <span className={styles.successTag}>✓ Form 138</span>
+                  <span className={styles.successTag}>✓ PSA Birth Cert</span>
+                  <span className={styles.successTag}>✓ Good Moral</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
+
       </div>
     </main>
   );
