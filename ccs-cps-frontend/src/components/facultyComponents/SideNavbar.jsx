@@ -1,8 +1,11 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { FaBars } from "react-icons/fa6";
 import styles from "../../pages/facultyPages/facultyStyles/SideNavbar.module.css";
 import ccsLogo from "../../assets/ccs_logo.png";
 import LogoutModal from "../LogoutModal";
+
+const TABLET_BREAKPOINT = 992;
 
 const navItems = [
   {
@@ -41,10 +44,23 @@ const faculty = { name: "Miriam B. Mulawin", id: "2203375" };
 
 export default function SidebarNav({ activeNav = "Dashboard", onNavigate }) {
   const navigate = useNavigate();
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(
+    window.innerWidth < TABLET_BREAKPOINT,
+  );
   const [showLogout, setShowLogout] = useState(false);
   const [tooltip, setTooltip] = useState({ visible: false, label: "", y: 0 });
   const sidebarRef = useRef(null);
+
+  // Auto-collapse on tablet resize
+  useEffect(() => {
+    const onResize = () => {
+      if (window.innerWidth < TABLET_BREAKPOINT) {
+        setCollapsed(true);
+      }
+    };
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("user");
@@ -75,27 +91,28 @@ export default function SidebarNav({ activeNav = "Dashboard", onNavigate }) {
         ref={sidebarRef}
         className={`${styles.sidebar} ${collapsed ? styles.collapsed : ""}`}
       >
-        {/* Header */}
+        {/* ── Header ── */}
         <div className={styles.header}>
           {!collapsed && <span className={styles.brandName}>Faculty</span>}
-          <button
-            className={styles.toggleBtn}
+          {/* Same hamburger button style as student sidebar */}
+          <div
+            className={styles.hamburgerBtn}
             onClick={() => {
               setCollapsed(!collapsed);
               hideTooltip();
             }}
             title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
           >
-            <i
-              className={`bi ${collapsed ? "bi-layout-sidebar" : "bi-layout-sidebar-reverse"}`}
-            />
-          </button>
+            <FaBars className={styles.menuIcon} />
+          </div>
         </div>
 
-        {/* Profile */}
+        {/* ── Profile ── */}
         {!collapsed ? (
           <div className={styles.profileSection}>
-            <i className={`bi bi-pencil-square ${styles.profileEditIcon}`} />
+            <div className={styles.profileEditBtn} title="Edit profile">
+              <i className="bi bi-pencil-fill" />
+            </div>
             <div className={styles.profileInner}>
               <div className={styles.profileAvatar}>
                 <i className="bi bi-person-fill" />
@@ -104,6 +121,7 @@ export default function SidebarNav({ activeNav = "Dashboard", onNavigate }) {
                 <p className={styles.profileName}>{faculty.name}</p>
                 <p className={styles.profileId}>{faculty.id}</p>
               </div>
+              <hr className={styles.profileDivider} />
             </div>
           </div>
         ) : (
@@ -112,29 +130,42 @@ export default function SidebarNav({ activeNav = "Dashboard", onNavigate }) {
           </div>
         )}
 
-        {/* Navigation */}
+        {/* ── Navigation ── */}
         <nav className={styles.sidebarNav}>
-          {navItems.map((item, index) => (
-            <div key={item.name}>
-              <div
-                className={`${styles.navItemRow} ${activeNav === item.name ? styles.activeNav : ""}`}
-                onClick={() => handleNav(item)}
-                onMouseEnter={(e) => showTooltip(e, item.label)}
-                onMouseLeave={hideTooltip}
-              >
-                <i className={`bi ${item.icon} ${styles.navIcon}`} />
-                {!collapsed && (
-                  <span className={styles.navLabel}>{item.label}</span>
+          {!collapsed && (
+            <span className={styles.navSectionLabel}>Navigation</span>
+          )}
+          {navItems.map((item, index) => {
+            const isActive = activeNav === item.name;
+            const isSignOut = item.name === "SignOut";
+            return (
+              <div key={item.name}>
+                <div
+                  className={`${styles.navItemRow} ${isActive ? styles.activeNav : ""} ${isSignOut ? styles.signOut : ""}`}
+                  onClick={() => handleNav(item)}
+                  onMouseEnter={(e) => showTooltip(e, item.label)}
+                  onMouseLeave={hideTooltip}
+                >
+                  <i className={`bi ${item.icon} ${styles.navIcon}`} />
+                  {!collapsed && (
+                    <>
+                      <span className={styles.navLabel}>{item.label}</span>
+                      {isActive && <span className={styles.navActiveDot} />}
+                    </>
+                  )}
+                </div>
+                {index < navItems.length - 1 && !isSignOut && (
+                  <hr className={styles.navDivider} />
+                )}
+                {index === navItems.length - 2 && (
+                  <hr className={styles.navDividerSignout} />
                 )}
               </div>
-              {index < navItems.length - 1 && (
-                <hr className={styles.navDivider} />
-              )}
-            </div>
-          ))}
+            );
+          })}
         </nav>
 
-        {/* Watermark */}
+        {/* ── Watermark ── */}
         <div className={styles.sidebarWatermark}>
           <img
             src={ccsLogo}
@@ -144,7 +175,7 @@ export default function SidebarNav({ activeNav = "Dashboard", onNavigate }) {
         </div>
       </div>
 
-      {/* Portal-style tooltip rendered outside sidebar — never clipped */}
+      {/* Portal tooltip for collapsed mode */}
       {tooltip.visible && (
         <div
           style={{
@@ -152,7 +183,7 @@ export default function SidebarNav({ activeNav = "Dashboard", onNavigate }) {
             left: "78px",
             top: tooltip.y,
             transform: "translateY(-50%)",
-            background: "#1c1c1c",
+            background: "rgba(0,0,0,0.85)",
             color: "#fff",
             fontSize: "12px",
             fontWeight: 600,
@@ -173,12 +204,14 @@ export default function SidebarNav({ activeNav = "Dashboard", onNavigate }) {
               transform: "translateY(-50%)",
               borderWidth: "5px",
               borderStyle: "solid",
-              borderColor: "transparent #1c1c1c transparent transparent",
+              borderColor:
+                "transparent rgba(0,0,0,0.85) transparent transparent",
             }}
           />
           {tooltip.label}
         </div>
       )}
+
       <LogoutModal
         isOpen={showLogout}
         onCancel={() => setShowLogout(false)}

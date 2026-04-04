@@ -1,0 +1,139 @@
+/* ── Overlay ── */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  backdrop-filter: blur(2px);
+  padding: 16px;
+  animation: fadeIn 0.15s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ── Modal Box ── */
+.modal {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 32px 28px 24px;
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  animation: slideUp 0.2s ease;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(16px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0)   scale(1);    }
+}
+
+/* ── Icon ── */
+.iconWrap {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: #fff3ee;
+  border: 2px solid #f5c4aa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #e65100;
+  margin-bottom: 18px;
+  flex-shrink: 0;
+}
+
+/* ── Text ── */
+.title {
+  font-family: 'Gabarito', sans-serif;
+  font-size: 1.2rem;
+  font-weight: 900;
+  color: #1a1a1a;
+  margin: 0 0 10px;
+}
+
+.message {
+  font-size: 0.82rem;
+  color: #666;
+  line-height: 1.6;
+  margin: 0 0 24px;
+}
+
+.message strong {
+  color: #1a1a1a;
+  font-weight: 700;
+}
+
+/* ── Actions ── */
+.actions {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+}
+
+.cancelBtn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 16px;
+  border-radius: 10px;
+  border: 1.5px solid #f5c4aa;
+  background: #ffffff;
+  color: #888;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+
+.cancelBtn:hover {
+  background: #fff3ee;
+  border-color: #e65100;
+  color: #e65100;
+}
+
+.deleteBtn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 16px;
+  border-radius: 10px;
+  border: none;
+  background: #c62828;
+  color: #ffffff;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+
+.deleteBtn:hover {
+  background: #991b1b;
+  transform: translateY(-1px);
+}
+
+/* ── Mobile ── */
+@media screen and (max-width: 480px) {
+  .modal {
+    padding: 24px 20px 20px;
+  }
+
+  .actions {
+    flex-direction: column;
+  }
+}

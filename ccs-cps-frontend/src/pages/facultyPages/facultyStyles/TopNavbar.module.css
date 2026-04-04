@@ -1,0 +1,154 @@
+@import url('https://fonts.googleapis.com/css2?family=Gabarito:wght@400;700;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+/* ── Top bar shell ── */
+.topNav {
+  background-color: #e65100;
+  min-height: clamp(50px, 7vw, 65px);
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+/* ── Brand title ── */
+.brandTitle {
+  font-family: "Gabarito", sans-serif;
+  font-size: clamp(1.5rem, 2.8vw, 2.2rem);
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 0.02em;
+  line-height: 1.1;
+  margin: 0;
+}
+
+/* ── Brand subtitle ── */
+.brandSub {
+  font-family: "Gabarito", sans-serif;
+  font-size: clamp(0.55rem, 0.9vw, 0.72rem);
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.88);
+  letter-spacing: 0.01em;
+  line-height: 1.2;
+  margin: 0;
+}
+
+/* ── Right icon group ── */
+.iconGroup {
+  display: flex;
+  align-items: center;
+  gap: clamp(6px, 1.5vw, 20px);
+}
+
+/* ── Search bar ── */
+.searchBar {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  overflow: hidden;
+  height: 34px;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+.searchBar:focus-within {
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.6);
+}
+
+.searchInput {
+  border: none;
+  outline: none;
+  background: transparent;
+  padding: 0 10px;
+  font-size: 13px;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  color: #ffffff;
+  width: 180px;
+  height: 100%;
+}
+.searchInput::placeholder {
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.searchBtn {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  border-left: 1px solid rgba(255, 255, 255, 0.25);
+  height: 100%;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #ffffff;
+  transition: background 0.18s ease;
+}
+.searchBtn:hover {
+  background: rgba(255, 255, 255, 0.32);
+}
+
+/* ── Icon button wrapper ── */
+.iconBtn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  pointer-events: auto;
+}
+.iconBtn:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* ── Action icons ── */
+.actionIcon {
+  font-size: clamp(1.15rem, 2vw, 1.5rem);
+  color: #ffffff !important;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  display: block;
+}
+.actionIcon:hover {
+  opacity: 0.9;
+  transform: scale(1.08);
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+.actionIcon:active {
+  transform: scale(0.98);
+}
+
+/* ── Notification bell wrapper ── */
+.notifWrap {
+  position: relative;
+  display: inline-flex;
+}
+
+/* ── Notification count badge ── */
+.notifBadge {
+  font-family: "Gabarito", sans-serif;
+  font-size: 0.5rem;
+  font-weight: 700;
+  color: #e65100;
+  background-color: #ffffff;
+  border-radius: 999px;
+  padding: 1px 5px;
+  line-height: 1.4;
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  pointer-events: none;
+}
+
+/* ── Mobile hamburger ── */
+.hamburgerIcon {
+  cursor: pointer;
+  pointer-events: auto;
+  z-index: 1040;
+  transition: transform 0.2s ease;
+}
+.hamburgerIcon:hover {
+  transform: scale(1.1);
+}
