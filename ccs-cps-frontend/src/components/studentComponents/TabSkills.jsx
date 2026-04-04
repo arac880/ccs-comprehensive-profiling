@@ -146,7 +146,10 @@ export default function TabSkills() {
   /* ── Fetch skills on mount ── */
   useEffect(() => {
     const fetchSkills = async () => {
-      if (!id) { setLoading(false); return; }
+      if (!id) {
+        setLoading(false);
+        return;
+      }
 
       try {
         const res = await fetch(`http://localhost:5000/api/students/${id}`);
@@ -220,6 +223,59 @@ export default function TabSkills() {
     }
   };
 
+  // 1. Add this state below the existing states
+  const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false);
+  const [deleteIndex, setDeleteIndex] = useState(null);
+
+  // 2. Add this handler below handleConfirmAdd
+  const handleDeleteClick = (index) => {
+    setDeleteIndex(index);
+    setIsConfirmDeleteOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (deleteIndex === null || !id) return;
+
+    const updatedSkills = skillList.filter((_, i) => i !== deleteIndex);
+
+    setSaving(true);
+    try {
+      const res = await fetch(`http://localhost:5000/api/students/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ skills: updatedSkills }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.message || "Failed to delete skill");
+      }
+
+      const updatedUser = { ...user, skills: updatedSkills };
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+
+      setSkillList(updatedSkills);
+      setIsConfirmDeleteOpen(false);
+      setDeleteIndex(null);
+
+      setToast({
+        isVisible: true,
+        message: "Skill deleted successfully.",
+        type: "success",
+      });
+    } catch (err) {
+      console.error("Delete skill error:", err);
+      setIsConfirmDeleteOpen(false);
+      setToast({
+        isVisible: true,
+        message: `Error: ${err.message}`,
+        type: "error",
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
+
   const categories = [...new Set(skillList.map((s) => s.category))];
 
   if (loading) {
@@ -261,7 +317,10 @@ export default function TabSkills() {
                           </div>
                           <div className={tabStyles.skillActions}>
                             {/* Delete button kept but no function yet */}
-                            <DeleteButton iconOnly />
+                            <DeleteButton
+                              iconOnly
+                              onClick={() => handleDeleteClick(globalIndex)}
+                            />
                           </div>
                         </li>
                       );
@@ -288,6 +347,15 @@ export default function TabSkills() {
         onConfirm={handleConfirmAdd}
         title="Add Skill"
         message={`Are you sure you want to add "${pendingSkill?.name}" under "${pendingSkill?.category}"?`}
+        isProcessing={saving}
+      />
+
+      <ConfirmModal
+        isOpen={isConfirmDeleteOpen}
+        onClose={() => setIsConfirmDeleteOpen(false)}
+        onConfirm={handleConfirmDelete}
+        title="Delete Skill"
+        message={`Are you sure you want to delete "${skillList[deleteIndex]?.name}"?`}
         isProcessing={saving}
       />
 
