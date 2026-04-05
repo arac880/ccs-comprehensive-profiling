@@ -1,29 +1,43 @@
 @import url("https://fonts.googleapis.com/css2?family=Afacad:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Freeman&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap");
 
+:root {
+  --orange:       #E65100;
+  --orange-light: #FF6D00;
+  --orange-pale:  #FFF3E0;
+  --orange-muted: #FFB74D;
+  --cream:        #FDF6F0;
+  --white:        #FFFFFF;
+  --warm-gray:    #F5EDE5;
+  --border:       #EDD8CA;
+  --shadow:       rgba(230, 81, 0, 0.10);
+  --text-dark:    #2D1F15;
+  --text-mid:     #7A4F35;
+  --text-muted:   #B07050;
+  --font-body:    'Plus Jakarta Sans', sans-serif;
+  --font-display: 'Freeman', sans-serif;
+  --font-ui:      'Afacad', sans-serif;
+}
+
 .scheduleContainer {
   background-color: transparent;
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: var(--font-body);
   animation: fadeUp 0.4s ease both;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 @keyframes fadeUp {
-  from {
-    opacity: 0;
-    transform: translateY(14px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ── Title Header ── */
+/* ── Page Header ── */
 .pageHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
   flex-wrap: wrap;
   gap: 16px;
 }
@@ -34,105 +48,230 @@
   gap: 12px;
 }
 
-.pageTitle {
-  margin: 0;
-  color: #7A4F35;
-  font-size: 1.8rem;
-  font-weight: 700;
-  font-family: "Afacad", sans-serif;
-}
-
 .iconBox {
-  background-color: #E65100;
+  background-color: var(--orange);
   border-radius: 8px;
   width: 42px;
   height: 42px;
   display: flex;
   justify-content: center;
   align-items: center;
-  box-shadow: 0 4px 12px rgba(230, 81, 0, 0.15);
+  box-shadow: 0 4px 12px rgba(230, 81, 0, 0.22);
+  flex-shrink: 0;
+}
+
+.pageTitle {
+  margin: 0;
+  color: var(--text-mid);
+  font-size: 1.8rem;
+  font-weight: 700;
+  font-family: var(--font-ui);
+}
+
+.headerControls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
 .headerNote {
-  font-family: "Afacad", sans-serif;
+  font-family: var(--font-ui);
   font-size: 0.85rem;
   font-weight: 600;
-  color: #e65d19;
-  background: #FFF3E0;
+  color: var(--orange);
+  background: var(--orange-pale);
   padding: 8px 16px;
-  border-radius: 10px;
-  border: 1px solid #f39353;
+  border-radius: 20px;
+  border: 1px dashed var(--orange-muted);
 }
 
-.calendarTable {
-  background-color: #ffffff;
-  border: 1px solid #EDD8CA;
-  border-radius: 12px;
+/* ── Legend ── */
+.legendWrap {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--white);
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: 1px dashed var(--border);
+  height: 100%;
+  flex-wrap: wrap;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-mid);
+}
+
+.legendColorDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.legendDivider {
+  width: 1px;
+  height: 16px;
+  background-color: var(--border);
+  margin: 0 4px;
+}
+
+.legendLecBox, .legendLabBox {
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  letter-spacing: 0.05em;
+}
+
+.legendLecBox {
+  background-color: #E3F2FD;
+  border: 1px solid #90CAF9;
+  color: #1976D2;
+}
+
+.legendLabBox {
+  background-color: var(--white);
+  border: 1px dashed var(--text-muted);
+  color: var(--text-mid);
+}
+
+/* ── Calendar Table Wrapper (Responsive) ── */
+.calendarOuterLayer {
+  background: var(--white);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 20px var(--shadow);
   overflow: hidden;
+  width: 100%;
   display: flex;
   flex-direction: column;
-  height: 100%;
-  min-width: 900px;
 }
 
+/* The element that actually scrolls horizontally */
+.calendarScrollArea {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: var(--orange-muted) var(--orange-pale);
+  -webkit-overflow-scrolling: touch; 
+}
+
+.calendarScrollArea::-webkit-scrollbar {
+  height: 8px;
+}
+.calendarScrollArea::-webkit-scrollbar-track {
+  background: var(--orange-pale);
+}
+.calendarScrollArea::-webkit-scrollbar-thumb {
+  background-color: var(--orange-muted);
+  border-radius: 4px;
+}
+
+/* Ensures the table doesn't squish below 900px on desktop/tablets */
+.calendarTable {
+  display: flex;
+  flex-direction: column;
+  min-width: 900px; 
+  width: 100%;
+}
+
+/* ── Sticky Header ── */
 .calendarHeader {
   display: grid;
   grid-template-columns: 110px repeat(7, 1fr);
-  background-color: #E65100;
-  color: white;
+  background-color: var(--orange-light);
+  color: var(--white);
   text-align: center;
-  font-weight: 600;
-  font-size: 0.9rem;
   position: sticky;
   top: 0;
-  z-index: 10;
+  z-index: 20;
+  border-bottom: 2px solid var(--border);
 }
 
 .timeHeaderBlock {
   padding: 14px 0;
-  border-right: 1px solid rgba(255, 255, 255, 0.2);
-  font-family: 'Freeman', sans-serif;
+  border-right: 1px dashed var(--border);
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  letter-spacing: 0.06em;
+  background-color: var(--orange-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: sticky;
+  left: 0;
+  z-index: 21; /* Keeps top-left corner locked in place while scrolling */
 }
 
 .dayHeaderBlock {
-  padding: 14px 0;
-  border-right: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 14px 8px;
+  border-right: 1px dashed var(--border);
+  font-family: var(--font-ui);
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .dayHeaderBlock:last-child {
   border-right: none;
 }
 
+.dayHeaderToday {
+  background-color: var(--orange);
+  color: var(--white);
+}
+
+/* ── Grid Body ── */
 .calendarBody {
   display: grid;
   grid-template-columns: 110px repeat(7, 1fr);
   position: relative;
 }
 
+/* ── Sticky Time Column ── */
 .timeColumn {
-  border-right: 1px solid #EDD8CA;
-  background-color: #ffffff;
+  border-right: 1px dashed var(--border);
+  background-color: #FAFAFA;
   text-align: center;
+  position: sticky;
+  left: 0; /* Keeps time column locked in place while scrolling */
+  z-index: 8;
 }
 
 .periodDivider {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  color: #E65100;
-  font-size: 0.7rem;
+  gap: 7px;
+  color: var(--orange);
+  font-size: 0.65rem;
   font-weight: 700;
-  height: 40px;
+  font-family: var(--font-ui);
+  letter-spacing: 0.12em;
+  height: 36px;
+  background-color: var(--orange-pale);
+  border-bottom: 1px dashed var(--border);
+  border-top: 1px dashed var(--border);
   box-sizing: border-box;
-  background-color: #FFF3E0;
-  border-bottom: none;
 }
 
 .periodLine {
-  height: 2px;
-  width: 15px;
-  background-color: #FFB74D;
+  height: 1.5px;
+  width: 14px;
+  background-color: var(--orange-muted);
+  border-radius: 2px;
 }
 
 .timeText {
@@ -141,14 +280,15 @@
   align-items: center;
   justify-content: center;
   font-size: 0.75rem;
-  color: #444;
-  font-weight: 500;
-  font-family: 'Afacad', sans-serif;
-  border-bottom: none;
+  color: var(--text-muted);
+  font-weight: 600;
+  font-family: var(--font-ui);
+  box-sizing: border-box;
 }
 
+/* ── Day Columns ── */
 .dayColumn {
-  border-right: 1px solid #EDD8CA;
+  border-right: 1px dashed var(--border);
   position: relative;
 }
 
@@ -156,89 +296,200 @@
   border-right: none;
 }
 
+.dayColumnToday {
+  background-color: #FFFAF8;
+}
+
 .periodSpacer {
-  height: 40px;
-  background-color: #fffcf9;
+  height: 36px;
+  background-color: #FAFAFA;
   width: 100%;
+  border-bottom: 1px dashed var(--border);
+  border-top: 1px dashed var(--border);
   box-sizing: border-box;
-  border-bottom: 1px solid #ebddd2;
 }
 
 .gridLine {
   height: 30px;
-  border-bottom: 1px solid #f1e7df;
+  border-bottom: 1px dashed var(--border);
   width: 100%;
   box-sizing: border-box;
 }
 
+.gridLineAlt {
+  background-color: rgba(253, 246, 240, 0.3);
+}
+
+/* ── Modern Translucent Class Cards ── */
 .classCard {
   position: absolute;
-  left: 0;
-  right: 0;
-  color: white;
+  left: 6px;
+  right: 6px;
   display: flex;
-  border-radius: 6px;
-  margin: 0 4px;
   flex-direction: column;
   justify-content: space-between;
-  align-items: center;
-  text-align: center;
-  padding: 12px 6px;
+  padding: 10px 12px;
   z-index: 5;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-  border-left: 3px solid rgba(0, 0, 0, 0.2);
-  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+  border-radius: 8px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
   cursor: pointer;
+  overflow: hidden;
 }
 
 .classCard:hover {
-  transform: translateY(-2px) scale(1.01);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
   z-index: 15;
-  filter: brightness(1.1);
 }
 
-
-.cardTop,
-.cardBottom {
+.cardTop {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  width: 100%;
+}
+
+.courseHeaderRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%;
+  margin-bottom: 4px;
 }
 
 .courseCode {
-  font-family: 'Freeman', sans-serif;
+  font-family: var(--font-display);
   font-size: 1rem;
-  font-weight: 700;
-  margin-bottom: 2px;
+  letter-spacing: 0.02em;
 }
 
 .courseName {
-  font-family: 'Afacad', sans-serif;
+  font-family: var(--font-ui);
   font-size: 0.8rem;
-  line-height: 1.1;
+  line-height: 1.2;
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+.cardBottom {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 4px;
+  padding-top: 8px;
+  margin-top: 8px;
+  border-top: 1px dashed rgba(0, 0, 0, 0.1);
 }
 
 .courseDetails {
-  font-family: 'Afacad', sans-serif;
-  font-size: 0.7rem;
-  opacity: 0.85;
-  line-height: 1.2;
+  font-family: var(--font-ui);
+  font-size: 0.75rem;
+  line-height: 1;
+  font-weight: 600;
+  color: var(--text-mid);
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
-/* ── Mobile Adjustments ── */
+.tagLec, .tagLab {
+  font-family: var(--font-ui);
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  letter-spacing: 0.05em;
+  border: 1px solid transparent;
+}
+
+.tagLab {
+  border-style: dashed;
+}
+
+/* ══════════════════════════════════════════════
+   MOBILE RESPONSIVE ADJUSTMENTS
+   ══════════════════════════════════════════════ */
+
+@media (max-width: 992px) {
+  .legendWrap {
+    display: none; 
+  }
+}
+
 @media (max-width: 768px) {
+  .scheduleContainer {
+    gap: 16px;
+  }
+
   .pageHeader {
     flex-direction: column;
     align-items: flex-start;
     gap: 12px;
   }
 
-  .classSection {
-    font-size: 1.2rem;
+  .headerControls {
+    width: 100%;
+    justify-content: space-between;
   }
 
+  /* Reduce minimum width slightly for smaller mobile devices,
+     so the cards aren't unnecessarily wide while scrolling */
+  .calendarTable {
+    min-width: 750px; 
+  }
+
+  /* Shrink the grid column widths for mobile */
+  .calendarHeader {
+    grid-template-columns: 75px repeat(7, 1fr);
+  }
+
+  .calendarBody {
+    grid-template-columns: 75px repeat(7, 1fr);
+  }
+
+  .timeHeaderBlock {
+    font-size: 0.75rem;
+  }
+
+  .dayHeaderBlock {
+    font-size: 0.8rem;
+    padding: 10px 4px;
+  }
+
+  .timeText {
+    font-size: 0.7rem;
+  }
+
+  .periodDivider {
+    font-size: 0.55rem;
+  }
+
+  /* Adjust padding and font sizes inside cards to fit tighter columns */
+  .classCard {
+    padding: 6px 8px;
+    left: 4px;
+    right: 4px;
+  }
+
+  .courseCode {
+    font-size: 0.85rem;
+  }
+
+  .courseName {
+    font-size: 0.7rem;
+  }
+
+  .courseDetails {
+    font-size: 0.65rem;
+  }
+
+  .tagLec, .tagLab {
+    font-size: 0.55rem;
+    padding: 2px 4px;
+  }
+}
+
+@media (max-width: 480px) {
   .calendarOuterLayer {
-    padding: 8px;
+    border-radius: var(--radius-sm);
   }
 }

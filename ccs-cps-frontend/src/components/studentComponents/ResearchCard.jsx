@@ -1,27 +1,42 @@
+import { FaFilePdf } from "react-icons/fa6";
+import { BsArrowRightShort } from "react-icons/bs";
+import { FaCalendarAlt } from "react-icons/fa";
 import styles from "../../pages/studentPages/studentStyles/ResearchCard.module.css";
-import { FaFilePdf } from "react-icons/fa";
 
-export default function ResearchCard({ title, uploadedAt, fileUrl = "#" }) {
+export default function ResearchCard({ title, uploadedAt, fileUrl = "#", index }) {
   return (
     <a
       href={fileUrl}
-      className={styles.card}
+      className={styles.docRow}
       target="_blank"
       rel="noopener noreferrer"
       aria-label={`Open research: ${title}`}
     >
-      {/* File icon area */}
-      <div className={styles.iconWrap}>
-        <FaFilePdf className={styles.icon} />
+      {/* Index number */}
+      {index !== undefined && (
+        <span className={styles.docIndex}>
+          {String(index).padStart(2, "0")}
+        </span>
+      )}
+
+      {/* PDF icon */}
+      <div className={styles.docIconWrap}>
+        <FaFilePdf size={20} className={styles.docIcon} />
       </div>
 
-      {/* Separator */}
-      <hr className={styles.divider} />
+      {/* Info */}
+      <div className={styles.docInfo}>
+        <h4 className={styles.docTitle}>{title}</h4>
+        <span className={styles.docMeta}>
+          <FaCalendarAlt size={10} />
+          Uploaded: {uploadedAt}
+        </span>
+      </div>
 
-      {/* Text info */}
-      <div className={styles.info}>
-        <p className={styles.title}>{title}</p>
-        <p className={styles.meta}>Uploaded at: {uploadedAt}</p>
+      {/* CTA */}
+      <div className={styles.docAction}>
+        <span className={styles.actionText}>View PDF</span>
+        <BsArrowRightShort size={22} className={styles.actionIcon} />
       </div>
     </a>
   );
