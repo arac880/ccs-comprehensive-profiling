@@ -1,14 +1,14 @@
 import React, { useState } from "react";
-import { Outlet, useLocation, useNavigate } from "react-router-dom"; 
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import SideBarNav from "../studentComponents/SideBarNav";
 import TopNavbar from "../studentComponents/TopBarNav";
 import Footer from "../Footer";
 import styles from "../../pages/studentPages/studentStyles/StudentLayout.module.css";
 
 const StudentLayout = () => {
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false); 
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const location = useLocation();
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
   const getActiveNav = () => {
     const path = location.pathname.toLowerCase();
@@ -25,25 +25,25 @@ const StudentLayout = () => {
   };
 
   const handleSignOut = () => {
-    console.log('Signing out...');
-    localStorage.removeItem('user');
+    console.log("Signing out...");
+    localStorage.removeItem("user");
     sessionStorage.clear();
-    navigate('/login', { replace: true });
+    navigate("/login", { replace: true });
   };
 
   return (
     <div className={styles.pageRoot}>
-      <SideBarNav 
-        activeNav={getActiveNav()} 
-        drawerOpen={isDrawerOpen} 
-        onDrawerToggle={handleDrawerToggle}  
+      <SideBarNav
+        activeNav={getActiveNav()}
+        drawerOpen={isDrawerOpen}
+        onDrawerToggle={handleDrawerToggle}
       />
 
       <div className={styles.pageMain}>
-        <TopNavbar 
-          notifCount={0}  
-          onSignOut={handleSignOut}     
-          onMenuClick={() => setIsDrawerOpen(true)}  
+        <TopNavbar
+          notifCount={0}
+          onSignOut={handleSignOut}
+          onMenuClick={() => setIsDrawerOpen(true)}
         />
 
         <div className={styles.pageContent}>

@@ -1,5 +1,6 @@
 // components/studentComponents/TabAcademic.jsx
 import { useState, useEffect, useMemo } from "react";
+import { AiOutlineBook } from "react-icons/ai"; // <-- change this line
 import styles from "../../pages/studentPages/studentStyles/Tab.module.css";
 
 function gradeClass(g) {
@@ -22,7 +23,10 @@ function gradeClass(g) {
 
 function SemBlock({ sem }) {
   const [open, setOpen] = useState(true);
-  const totalUnits = sem.subjects.reduce((acc, s) => acc + (Number(s.units) || 0), 0);
+  const totalUnits = sem.subjects.reduce(
+    (acc, s) => acc + (Number(s.units) || 0),
+    0,
+  );
 
   return (
     <div style={{ marginBottom: "1.25rem" }}>
@@ -118,7 +122,7 @@ function SemBlock({ sem }) {
               border: "none",
               color: "#E65100",
               cursor: "pointer",
-              fontSize: "1rem"
+              fontSize: "1rem",
             }}
           >
             {open ? "▲" : "▼"}
@@ -211,7 +215,7 @@ export default function TabAcademic() {
     history.forEach((record) => {
       // Create a unique key for each semester group
       const key = `${record.schoolYear}||${record.yearLevel}||${record.semester}`;
-      
+
       if (!map[key]) {
         map[key] = {
           schoolYear: record.schoolYear || "Unknown Year",
@@ -233,17 +237,23 @@ export default function TabAcademic() {
     });
 
     // Convert map to array and calculate GWA for each group
-    return Object.values(map).map((group) => {
-      const numericGrades = group.subjects
-        .map((s) => parseFloat(s.grade))
-        .filter((g) => !isNaN(g));
-      
-      const gwa = numericGrades.length > 0
-        ? (numericGrades.reduce((sum, g) => sum + g, 0) / numericGrades.length).toFixed(2)
-        : "—";
+    return Object.values(map)
+      .map((group) => {
+        const numericGrades = group.subjects
+          .map((s) => parseFloat(s.grade))
+          .filter((g) => !isNaN(g));
 
-      return { ...group, gwa };
-    }).sort((a, b) => b.schoolYear.localeCompare(a.schoolYear)); // Sort newest first
+        const gwa =
+          numericGrades.length > 0
+            ? (
+                numericGrades.reduce((sum, g) => sum + g, 0) /
+                numericGrades.length
+              ).toFixed(2)
+            : "—";
+
+        return { ...group, gwa };
+      })
+      .sort((a, b) => b.schoolYear.localeCompare(a.schoolYear)); // Sort newest first
   }, [history]);
 
   if (loading) {
@@ -253,8 +263,12 @@ export default function TabAcademic() {
   return (
     <div>
       <div className={styles.section}>
-        <div className={styles.sectionTitle}>Academic Records</div>
-
+        <div className={styles.sectionHeader}>
+          <div className={styles.sectionTitle}>
+            <AiOutlineBook size={18} /> {/* updated icon */}
+            <span>ACADEMIC HISTORY</span>
+          </div>
+        </div>
         {/* Static Legend */}
         <div
           style={{
@@ -274,16 +288,36 @@ export default function TabAcademic() {
           </div>
 
           <div style={{ display: "flex", flexWrap: "wrap", gap: "0.8rem" }}>
-            <span><b>1.00</b> (96–100)</span>
-            <span><b>1.25</b> (92–95)</span>
-            <span><b>1.50</b> (88–91)</span>
-            <span><b>1.75</b> (84–87)</span>
-            <span><b>2.00</b> (80–83)</span>
-            <span><b>2.25</b> (75–79)</span>
-            <span><b>2.50</b> (70–74)</span>
-            <span><b>2.75</b> (65–69)</span>
-            <span><b>3.00</b> (60–64)</span>
-            <span><b>5.00</b> (0–59)</span>
+            <span>
+              <b>1.00</b> (96–100)
+            </span>
+            <span>
+              <b>1.25</b> (92–95)
+            </span>
+            <span>
+              <b>1.50</b> (88–91)
+            </span>
+            <span>
+              <b>1.75</b> (84–87)
+            </span>
+            <span>
+              <b>2.00</b> (80–83)
+            </span>
+            <span>
+              <b>2.25</b> (75–79)
+            </span>
+            <span>
+              <b>2.50</b> (70–74)
+            </span>
+            <span>
+              <b>2.75</b> (65–69)
+            </span>
+            <span>
+              <b>3.00</b> (60–64)
+            </span>
+            <span>
+              <b>5.00</b> (0–59)
+            </span>
           </div>
 
           <div style={{ marginTop: "0.3rem", color: "#6b7280" }}>
@@ -296,9 +330,7 @@ export default function TabAcademic() {
         {groupedHistory.length === 0 ? (
           <p className={styles.empty}>No academic records found.</p>
         ) : (
-          groupedHistory.map((sem, idx) => (
-            <SemBlock key={idx} sem={sem} />
-          ))
+          groupedHistory.map((sem, idx) => <SemBlock key={idx} sem={sem} />)
         )}
       </div>
     </div>

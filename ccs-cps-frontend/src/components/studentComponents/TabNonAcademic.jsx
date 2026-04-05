@@ -9,16 +9,121 @@ import EditButton from "../../components/ui/EditButton";
 import DeleteButton from "../../components/ui/DeleteButton";
 import ConfirmModal from "../../components/ui/ConfirmModal";
 import AppToast from "../../components/ui/AppToast";
+import FilterDropdown from "../../components/ui/FilterDropdown";
 import { FiAward, FiCalendar, FiTag } from "react-icons/fi";
 
-const CAT_COLOR = {
+/* ── Category badge map ─────────────────────────────────────── */
+const CAT_BADGE = {
   Competition: `${tabStyles.badge} ${tabStyles.badgeOrange}`,
   Event: `${tabStyles.badge} ${tabStyles.badgeBlue}`,
   Seminar: `${tabStyles.badge} ${tabStyles.badgeGreen}`,
   Workshop: `${tabStyles.badge} ${tabStyles.badgeAmber}`,
 };
 
+const CATEGORIES = ["All", "Competition", "Event", "Seminar", "Workshop"];
+
 const EMPTY_FORM = { title: "", category: "", date: "", description: "" };
+
+/* ── Helpers ─────────────────────────────────────────────────── */
+function parseDateParts(dateStr) {
+  if (!dateStr) return { month: "—", day: "—" };
+  const d = new Date(dateStr);
+  if (isNaN(d)) return { month: "—", day: "—" };
+  return {
+    month: d.toLocaleString("en-US", { month: "short" }).toUpperCase(),
+    day: String(d.getDate()).padStart(2, "0"),
+  };
+}
+
+function formatFullDate(dateStr) {
+  if (!dateStr) return "";
+  const d = new Date(dateStr);
+  if (isNaN(d)) return dateStr;
+  return d.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+}
+
+/* ── Activity Row ────────────────────────────────────────────── */
+function ActivityRow({ act, onEdit, onDelete }) {
+  const [expanded, setExpanded] = useState(false);
+  const { month, day } = parseDateParts(act.date);
+  const desc = act.description || "";
+  const isLong = desc.length > 220 || desc.split("\n").length > 3;
+
+  return (
+    <div className={tabStyles.naActivityItem}>
+      {/* Date block */}
+      <div className={tabStyles.naDateBlock}>
+        <span className={tabStyles.naDateMonth}>{month}</span>
+        <span className={tabStyles.naDateDay}>{day}</span>
+      </div>
+
+      {/* Content */}
+      <div className={tabStyles.naActivityContent}>
+        {/* Title + actions */}
+        <div className={tabStyles.naActivityHeader}>
+          <h3 className={tabStyles.naActivityTitle}>{act.title}</h3>
+          <div className={tabStyles.naActivityActions}>
+            <DeleteButton iconOnly onClick={onDelete} />
+            <EditButton iconOnly onClick={onEdit} />
+          </div>
+        </div>
+
+        {/* Badge + year */}
+        <div className={tabStyles.naActivityMeta}>
+          <span
+            className={
+              CAT_BADGE[act.category] ||
+              `${tabStyles.badge} ${tabStyles.badgeBlue}`
+            }
+          >
+            <FiTag size={9} style={{ marginRight: 3 }} />
+            {act.category}
+          </span>
+          {act.year && (
+            <>
+              <span className={tabStyles.naMetaDot} />
+              <span className={tabStyles.naMetaYear}>{act.year}</span>
+            </>
+          )}
+        </div>
+
+        {/* Description */}
+        {desc && (
+          <p
+            className={`${tabStyles.naActivityBody} ${
+              isLong && !expanded ? tabStyles.naActivityBodyCollapsed : ""
+            }`}
+          >
+            {desc}
+          </p>
+        )}
+
+        {isLong && (
+          <button
+            className={tabStyles.naReadMoreBtn}
+            onClick={() => setExpanded((v) => !v)}
+          >
+            {expanded ? "Show less ↑" : "Read more ↓"}
+          </button>
+        )}
+
+        {/* Date footer */}
+        {act.date && (
+          <div className={tabStyles.naActivityFooter}>
+            <span className={tabStyles.naActivityDate}>
+              <FiCalendar size={11} />
+              {formatFullDate(act.date)}
+            </span>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
 
 /* ── Activity Modal ─────────────────────────────────────────── */
 function ActivityModal({ isOpen, onClose, onSave, initialData }) {
@@ -127,6 +232,7 @@ export default function TabNonAcademic() {
   const [activityList, setActivityList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [filter, setFilter] = useState("All");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedActivity, setSelectedActivity] = useState(null);
   const [editIndex, setEditIndex] = useState(null);
@@ -139,6 +245,12 @@ export default function TabNonAcademic() {
     message: "",
     type: "success",
   });
+
+  /* ── Count totals by category ───────────────────────────── */
+  const countByCategory = activityList.reduce((acc, a) => {
+    acc[a.category] = (acc[a.category] || 0) + 1;
+    return acc;
+  }, {});
 
   const user = JSON.parse(localStorage.getItem("user"));
   const id = user?._id;
@@ -157,6 +269,11 @@ export default function TabNonAcademic() {
       } catch (err) {
         console.error(err);
         setActivityList([]);
+        setToast({
+          isVisible: true,
+          message: `Error: ${err.message}`,
+          type: "error",
+        });
       } finally {
         setLoading(false);
       }
@@ -180,12 +297,13 @@ export default function TabNonAcademic() {
       );
       return true;
     } catch (err) {
+      console.error(err);
+      setActivityList([]);
       setToast({
         isVisible: true,
         message: `Error: ${err.message}`,
         type: "error",
       });
-      return false;
     } finally {
       setSaving(false);
     }
@@ -249,6 +367,12 @@ export default function TabNonAcademic() {
     }
   };
 
+  /* Filtered list */
+  const filtered =
+    filter === "All"
+      ? activityList
+      : activityList.filter((a) => a.category === filter);
+
   if (loading)
     return (
       <div className={tabStyles.section}>
@@ -259,12 +383,20 @@ export default function TabNonAcademic() {
   return (
     <div className={tabStyles.tabWrapper}>
       <div className={tabStyles.section}>
+        {/* Section header */}
         <div className={tabStyles.sectionHeader}>
           <div className={tabStyles.sectionTitle}>
-            <FiAward size={13} />
-            Activities &amp; Recognitions
+            <FiAward size={15} />
+            <span>Activities & Recognitions</span>
           </div>
           <div className={tabStyles.headerActions}>
+            <FilterDropdown
+              value={filter}
+              onChange={setFilter}
+              options={CATEGORIES}
+              label="FILTER"
+              placeholder="All"
+            />
             <AddButton
               title="Add Activity"
               onClick={handleAdd}
@@ -273,61 +405,54 @@ export default function TabNonAcademic() {
           </div>
         </div>
 
-        {activityList.length === 0 ? (
-          <p className={tabStyles.empty}>No activities recorded yet.</p>
+        {/* Count strip */}
+        {activityList.length > 0 && (
+          <div className={tabStyles.naCountStrip}>
+            <div className={tabStyles.naCountTotal}>
+              <span className={tabStyles.naCountPill}>
+                {activityList.length} Total
+              </span>
+            </div>
+            <div className={tabStyles.naCountCategories}>
+              {CATEGORIES.filter((c) => c !== "All").map((cat) => (
+                <span
+                  key={cat}
+                  className={`${tabStyles.naCountPill} ${
+                    filter === cat ? tabStyles.naCountPillActive : ""
+                  }`}
+                >
+                  {countByCategory[cat] || 0} {cat}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Timeline list */}
+        {filtered.length === 0 ? (
+          <p className={tabStyles.empty}>
+            {activityList.length === 0
+              ? "No activities recorded yet."
+              : `No ${filter.toLowerCase()} activities found.`}
+          </p>
         ) : (
-          <div className={tabStyles.cardGrid}>
-            {activityList.map((act, idx) => (
-              <div key={idx} className={tabStyles.card}>
-                <div className={tabStyles.cardHeader}>
-                  <div className={tabStyles.cardTitle}>{act.title}</div>
-                  <div className={tabStyles.cardActions}>
-                    <DeleteButton
-                      iconOnly
-                      onClick={() => handleDeleteClick(idx)}
-                    />
-                    <EditButton iconOnly onClick={() => handleEdit(act, idx)} />
-                  </div>
-                </div>
-
-                <div className={tabStyles.cardMeta}>
-                  <span
-                    className={
-                      CAT_COLOR[act.category] ||
-                      `${tabStyles.badge} ${tabStyles.badgeBlue}`
-                    }
-                  >
-                    <FiTag size={9} style={{ marginRight: 3 }} />
-                    {act.category}
-                  </span>
-                  <span className={tabStyles.cardMetaYear}>{act.year}</span>
-                </div>
-
-                {act.description && (
-                  <p className={tabStyles.cardDesc}>{act.description}</p>
-                )}
-
-                {act.date && (
-                  <div className={tabStyles.cardFooter}>
-                    <span className={tabStyles.cardDate}>
-                      <FiCalendar
-                        size={10}
-                        style={{ marginRight: 4, verticalAlign: "middle" }}
-                      />
-                      {new Date(act.date).toLocaleDateString("en-US", {
-                        year: "numeric",
-                        month: "short",
-                        day: "numeric",
-                      })}
-                    </span>
-                  </div>
-                )}
-              </div>
-            ))}
+          <div className={tabStyles.naTimelineList}>
+            {filtered.map((act) => {
+              const realIdx = activityList.indexOf(act);
+              return (
+                <ActivityRow
+                  key={realIdx}
+                  act={act}
+                  onEdit={() => handleEdit(act, realIdx)}
+                  onDelete={() => handleDeleteClick(realIdx)}
+                />
+              );
+            })}
           </div>
         )}
       </div>
 
+      {/* Modals */}
       <ActivityModal
         isOpen={isModalOpen}
         onClose={() => {
@@ -369,12 +494,16 @@ export default function TabNonAcademic() {
           document.body,
         )}
 
-      <AppToast
-        isVisible={toast.isVisible}
-        message={toast.message}
-        type={toast.type}
-        onClose={() => setToast((p) => ({ ...p, isVisible: false }))}
-      />
+      {toast.isVisible &&
+        createPortal(
+          <AppToast
+            isVisible={toast.isVisible}
+            message={toast.message}
+            type={toast.type}
+            onClose={() => setToast((p) => ({ ...p, isVisible: false }))}
+          />,
+          document.body,
+        )}
     </div>
   );
 }

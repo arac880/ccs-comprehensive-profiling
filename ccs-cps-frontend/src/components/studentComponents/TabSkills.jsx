@@ -1,18 +1,23 @@
-import { useState, useEffect } from "react";
+// components/studentComponents/TabSkills.jsx
+import { useState, useEffect, useMemo } from "react";
 import { createPortal } from "react-dom";
 import tabStyles from "../../pages/studentPages/studentStyles/Tab.module.css";
 import formStyles from "../../pages/facultyPages/facultyStyles/studentList.module.css";
+
 import AppModal from "../ui/Modal";
 import AppButton from "../ui/AppButton";
 import AddButton from "../../components/ui/AddButton";
 import DeleteButton from "../../components/ui/DeleteButton";
 import AppToast from "../../components/ui/AppToast";
 import ConfirmModal from "../../components/ui/ConfirmModal";
+import FilterDropdown from "../../components/ui/FilterDropdown";
+
 import { FiCode } from "react-icons/fi";
 
 const EMPTY_FORM = { name: "", category: "", customCategory: "" };
 
 const CATEGORIES = [
+  "All",
   "Programming",
   "Web Development",
   "Database",
@@ -21,29 +26,17 @@ const CATEGORIES = [
   "Other",
 ];
 
-/* Category → badge color */
-const CAT_COLOR = {
-  Programming: tabStyles.badgeOrange,
-  "Web Development": tabStyles.badgeBlue,
-  Database: tabStyles.badgeGreen,
-  Design: tabStyles.badgePurple,
-  Networking: tabStyles.badgeAmber,
-};
-
-/* ── Skill Modal ────────────────────────────────────────────── */
+/* ───────────────────────────── */
+/* MODAL */
+/* ───────────────────────────── */
+/* MODAL (self-contained, no AppModal) */
 function SkillModal({ isOpen, onClose, onConfirmOpen, initialData }) {
   const [formData, setFormData] = useState(EMPTY_FORM);
 
   useEffect(() => {
     if (initialData) {
-      const { index: _i, ...rest } = initialData;
-      const isCustom = rest.category && !CATEGORIES.includes(rest.category);
-      setFormData({
-        ...rest,
-        category: isCustom ? "Other" : rest.category,
-        customCategory: isCustom ? rest.category : "",
-      });
-    } else {
+      setFormData(initialData);
+    } else if (isOpen) {
       setFormData(EMPTY_FORM);
     }
   }, [initialData, isOpen]);
@@ -54,19 +47,15 @@ function SkillModal({ isOpen, onClose, onConfirmOpen, initialData }) {
   };
 
   const handleSubmit = () => {
-    if (!formData.name.trim()) {
-      alert("Please enter a skill name.");
-      return;
-    }
-    if (!formData.category) {
-      alert("Please select a category.");
-      return;
-    }
+    if (!formData.name.trim()) return alert("Please enter a skill name");
+    if (!formData.category) return alert("Please select a category");
+
     const finalCategory =
       formData.category === "Other"
         ? formData.customCategory.trim() || "Other"
         : formData.category;
-    onConfirmOpen({ name: formData.name.trim(), category: finalCategory });
+
+    onConfirmOpen({ ...formData, category: finalCategory });
   };
 
   if (!isOpen) return null;
@@ -75,52 +64,55 @@ function SkillModal({ isOpen, onClose, onConfirmOpen, initialData }) {
     <AppModal
       isOpen={isOpen}
       onClose={onClose}
-      title="Add Skill"
+      title={initialData ? "Edit Skill" : "Add Skill"}
       maxWidth="450px"
     >
       <div className={formStyles.modalBody}>
         <div className={formStyles.formGrid}>
-          <div className={`${formStyles.formGroup} ${formStyles.fullWidth}`}>
+          <div className={formStyles.formGroup}>
             <label>Skill Name</label>
             <input
               name="name"
               value={formData.name}
               onChange={handleChange}
-              placeholder="e.g. React, Python, Figma"
+              placeholder="e.g. React, Node.js"
             />
           </div>
-          <div className={`${formStyles.formGroup} ${formStyles.fullWidth}`}>
+
+          <div className={formStyles.formGroup}>
             <label>Category</label>
             <select
               name="category"
               value={formData.category}
               onChange={handleChange}
             >
-              <option value="">Select</option>
-              {CATEGORIES.map((c) => (
+              <option value="">Select Category</option>
+              {CATEGORIES.filter((c) => c !== "All").map((c) => (
                 <option key={c}>{c}</option>
               ))}
             </select>
           </div>
+
           {formData.category === "Other" && (
             <div className={`${formStyles.formGroup} ${formStyles.fullWidth}`}>
-              <label>Specify Category</label>
+              <label>Custom Category</label>
               <input
                 name="customCategory"
                 value={formData.customCategory}
                 onChange={handleChange}
-                placeholder="e.g. Mobile Development, AI, DevOps"
+                placeholder="Enter custom category"
               />
             </div>
           )}
         </div>
       </div>
+
       <div className={formStyles.modalFooter}>
         <AppButton variant="secondary" onClick={onClose}>
           Cancel
         </AppButton>
         <AppButton variant="primary" onClick={handleSubmit}>
-          Add Skill
+          {initialData ? "Save Changes" : "Add Skill"}
         </AppButton>
       </div>
     </AppModal>,
@@ -128,16 +120,20 @@ function SkillModal({ isOpen, onClose, onConfirmOpen, initialData }) {
   );
 }
 
-/* ── Main Component ─────────────────────────────────────────── */
+/* ───────────────────────────── */
+/* MAIN */
 export default function TabSkills() {
   const [skillList, setSkillList] = useState([]);
+  const [filter, setFilter] = useState("All");
   const [loading, setLoading] = useState(true);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [pendingSkill, setPendingSkill] = useState(null);
-  const [saving, setSaving] = useState(false);
-  const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false);
+
   const [deleteIndex, setDeleteIndex] = useState(null);
+  const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false);
+
   const [toast, setToast] = useState({
     isVisible: false,
     message: "",
@@ -147,214 +143,190 @@ export default function TabSkills() {
   const user = JSON.parse(localStorage.getItem("user"));
   const id = user?._id;
 
+  /* ── FETCH ── */
   useEffect(() => {
     const fetchSkills = async () => {
-      if (!id) {
-        setLoading(false);
-        return;
-      }
       try {
         const res = await fetch(`http://localhost:5000/api/students/${id}`);
-        if (!res.ok) throw new Error("Failed");
+        if (!res.ok) throw new Error("Fetch failed");
         const data = await res.json();
         setSkillList(data.skills || []);
       } catch (err) {
-        console.error(err);
-        setSkillList([]);
+        setToast({ isVisible: true, message: err.message, type: "error" });
       } finally {
         setLoading(false);
       }
     };
-    fetchSkills();
-  }, []);
 
-  const handleConfirmOpen = (skillData) => {
-    setPendingSkill(skillData);
-    setIsConfirmOpen(true);
-  };
+    if (id) fetchSkills();
+  }, [id]);
 
+  /* ── COUNTS ── */
+  const countByCategory = useMemo(() => {
+    return skillList.reduce((acc, s) => {
+      acc[s.category] = (acc[s.category] || 0) + 1;
+      return acc;
+    }, {});
+  }, [skillList]);
+
+  /* ── FILTER ── */
+  const filteredSkills =
+    filter === "All"
+      ? skillList
+      : skillList.filter((s) => s.category === filter);
+
+  /* ── ADD ── */
   const handleConfirmAdd = async () => {
-    if (!pendingSkill || !id) return;
     const updated = [...skillList, pendingSkill];
-    setSaving(true);
+
     try {
-      const res = await fetch(`http://localhost:5000/api/students/${id}`, {
+      await fetch(`http://localhost:5000/api/students/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ skills: updated }),
       });
-      if (!res.ok) throw new Error((await res.json()).message || "Failed");
-      localStorage.setItem(
-        "user",
-        JSON.stringify({ ...user, skills: updated }),
-      );
+
       setSkillList(updated);
-      setIsConfirmOpen(false);
-      setIsModalOpen(false);
-      setPendingSkill(null);
-      setToast({
-        isVisible: true,
-        message: "Skill added successfully.",
-        type: "success",
-      });
+      setToast({ isVisible: true, message: "Skill added!", type: "success" });
     } catch (err) {
-      setIsConfirmOpen(false);
-      setToast({
-        isVisible: true,
-        message: `Error: ${err.message}`,
-        type: "error",
-      });
-    } finally {
-      setSaving(false);
+      setToast({ isVisible: true, message: err.message, type: "error" });
     }
+
+    setIsConfirmOpen(false);
+    setIsModalOpen(false);
   };
 
-  const handleDeleteClick = (index) => {
-    setDeleteIndex(index);
-    setIsConfirmDeleteOpen(true);
-  };
-  const handleConfirmDelete = async () => {
-    if (deleteIndex === null || !id) return;
+  /* ── DELETE ── */
+  const handleDelete = async () => {
     const updated = skillList.filter((_, i) => i !== deleteIndex);
-    setSaving(true);
+
     try {
-      const res = await fetch(`http://localhost:5000/api/students/${id}`, {
+      await fetch(`http://localhost:5000/api/students/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ skills: updated }),
       });
-      if (!res.ok) throw new Error((await res.json()).message || "Failed");
-      localStorage.setItem(
-        "user",
-        JSON.stringify({ ...user, skills: updated }),
-      );
+
       setSkillList(updated);
-      setIsConfirmDeleteOpen(false);
-      setDeleteIndex(null);
-      setToast({
-        isVisible: true,
-        message: "Skill deleted successfully.",
-        type: "success",
-      });
+      setToast({ isVisible: true, message: "Deleted!", type: "success" });
     } catch (err) {
-      setIsConfirmDeleteOpen(false);
-      setToast({
-        isVisible: true,
-        message: `Error: ${err.message}`,
-        type: "error",
-      });
-    } finally {
-      setSaving(false);
+      setToast({ isVisible: true, message: err.message, type: "error" });
     }
+
+    setIsConfirmDeleteOpen(false);
   };
 
-  const categories = [...new Set(skillList.map((s) => s.category))];
+  if (loading) return <div>Loading skills...</div>;
 
-  if (loading)
-    return (
-      <div className={tabStyles.section}>
-        <div className={tabStyles.loadingState}>Loading skills…</div>
-      </div>
-    );
+  const categoryOptionsWithCount = CATEGORIES.map((cat) => {
+    if (cat === "All") return `${cat} (${skillList.length})`;
+    return `${cat} (${countByCategory[cat] || 0})`;
+  });
 
   return (
     <div className={tabStyles.tabWrapper}>
       <div className={tabStyles.section}>
+        {/* HEADER */}
         <div className={tabStyles.sectionHeader}>
           <div className={tabStyles.sectionTitle}>
-            <FiCode size={13} />
-            Skills
+            <FiCode /> Skills
           </div>
+
           <div className={tabStyles.headerActions}>
-            <AddButton
-              title="Add Skill"
-              onClick={() => setIsModalOpen(true)}
-              disabled={saving}
+            <FilterDropdown
+              value={filter}
+              onChange={(val) => {
+                const cat = val.split(" (")[0];
+                setFilter(cat);
+              }}
+              options={categoryOptionsWithCount}
             />
+
+            <AddButton onClick={() => setIsModalOpen(true)} />
           </div>
         </div>
 
-        {skillList.length === 0 ? (
-          <p className={tabStyles.empty}>No skills recorded yet.</p>
-        ) : (
-          <div className={tabStyles.skillColumns}>
-            {categories.map((cat) => (
-              <div key={cat} className={tabStyles.skillColumn}>
-                <div className={tabStyles.skillCat}>
-                  <span
-                    className={`${tabStyles.badge} ${CAT_COLOR[cat] ?? tabStyles.badgeBlue}`}
-                    style={{ marginRight: 6 }}
-                  >
-                    {cat}
+        {/* LIST */}
+        <div className={tabStyles.skillNumberedList}>
+          {filteredSkills.length === 0 ? (
+            <p className={tabStyles.empty}>No skills found.</p>
+          ) : (
+            filteredSkills.map((skill, i) => (
+              <div key={i} className={tabStyles.skillNumberedRow}>
+                <span className={tabStyles.skillRowNumber}>
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+
+                <div className={tabStyles.skillIconBox}>
+                  <FiCode size={16} />
+                </div>
+
+                <div className={tabStyles.skillRowInfo}>
+                  <span className={tabStyles.skillRowName}>{skill.name}</span>
+                  <span className={tabStyles.skillCategoryPill}>
+                    {skill.category}
                   </span>
                 </div>
-                <ul className={tabStyles.skillList}>
-                  {skillList
-                    .filter((s) => s.category === cat)
-                    .map((skill) => {
-                      const globalIndex = skillList.indexOf(skill);
-                      return (
-                        <li key={globalIndex} className={tabStyles.skillItem}>
-                          <div className={tabStyles.skillInfo}>
-                            <span className={tabStyles.skillName}>
-                              {skill.name}
-                            </span>
-                          </div>
-                          <div className={tabStyles.skillActions}>
-                            <DeleteButton
-                              iconOnly
-                              onClick={() => handleDeleteClick(globalIndex)}
-                            />
-                          </div>
-                        </li>
-                      );
-                    })}
-                </ul>
+
+                <DeleteButton
+                  iconOnly
+                  onClick={() => {
+                    setDeleteIndex(i);
+                    setIsConfirmDeleteOpen(true);
+                  }}
+                />
               </div>
-            ))}
-          </div>
-        )}
+            ))
+          )}
+        </div>
       </div>
 
+      {/* MODAL */}
       <SkillModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onConfirmOpen={handleConfirmOpen}
-        initialData={null}
+        onConfirmOpen={(data) => {
+          setPendingSkill(data);
+          setIsConfirmOpen(true);
+        }}
+        initialData={null} // set skill object here if editing
       />
 
+      {/* CONFIRM ADD */}
       {isConfirmOpen &&
         createPortal(
           <ConfirmModal
-            isOpen={isConfirmOpen}
+            isOpen
             onClose={() => setIsConfirmOpen(false)}
             onConfirm={handleConfirmAdd}
-            title="Add Skill"
-            message={`Add "${pendingSkill?.name}" under "${pendingSkill?.category}"?`}
-            isProcessing={saving}
+            message={`Add "${pendingSkill?.name}"?`}
           />,
           document.body,
         )}
 
+      {/* CONFIRM DELETE */}
       {isConfirmDeleteOpen &&
         createPortal(
           <ConfirmModal
-            isOpen={isConfirmDeleteOpen}
+            isOpen
             onClose={() => setIsConfirmDeleteOpen(false)}
-            onConfirm={handleConfirmDelete}
-            title="Delete Skill"
-            message={`Delete "${skillList[deleteIndex]?.name}"?`}
-            isProcessing={saving}
+            onConfirm={handleDelete}
+            message="Delete this skill?"
           />,
           document.body,
         )}
 
-      <AppToast
-        isVisible={toast.isVisible}
-        message={toast.message}
-        type={toast.type}
-        onClose={() => setToast((p) => ({ ...p, isVisible: false }))}
-      />
+      {/* TOAST */}
+      {toast.isVisible &&
+        createPortal(
+          <AppToast
+            isVisible={toast.isVisible}
+            message={toast.message}
+            type={toast.type}
+            onClose={() => setToast((p) => ({ ...p, isVisible: false }))}
+          />,
+          document.body,
+        )}
     </div>
   );
 }
