@@ -106,7 +106,7 @@ const StatCard = ({ icon, label, value, sub, color, loading }) => (
   </div>
 );
 
-/* ── Static sample data (events, announcements, schedule) ── */
+/* ── Static sample data ── */
 const ANNOUNCEMENTS = [
   {
     id: 1,
@@ -174,12 +174,27 @@ const SCHEDULE = [
     day: "TTh",
   },
   {
-    subject: "Introduction to Programming",
+    subject: "Intro to Programming",
     code: "CS 401",
     room: "Room 301",
     time: "1:00–2:30 PM",
     day: "MWF",
   },
+];
+
+const QUICK_ACTIONS = [
+  {
+    icon: "bi-person-plus-fill",
+    label: "Add Student",
+    path: "/faculty/student-list",
+  },
+  { icon: "bi-clipboard2-check-fill", label: "Clearance", path: null },
+  {
+    icon: "bi-calendar-plus-fill",
+    label: "Add Event",
+    path: "/faculty/events",
+  },
+  { icon: "bi-file-earmark-text-fill", label: "Reports", path: null },
 ];
 
 function getInitials(name) {
@@ -235,7 +250,6 @@ const FacultyDashboard = () => {
     fullMonth: MONS_FULL[now.getMonth()],
   };
 
-  // ── Real student data from API ──
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -249,7 +263,6 @@ const FacultyDashboard = () => {
       .catch(() => setLoading(false));
   }, []);
 
-  // ── Computed stats from real data ──
   const totalCount = students.length;
   const regularCount = students.filter((s) => s.type === "Regular").length;
   const enrolledCount = students.filter((s) => s.status === "Enrolled").length;
@@ -257,7 +270,6 @@ const FacultyDashboard = () => {
     (s) => s.status === "LOA" || s.status === "Dropped",
   ).length;
 
-  // ── Most recent 4 students ──
   const recentStudents = [...students]
     .slice(-4)
     .reverse()
@@ -272,305 +284,287 @@ const FacultyDashboard = () => {
     }));
 
   return (
-    <>
-      <div className={styles.dashboardContent}>
-        {/* ── LEFT COLUMN ── */}
-        <div className={styles.dashboardLeft}>
-          {/* Welcome Banner */}
-          <div className={styles.welcomeBanner}>
-            <div className={styles.welcomeOrb} />
-            <div className={styles.welcomeOrb2} />
-            <div className={styles.welcomeBannerInner}>
-              <div className={styles.welcomeText}>
-                <p className={styles.welcomeGreet}>
-                  Good day, <strong>Prof. Mulawin</strong> 👋
-                </p>
-                <p className={styles.welcomeTitle}>
-                  Welcome to the <span className={styles.welcomeCcs}>CCS</span>
-                </p>
-                <p className={styles.welcomeSub}>
-                  Comprehensive Profiling System
-                </p>
-              </div>
-              <div className={styles.welcomeStats}>
-                <div className={styles.welcomeStat}>
-                  <span className={styles.welcomeStatNum}>
-                    {loading ? "—" : totalCount}
-                  </span>
-                  <span className={styles.welcomeStatLbl}>Students</span>
-                </div>
-                <div className={styles.welcomeStatDiv} />
-                <div className={styles.welcomeStat}>
-                  <span className={styles.welcomeStatNum}>3</span>
-                  <span className={styles.welcomeStatLbl}>Subjects</span>
-                </div>
-                <div className={styles.welcomeStatDiv} />
-                <div className={styles.welcomeStat}>
-                  <span className={styles.welcomeStatNum}>2</span>
-                  <span className={styles.welcomeStatLbl}>Sections</span>
-                </div>
-              </div>
+    <div className={styles.dashboardContent}>
+      {/* ── LEFT COLUMN ── */}
+      <div className={styles.dashboardLeft}>
+        {/* Welcome Banner */}
+        <div className={styles.welcomeBanner}>
+          <div className={styles.welcomeOrb} />
+          <div className={styles.welcomeOrb2} />
+          <div className={styles.welcomeBannerInner}>
+            <div className={styles.welcomeText}>
+              <p className={styles.welcomeGreet}>
+              Dangal Greetings!
+              </p>
+              <p className={styles.welcomeTitle}>
+                Welcome to the <span className={styles.welcomeCcs}>CCS</span>
+              </p>
+              <p className={styles.welcomeSub}>
+                Comprehensive Profiling System
+              </p>
             </div>
-          </div>
-
-          {/* Stat Cards */}
-          <div className={styles.statRow}>
-            <StatCard
-              icon="bi-people-fill"
-              label="Total Students"
-              value={totalCount}
-              sub={`${regularCount} regular`}
-              color="#e65100"
-              loading={loading}
-            />
-            <StatCard
-              icon="bi-check2-circle"
-              label="Enrolled"
-              value={enrolledCount}
-              sub={`${Math.round((enrolledCount / Math.max(totalCount, 1)) * 100)}% of total`}
-              color="#2e7d32"
-              loading={loading}
-            />
-            <StatCard
-              icon="bi-exclamation-circle"
-              label="LOA / Dropped"
-              value={pendingCount}
-              sub="Need attention"
-              color="#b45309"
-              loading={loading}
-            />
-            <StatCard
-              icon="bi-calendar2-check-fill"
-              label="Events This Month"
-              value="5"
-              sub="Next: Apr 10"
-              color="#1565c0"
-              loading={false}
-            />
-          </div>
-
-          {/* Mid row: Announcements + Schedule */}
-          <div className={styles.midRow}>
-            <div className={styles.dashboardCard}>
-              <div className={styles.cardHeader}>
-                <div className={styles.cardTitle}>
-                  <span className={styles.cardTitleIcon}>
-                    <i className="bi bi-megaphone-fill" />
-                  </span>
-                  Announcements
-                </div>
-                <span className={styles.cardBadge}>
-                  {ANNOUNCEMENTS.length} new
+            <div className={styles.welcomeStats}>
+              <div className={styles.welcomeStat}>
+                <span className={styles.welcomeStatNum}>
+                  {loading ? "—" : totalCount}
                 </span>
+                <span className={styles.welcomeStatLbl}>Students</span>
               </div>
-              <div className={styles.announcementList}>
-                {ANNOUNCEMENTS.map((a) => (
-                  <div
-                    key={a.id}
-                    className={`${styles.announcementItem} ${a.urgent ? styles.announcementUrgent : ""}`}
-                  >
-                    <div className={styles.announcementLeft}>
-                      <span className={styles.announcementTag}>{a.tag}</span>
-                      <p className={styles.announcementTitle}>{a.title}</p>
-                      <span className={styles.announcementDate}>{a.date}</span>
-                    </div>
-                    {a.urgent && <span className={styles.urgentPip}>!</span>}
-                  </div>
-                ))}
+              <div className={styles.welcomeStatDiv} />
+              <div className={styles.welcomeStat}>
+                <span className={styles.welcomeStatNum}>3</span>
+                <span className={styles.welcomeStatLbl}>Subjects</span>
               </div>
-            </div>
-
-            <div className={styles.dashboardCard}>
-              <div className={styles.cardHeader}>
-                <div className={styles.cardTitle}>
-                  <span className={styles.cardTitleIcon}>
-                    <i className="bi bi-journal-bookmark-fill" />
-                  </span>
-                  My Schedule
-                </div>
-                <span
-                  className={styles.cardLink}
-                  onClick={() => navigate("/faculty/schedule")}
-                >
-                  View all
-                </span>
-              </div>
-              <div className={styles.scheduleList}>
-                {SCHEDULE.map((s, i) => (
-                  <div key={i} className={styles.scheduleItem}>
-                    <div className={styles.scheduleAccent} />
-                    <div className={styles.scheduleInfo}>
-                      <p className={styles.scheduleSubject}>{s.subject}</p>
-                      <p className={styles.scheduleMeta}>
-                        {s.code} · {s.room}
-                      </p>
-                    </div>
-                    <div className={styles.scheduleTime}>
-                      <span className={styles.scheduleTimeText}>{s.time}</span>
-                      <span className={styles.scheduleDay}>{s.day}</span>
-                    </div>
-                  </div>
-                ))}
+              <div className={styles.welcomeStatDiv} />
+              <div className={styles.welcomeStat}>
+                <span className={styles.welcomeStatNum}>2</span>
+                <span className={styles.welcomeStatLbl}>Sections</span>
               </div>
             </div>
           </div>
+        </div>
 
-          {/* Recent Students — REAL DATA */}
+        {/* Stat Cards */}
+        <div className={styles.statRow}>
+          <StatCard
+            icon="bi-people-fill"
+            label="Total Students"
+            value={totalCount}
+            sub={`${regularCount} regular`}
+            color="#e65100"
+            loading={loading}
+          />
+          <StatCard
+            icon="bi-check2-circle"
+            label="Enrolled"
+            value={enrolledCount}
+            sub={`${Math.round((enrolledCount / Math.max(totalCount, 1)) * 100)}% of total`}
+            color="#2e7d32"
+            loading={loading}
+          />
+          <StatCard
+            icon="bi-exclamation-circle"
+            label="LOA / Dropped"
+            value={pendingCount}
+            sub="Need attention"
+            color="#b45309"
+            loading={loading}
+          />
+          <StatCard
+            icon="bi-calendar2-check-fill"
+            label="Events This Month"
+            value="5"
+            sub="Next: Apr 10"
+            color="#1565c0"
+            loading={false}
+          />
+        </div>
+
+        {/* Mid row: Announcements + Schedule */}
+        <div className={styles.midRow}>
+          {/* Announcements */}
           <div className={styles.dashboardCard}>
             <div className={styles.cardHeader}>
               <div className={styles.cardTitle}>
                 <span className={styles.cardTitleIcon}>
-                  <i className="bi bi-people-fill" />
+                  <i className="bi bi-megaphone-fill" />
                 </span>
-                Recent Students
+                Announcements
+              </div>
+              <span className={styles.cardBadge}>
+                {ANNOUNCEMENTS.length} new
+              </span>
+            </div>
+            <div className={styles.announcementList}>
+              {ANNOUNCEMENTS.map((a) => (
+                <div
+                  key={a.id}
+                  className={`${styles.announcementItem} ${a.urgent ? styles.announcementUrgent : ""}`}
+                >
+                  <div className={styles.announcementLeft}>
+                    <span className={styles.announcementTag}>{a.tag}</span>
+                    <p className={styles.announcementTitle}>{a.title}</p>
+                    <span className={styles.announcementDate}>{a.date}</span>
+                  </div>
+                  {a.urgent && <span className={styles.urgentPip}>!</span>}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Schedule */}
+          <div className={styles.dashboardCard}>
+            <div className={styles.cardHeader}>
+              <div className={styles.cardTitle}>
+                <span className={styles.cardTitleIcon}>
+                  <i className="bi bi-journal-bookmark-fill" />
+                </span>
+                My Schedule
               </div>
               <span
                 className={styles.cardLink}
-                onClick={() => navigate("/faculty/student-list")}
+                onClick={() => navigate("/faculty/schedule")}
               >
                 View all
               </span>
             </div>
-
-            {loading ? (
-              <div className={styles.skeletonRows}>
-                {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className={styles.skeletonRow} />
-                ))}
-              </div>
-            ) : recentStudents.length === 0 ? (
-              <div className={styles.emptyStudents}>
-                <i className="bi bi-people" />
-                <p>No students yet.</p>
-              </div>
-            ) : (
-              <div className={styles.studentTable}>
-                <div className={styles.studentTableHead}>
-                  <span>Name</span>
-                  <span>ID</span>
-                  <span>Year</span>
-                  <span>Section</span>
-                  <span>Status</span>
-                </div>
-                {recentStudents.map((s) => (
-                  <div
-                    key={s._id}
-                    className={styles.studentRow}
-                    onClick={() => navigate(`/faculty/student/${s._id}`)}
-                    style={{ cursor: "pointer" }}
-                  >
-                    <span className={styles.studentName}>
-                      <span className={styles.studentAvatar}>
-                        {getInitials(s.name)}
-                      </span>
-                      {s.name}
-                    </span>
-                    <span className={styles.studentMeta}>{s.displayId}</span>
-                    <span className={styles.studentMeta}>{s.year}</span>
-                    <span className={styles.studentMeta}>{s.section}</span>
-                    <span
-                      className={`${styles.statusBadge} ${s.type === "Regular" ? styles.statusRegular : styles.statusIrregular}`}
-                    >
-                      {s.type}
-                    </span>
+            <div className={styles.scheduleList}>
+              {SCHEDULE.map((s, i) => (
+                <div key={i} className={styles.scheduleItem}>
+                  <div className={styles.scheduleAccent} />
+                  <div className={styles.scheduleInfo}>
+                    <p className={styles.scheduleSubject}>{s.subject}</p>
+                    <p className={styles.scheduleMeta}>
+                      {s.code} · {s.room}
+                    </p>
                   </div>
-                ))}
-              </div>
-            )}
+                  <div className={styles.scheduleTime}>
+                    <span className={styles.scheduleTimeText}>{s.time}</span>
+                    <span className={styles.scheduleDay}>{s.day}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
-        {/* ── RIGHT COLUMN ── */}
-        <div className={styles.dashboardRight}>
-          <div className={styles.calendarCard}>
-            <div className={styles.calendarHeader}>
-              <span className={styles.calendarDayNum}>{today.day}</span>
-              <div className={styles.calendarDayInfo}>
-                <span className={styles.dow}>{today.dow}</span>
-                <span className={styles.moy}>{today.moy}</span>
-              </div>
-              <button className={styles.calendarExpand}>⤢</button>
+        {/* Recent Students */}
+        <div className={styles.dashboardCard}>
+          <div className={styles.cardHeader}>
+            <div className={styles.cardTitle}>
+              <span className={styles.cardTitleIcon}>
+                <i className="bi bi-people-fill" />
+              </span>
+              Recent Students
             </div>
-            <MiniCalendar today={today} />
+            <span
+              className={styles.cardLink}
+              onClick={() => navigate("/faculty/student-list")}
+            >
+              View all
+            </span>
           </div>
 
-          <div className={`${styles.dashboardCard} ${styles.eventsCard}`}>
-            <div className={styles.cardHeader}>
-              <div className={styles.cardTitle}>
-                <span className={styles.cardTitleIcon}>
-                  <i className="bi bi-calendar-event-fill" />
-                </span>
-                Upcoming
-              </div>
+          {loading ? (
+            <div className={styles.skeletonRows}>
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className={styles.skeletonRow} />
+              ))}
             </div>
-            <div className={styles.eventList}>
-              {EVENTS.map((ev) => (
+          ) : recentStudents.length === 0 ? (
+            <div className={styles.emptyStudents}>
+              <i className="bi bi-people" />
+              <p>No students yet.</p>
+            </div>
+          ) : (
+            <div className={styles.studentTable}>
+              <div className={styles.studentTableHead}>
+                <span>Name</span>
+                <span>ID</span>
+                <span>Year</span>
+                <span>Section</span>
+                <span>Status</span>
+              </div>
+              {recentStudents.map((s) => (
                 <div
-                  key={ev.id}
-                  className={styles.eventItem}
-                  style={{ "--ev-color": ev.color }}
+                  key={s._id}
+                  className={styles.studentRow}
+                  onClick={() => navigate(`/faculty/student/${s._id}`)}
                 >
-                  <div className={styles.eventIconWrap}>
-                    <i
-                      className={`bi ${ev.icon}`}
-                      style={{ color: ev.color }}
-                    />
-                  </div>
-                  <div className={styles.eventInfo}>
-                    <p className={styles.eventTitle}>{ev.title}</p>
-                    <p className={styles.eventMeta}>
-                      {ev.date} · {ev.time}
-                    </p>
-                  </div>
+                  <span className={styles.studentName}>
+                    <span className={styles.studentAvatar}>
+                      {getInitials(s.name)}
+                    </span>
+                    {s.name}
+                  </span>
+                  <span className={styles.studentMeta}>{s.displayId}</span>
+                  <span className={styles.studentMeta}>{s.year}</span>
+                  <span className={styles.studentMeta}>{s.section}</span>
+                  <span
+                    className={`${styles.statusBadge} ${
+                      s.type === "Regular"
+                        ? styles.statusRegular
+                        : styles.statusIrregular
+                    }`}
+                  >
+                    {s.type}
+                  </span>
                 </div>
               ))}
             </div>
-          </div>
+          )}
+        </div>
+      </div>
 
-          <div className={`${styles.dashboardCard} ${styles.quickCard}`}>
-            <div className={styles.cardTitle} style={{ marginBottom: "10px" }}>
+      {/* ── RIGHT COLUMN ── */}
+      <div className={styles.dashboardRight}>
+        {/* Mini Calendar */}
+        <div className={styles.calendarCard}>
+          <div className={styles.calendarHeader}>
+            <span className={styles.calendarDayNum}>{today.day}</span>
+            <div className={styles.calendarDayInfo}>
+              <span className={styles.dow}>{today.dow}</span>
+              <span className={styles.moy}>{today.moy}</span>
+            </div>
+            <button className={styles.calendarExpand}>⤢</button>
+          </div>
+          <MiniCalendar today={today} />
+        </div>
+
+        {/* Upcoming Events */}
+        <div className={`${styles.dashboardCard} ${styles.eventsCard}`}>
+          <div className={styles.cardHeader}>
+            <div className={styles.cardTitle}>
               <span className={styles.cardTitleIcon}>
-                <i className="bi bi-lightning-charge-fill" />
+                <i className="bi bi-calendar-event-fill" />
               </span>
-              Quick Actions
+              Upcoming
             </div>
-            <div className={styles.quickGrid}>
-              {[
-                {
-                  icon: "bi-person-plus-fill",
-                  label: "Add Student",
-                  path: "/faculty/student-list",
-                },
-                {
-                  icon: "bi-clipboard2-check-fill",
-                  label: "Clearance",
-                  path: null,
-                },
-                {
-                  icon: "bi-calendar-plus-fill",
-                  label: "Add Event",
-                  path: "/faculty/events",
-                },
-                {
-                  icon: "bi-file-earmark-text-fill",
-                  label: "Reports",
-                  path: null,
-                },
-              ].map((q) => (
-                <button
-                  key={q.label}
-                  className={styles.quickBtn}
-                  onClick={() => q.path && navigate(q.path)}
-                >
-                  <i className={`bi ${q.icon} ${styles.quickBtnIcon}`} />
-                  <span>{q.label}</span>
-                </button>
-              ))}
-            </div>
+          </div>
+          <div className={styles.eventList}>
+            {EVENTS.map((ev) => (
+              <div
+                key={ev.id}
+                className={styles.eventItem}
+                style={{ "--ev-color": ev.color }}
+              >
+                <div className={styles.eventIconWrap}>
+                  <i className={`bi ${ev.icon}`} style={{ color: ev.color }} />
+                </div>
+                <div className={styles.eventInfo}>
+                  <p className={styles.eventTitle}>{ev.title}</p>
+                  <p className={styles.eventMeta}>
+                    {ev.date} · {ev.time}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Quick Actions */}
+        <div className={`${styles.dashboardCard} ${styles.quickCard}`}>
+          <div className={styles.cardTitle} style={{ marginBottom: "10px" }}>
+            <span className={styles.cardTitleIcon}>
+              <i className="bi bi-lightning-charge-fill" />
+            </span>
+            Quick Actions
+          </div>
+          <div className={styles.quickGrid}>
+            {QUICK_ACTIONS.map((q) => (
+              <button
+                key={q.label}
+                className={styles.quickBtn}
+                onClick={() => q.path && navigate(q.path)}
+              >
+                <i className={`bi ${q.icon} ${styles.quickBtnIcon}`} />
+                <span>{q.label}</span>
+              </button>
+            ))}
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import SideNavbar from "../../components/facultyComponents/SideNavbar";
 import TopNavbar from "../../components/facultyComponents/TopNavbar";
@@ -7,6 +7,7 @@ import styles from "../../pages/facultyPages/facultyStyles/FacultyLayout.module.
 
 const FacultyLayout = () => {
   const location = useLocation();
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   const getActiveNav = () => {
     const path = location.pathname.toLowerCase();
@@ -20,15 +21,23 @@ const FacultyLayout = () => {
 
   return (
     <div className={styles.pageRoot}>
-      <SideNavbar activeNav={getActiveNav()} />
+      <SideNavbar
+        activeNav={getActiveNav()}
+        mobileOpen={mobileOpen}
+        setMobileOpen={setMobileOpen}
+      />
 
       <div className={styles.pageMain}>
-        <TopNavbar activePage={getActiveNav()} />
+        <TopNavbar
+          activePage={getActiveNav()}
+          onMenuClick={() => setMobileOpen(!mobileOpen)}
+          mobileOpen={mobileOpen}
+          notifCount={2}
+        />
         <div className={styles.pageContent}>
-          {" "}
           <Outlet />
         </div>
-        <CCSFooter version="v1.0.2" />{" "}
+        <CCSFooter version="v1.0.2" />
       </div>
     </div>
   );

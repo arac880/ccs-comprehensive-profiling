@@ -1,11 +1,12 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { FaBars } from "react-icons/fa6";
+import { FaBars, FaXmark } from "react-icons/fa6";
 import styles from "../../pages/facultyPages/facultyStyles/SideNavbar.module.css";
 import ccsLogo from "../../assets/ccs_logo.png";
 import LogoutModal from "../LogoutModal";
 
 const TABLET_BREAKPOINT = 992;
+const MOBILE_BREAKPOINT = 768;
 
 const navItems = [
   {
@@ -32,13 +33,16 @@ const navItems = [
     icon: "bi-calendar-event",
     path: "/faculty/events",
   },
-
 ];
 
-export default function SidebarNav({ activeNav = "Dashboard", onNavigate }) {
+export default function SidebarNav({
+  activeNav = "Dashboard",
+  onNavigate,
+  mobileOpen,
+  setMobileOpen,
+}) {
   const navigate = useNavigate();
 
-  // ✅ Get logged-in faculty from localStorage
   const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
   const faculty = {
     name:
@@ -47,6 +51,8 @@ export default function SidebarNav({ activeNav = "Dashboard", onNavigate }) {
     id: storedUser.id || "—",
     isDean: storedUser.isDean || false,
   };
+
+  const isMobile = () => window.innerWidth <= MOBILE_BREAKPOINT;
 
   const [collapsed, setCollapsed] = useState(
     window.innerWidth < TABLET_BREAKPOINT,
@@ -58,10 +64,19 @@ export default function SidebarNav({ activeNav = "Dashboard", onNavigate }) {
   useEffect(() => {
     const onResize = () => {
       if (window.innerWidth < TABLET_BREAKPOINT) setCollapsed(true);
+      if (window.innerWidth > MOBILE_BREAKPOINT) setMobileOpen(false);
     };
     window.addEventListener("resize", onResize);
     return () => window.removeEventListener("resize", onResize);
-  }, []);
+  }, [setMobileOpen]);
+
+  /* Lock body scroll when drawer is open */
+  useEffect(() => {
+    document.body.style.overflow = mobileOpen ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [mobileOpen]);
 
   const handleLogout = () => {
     localStorage.removeItem("user");
@@ -75,41 +90,70 @@ export default function SidebarNav({ activeNav = "Dashboard", onNavigate }) {
       setShowLogout(true);
       return;
     }
+    setMobileOpen(false);
     onNavigate?.(item.name);
     navigate(item.path);
   };
 
   const showTooltip = (e, label) => {
-    if (!collapsed) return;
+    if (!collapsed || isMobile()) return;
     const rect = e.currentTarget.getBoundingClientRect();
     setTooltip({ visible: true, label, y: rect.top + rect.height / 2 });
   };
-
   const hideTooltip = () => setTooltip({ visible: false, label: "", y: 0 });
+
+  const showFull = !collapsed || isMobile();
 
   return (
     <>
+      {/* MOBILE: backdrop overlay */}
+      {mobileOpen && (
+        <div
+          className={styles.mobileOverlay}
+          onClick={() => setMobileOpen(false)}
+          aria-hidden="true"
+        />
+      )}
+
+      {/* SIDEBAR PANEL */}
       <div
         ref={sidebarRef}
-        className={`${styles.sidebar} ${collapsed ? styles.collapsed : ""}`}
+        className={[
+          styles.sidebar,
+          collapsed && !isMobile() ? styles.collapsed : "",
+          mobileOpen ? styles.mobileOpen : "",
+        ]
+          .filter(Boolean)
+          .join(" ")}
       >
         {/* ── Header ── */}
         <div className={styles.header}>
-          {!collapsed && <span className={styles.brandName}>Faculty</span>}
-          <div
-            className={styles.hamburgerBtn}
-            onClick={() => {
-              setCollapsed(!collapsed);
-              hideTooltip();
-            }}
-            title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-          >
-            <FaBars className={styles.menuIcon} />
-          </div>
+          {showFull && <span className={styles.brandName}>Faculty</span>}
+
+          {isMobile() ? (
+            <button
+              className={styles.drawerClose}
+              onClick={() => setMobileOpen(false)}
+              aria-label="Close menu"
+            >
+              <FaXmark />
+            </button>
+          ) : (
+            <div
+              className={styles.hamburgerBtn}
+              onClick={() => {
+                setCollapsed(!collapsed);
+                hideTooltip();
+              }}
+              title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+            >
+              <FaBars className={styles.menuIcon} />
+            </div>
+          )}
         </div>
 
         {/* ── Profile ── */}
-        {!collapsed ? (
+        {showFull ? (
           <div className={styles.profileSection}>
             <div className={styles.profileEditBtn} title="Edit profile">
               <i className="bi bi-pencil-fill" />
@@ -121,7 +165,6 @@ export default function SidebarNav({ activeNav = "Dashboard", onNavigate }) {
               <div className={styles.profileInfo}>
                 <p className={styles.profileName}>{faculty.name}</p>
                 <p className={styles.profileId}>{faculty.id}</p>
-                {/* ✅ Dean badge */}
                 {faculty.isDean && (
                   <span className={styles.deanBadge}>Dean</span>
                 )}
@@ -137,22 +180,29 @@ export default function SidebarNav({ activeNav = "Dashboard", onNavigate }) {
 
         {/* ── Navigation ── */}
         <nav className={styles.sidebarNav}>
-          {!collapsed && (
+          {showFull && (
             <span className={styles.navSectionLabel}>Navigation</span>
           )}
+
           {navItems.map((item, index) => {
             const isActive = activeNav === item.name;
             const isSignOut = item.name === "SignOut";
             return (
               <div key={item.name}>
                 <div
-                  className={`${styles.navItemRow} ${isActive ? styles.activeNav : ""} ${isSignOut ? styles.signOut : ""}`}
+                  className={[
+                    styles.navItemRow,
+                    isActive ? styles.activeNav : "",
+                    isSignOut ? styles.signOut : "",
+                  ]
+                    .filter(Boolean)
+                    .join(" ")}
                   onClick={() => handleNav(item)}
                   onMouseEnter={(e) => showTooltip(e, item.label)}
                   onMouseLeave={hideTooltip}
                 >
                   <i className={`bi ${item.icon} ${styles.navIcon}`} />
-                  {!collapsed && (
+                  {showFull && (
                     <>
                       <span className={styles.navLabel}>{item.label}</span>
                       {isActive && <span className={styles.navActiveDot} />}
@@ -180,7 +230,7 @@ export default function SidebarNav({ activeNav = "Dashboard", onNavigate }) {
         </div>
       </div>
 
-      {/* Portal tooltip */}
+      {/* ── Desktop tooltip ── */}
       {tooltip.visible && (
         <div
           style={{

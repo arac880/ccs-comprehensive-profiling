@@ -4,7 +4,6 @@
   font-family: "Plus Jakarta Sans", sans-serif !important;
 }
 
-/* ── Variables ── */
 :root {
   --orange: #e65100;
   --orange-light: #ff7d2e;
@@ -14,7 +13,9 @@
   --transition: 0.22s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* ── Expanded sidebar ── */
+/* ════════════════════════════════════
+   DESKTOP SIDEBAR
+   ════════════════════════════════════ */
 .sidebar {
   width: clamp(230px, 22vw, 280px);
   height: 100dvh;
@@ -28,20 +29,13 @@
   overflow: hidden;
   box-shadow: 4px 0 20px rgba(230, 81, 0, 0.06);
   transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 200;
 }
 
-.sidebar::-webkit-scrollbar {
-  width: 4px;
-}
-.sidebar::-webkit-scrollbar-thumb {
-  background: rgba(230, 81, 0, 0.3);
-  border-radius: 4px;
-}
-.sidebar::-webkit-scrollbar-track {
-  background: transparent;
-}
+.sidebar::-webkit-scrollbar { width: 4px; }
+.sidebar::-webkit-scrollbar-thumb { background: rgba(230, 81, 0, 0.3); border-radius: 4px; }
+.sidebar::-webkit-scrollbar-track { background: transparent; }
 
-/* ── Collapsed sidebar ── */
 .sidebar.collapsed {
   width: clamp(60px, 6vw, 72px);
   overflow: visible;
@@ -55,8 +49,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 16px; /* ← reduce from 14px */
-  min-height: 48px; /* ← reduce from 56px */
+  padding: 10px 16px;
+  min-height: 48px;
   flex-shrink: 0;
 }
 
@@ -82,7 +76,6 @@
   margin-top: 4px;
 }
 
-/* ── Hamburger button — exactly like student sidebar ── */
 .hamburgerBtn {
   width: 32px;
   height: 32px;
@@ -93,12 +86,9 @@
   justify-content: center;
   cursor: pointer;
   transition: background var(--transition);
-  /* Push to right when label is absent (collapsed) */
   margin-left: auto;
 }
-.hamburgerBtn:hover {
-  background: #fde0ce;
-}
+.hamburgerBtn:hover { background: #fde0ce; }
 
 .menuIcon {
   font-size: clamp(1rem, 1.6vw, 1.2rem);
@@ -106,47 +96,41 @@
   display: block;
 }
 
+.drawerClose { display: none; }
+
 /* ── Profile card — EXPANDED ── */
 .profileSection {
   background: linear-gradient(145deg, #e65100 0%, #ff7d2e 100%);
   border-radius: 14px;
-  margin: 10px 12px; /* ← reduce from 14px */
-  padding: 12px 16px 10px; /* ← reduce from 18px 16px 14px */
+  margin: 10px 12px;
+  padding: 12px 16px 10px;
   text-align: center;
   flex-shrink: 0;
   position: relative;
   overflow: hidden;
 }
-
 .profileSection::before {
   content: "";
   position: absolute;
-  top: -20px;
-  right: -20px;
-  width: 80px;
-  height: 80px;
+  top: -20px; right: -20px;
+  width: 80px; height: 80px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.08);
 }
 .profileSection::after {
   content: "";
   position: absolute;
-  bottom: -30px;
-  left: -10px;
-  width: 100px;
-  height: 100px;
+  bottom: -30px; left: -10px;
+  width: 100px; height: 100px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.05);
 }
 
-/* ── Cute circular edit button ── */
 .profileEditBtn {
   position: absolute;
-  top: 10px;
-  right: 10px;
+  top: 10px; right: 10px;
   z-index: 2;
-  width: 26px;
-  height: 26px;
+  width: 26px; height: 26px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.22);
   border: 1.5px solid rgba(255, 255, 255, 0.4);
@@ -154,16 +138,9 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition:
-    background var(--transition),
-    transform var(--transition),
-    border-color var(--transition);
+  transition: background var(--transition), transform var(--transition), border-color var(--transition);
 }
-.profileEditBtn i {
-  font-size: 11px;
-  color: #ffffff;
-  display: block;
-}
+.profileEditBtn i { font-size: 11px; color: #ffffff; display: block; }
 .profileEditBtn:hover {
   background: rgba(255, 255, 255, 0.38);
   border-color: rgba(255, 255, 255, 0.7);
@@ -180,7 +157,7 @@
 }
 
 .profileAvatar {
-  width: clamp(44px, 5vw, 56px); /* ← smaller */
+  width: clamp(44px, 5vw, 56px);
   height: clamp(44px, 5vw, 56px);
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.2);
@@ -190,14 +167,11 @@
   justify-content: center;
   overflow: hidden;
   margin: 0 auto 4px;
-  font-size: clamp(1.2rem, 2.5vw, 1.8rem); /* ← smaller */
+  font-size: clamp(1.2rem, 2.5vw, 1.8rem);
   color: #ffffff;
 }
 
-.profileInfo {
-  overflow: hidden;
-  width: 100%;
-}
+.profileInfo { overflow: hidden; width: 100%; }
 
 .profileName {
   font-size: clamp(0.82rem, 1.2vw, 0.95rem);
@@ -227,10 +201,8 @@
   z-index: 1;
 }
 
-/* ── Collapsed avatar ── */
 .collapsedAvatar {
-  width: 44px;
-  height: 44px;
+  width: 44px; height: 44px;
   border-radius: 50%;
   background: rgba(230, 81, 0, 0.15);
   border: 2.5px solid rgba(230, 81, 0, 0.3);
@@ -243,31 +215,27 @@
   cursor: pointer;
   transition: background var(--transition);
 }
-.collapsedAvatar:hover {
-  background: rgba(230, 81, 0, 0.2);
-}
+.collapsedAvatar:hover { background: rgba(230, 81, 0, 0.2); }
 
-/* ── Nav section label ── */
 .navSectionLabel {
   font-size: 0.6rem;
   font-weight: 700;
   color: var(--orange);
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  padding: 0 6px 2px; /* ← reduce bottom from 4px */
+  padding: 0 6px 2px;
   opacity: 0.6;
 }
 
-/* ── Nav wrapper ── */
 .sidebarNav {
-  overflow-y: auto; /* ← add scroll if still overflows */
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 2px; /* ← reduce from 4px */
+  gap: 2px;
   background-color: var(--orange-dim);
   border: 1.5px solid var(--orange-border);
   border-radius: 14px;
-  padding: 8px 8px; /* ← reduce from 10px 8px 8px */
+  padding: 8px;
   margin: 0 12px;
   flex-grow: 0;
 }
@@ -282,7 +250,6 @@
   align-items: center;
 }
 
-/* ── Nav item — EXPANDED ── */
 .navItemRow {
   border-radius: 10px;
   border: 1.5px solid var(--orange-mid);
@@ -291,26 +258,19 @@
   display: flex;
   align-items: center;
   gap: 11px;
-  padding: 7px 13px; /* ← reduce from 10px 13px */
-  font-size: clamp(0.78rem, 1vw, 0.92rem); /* ← slightly smaller */
+  padding: 7px 13px;
+  font-size: clamp(0.78rem, 1vw, 0.92rem);
   font-weight: 600;
   color: var(--orange);
-  transition:
-    background var(--transition),
-    border-color var(--transition),
-    transform var(--transition),
-    box-shadow var(--transition);
+  transition: background var(--transition), border-color var(--transition), transform var(--transition), box-shadow var(--transition);
   position: relative;
   overflow: hidden;
   white-space: nowrap;
 }
-
 .navItemRow::before {
   content: "";
   position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
+  left: 0; top: 0; bottom: 0;
   width: 3px;
   background: var(--orange);
   border-radius: 0 3px 3px 0;
@@ -324,12 +284,8 @@
   box-shadow: 0 2px 8px rgba(230, 81, 0, 0.1);
   color: var(--orange-light);
 }
-.navItemRow:hover::before {
-  transform: scaleY(1);
-}
-.navItemRow:hover .navIcon {
-  color: var(--orange-light);
-}
+.navItemRow:hover::before { transform: scaleY(1); }
+.navItemRow:hover .navIcon { color: var(--orange-light); }
 
 .navItemRow.activeNav {
   background-color: var(--orange) !important;
@@ -338,23 +294,16 @@
   box-shadow: 0 4px 12px rgba(230, 81, 0, 0.28) !important;
   transform: none !important;
 }
-.navItemRow.activeNav::before {
-  display: none;
-}
-.navItemRow.activeNav .navIcon {
-  color: #ffffff !important;
-}
+.navItemRow.activeNav::before { display: none; }
+.navItemRow.activeNav .navIcon { color: #ffffff !important; }
 
-/* ── Nav item — COLLAPSED ── */
 .sidebar.collapsed .navItemRow {
-  width: 44px;
-  height: 44px;
+  width: 44px; height: 44px;
   border-radius: 12px;
   border: none;
   background: transparent;
   justify-content: center;
-  padding: 0;
-  gap: 0;
+  padding: 0; gap: 0;
   margin: 0 auto;
   box-shadow: none !important;
 }
@@ -364,9 +313,7 @@
   border: none;
   box-shadow: none !important;
 }
-.sidebar.collapsed .navItemRow::before {
-  display: none;
-}
+.sidebar.collapsed .navItemRow::before { display: none; }
 .sidebar.collapsed .navItemRow.activeNav {
   background-color: var(--orange) !important;
   box-shadow: 0 4px 12px rgba(230, 81, 0, 0.3) !important;
@@ -382,72 +329,151 @@
   transition: color var(--transition);
   display: block;
 }
-.navLabel {
-  flex: 1;
-  font-weight: 600;
-}
-
+.navLabel { flex: 1; font-weight: 600; }
 .navActiveDot {
-  width: 6px;
-  height: 6px;
+  width: 6px; height: 6px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.7);
   margin-left: auto;
   flex-shrink: 0;
 }
 
-/* ── Sign out ── */
-.navItemRow.signOut {
-  color: #e53935;
-  border-color: #ffd0ce;
-}
-.navItemRow.signOut .navIcon {
-  color: #e53935;
-}
-.navItemRow.signOut:hover {
-  background: #fff5f5;
-  border-color: #e53935;
-  color: #c62828;
-}
-.navItemRow.signOut:hover .navIcon {
-  color: #c62828;
-}
-.navItemRow.signOut::before {
-  background: #e53935;
-}
+.navItemRow.signOut { color: #e53935; border-color: #ffd0ce; }
+.navItemRow.signOut .navIcon { color: #e53935; }
+.navItemRow.signOut:hover { background: #fff5f5; border-color: #e53935; color: #c62828; }
+.navItemRow.signOut:hover .navIcon { color: #c62828; }
+.navItemRow.signOut::before { background: #e53935; }
 
-/* ── Dividers ── */
-.navDivider {
-  border: none;
-  border-top: 1px solid var(--orange-mid);
-  margin: 1px 0;
-} /* ← reduce from 2px */
-.navDividerSignout {
-  border: none;
-  border-top: 1px solid var(--orange-mid);
-  margin: 4px 0;
-} /* ← reduce from 6px */
+.navDivider { border: none; border-top: 1px solid var(--orange-mid); margin: 1px 0; }
+.navDividerSignout { border: none; border-top: 1px solid var(--orange-mid); margin: 4px 0; }
 
-/* ── Watermark ── */
 .sidebarWatermark {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 12px 0 16px; /* ← reduce from 20px 0 24px */
+  padding: 12px 0 16px;
   opacity: 0.18;
   margin-top: auto;
   flex-shrink: 0;
 }
-
 .sidebarWatermark img {
   width: clamp(60px, 7vw, 82px);
   height: clamp(60px, 7vw, 82px);
   object-fit: contain;
-  transition:
-    width 0.3s,
-    height 0.3s;
+  transition: width 0.3s, height 0.3s;
 }
 .sidebar.collapsed .sidebarWatermark img {
   width: clamp(30px, 3vw, 40px);
   height: clamp(30px, 3vw, 40px);
+}
+
+/* ════════════════════════════════════
+   MOBILE (≤ 768px)
+   ════════════════════════════════════ */
+@media (max-width: 768px) {
+
+  /* Dim overlay behind drawer */
+  .mobileOverlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.38);
+    z-index: 1030;
+    animation: overlayIn 0.22s ease;
+  }
+  @keyframes overlayIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+
+  /* Drawer sidebar — slides in over the top bar */
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100dvh;
+    width: min(80vw, 300px) !important;
+    max-width: none !important;
+    z-index: 1050;
+    transform: translateX(-105%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow-y: auto;
+    overflow-x: hidden;
+    border-right: none;
+    box-shadow: 8px 0 40px rgba(230, 81, 0, 0.2);
+    align-items: stretch;
+  }
+
+  .sidebar.mobileOpen {
+    transform: translateX(0);
+  }
+
+  /* Collapsed overrides — not used on mobile */
+  .sidebar.collapsed {
+    width: min(80vw, 300px) !important;
+    align-items: stretch;
+    overflow: auto;
+  }
+
+  /* Restore full expanded nav inside drawer */
+  .sidebar.collapsed .sidebarNav {
+    background: var(--orange-dim);
+    border: 1.5px solid var(--orange-border);
+    border-radius: 14px;
+    padding: 8px;
+    margin: 0 12px;
+    align-items: stretch;
+    gap: 2px;
+  }
+  .sidebar.collapsed .navItemRow {
+    width: auto;
+    height: auto;
+    border-radius: 10px;
+    border: 1.5px solid var(--orange-mid);
+    background-color: #ffffff;
+    justify-content: flex-start;
+    padding: 9px 13px;
+    gap: 11px;
+    margin: 0;
+  }
+  .sidebar.collapsed .navItemRow:hover {
+    background-color: #fffaf7;
+    transform: translateX(2px);
+    box-shadow: 0 2px 8px rgba(230, 81, 0, 0.1);
+  }
+  .sidebar.collapsed .navItemRow.activeNav {
+    background-color: var(--orange) !important;
+    box-shadow: 0 4px 12px rgba(230, 81, 0, 0.28) !important;
+    transform: none !important;
+  }
+  .sidebar.collapsed .navItemRow::before { display: block; }
+  .sidebar.collapsed .navItemRow.activeNav::before { display: none; }
+
+  .navLabel { display: block !important; }
+  .navActiveDot { display: flex !important; }
+  .navSectionLabel { display: block !important; }
+  .collapsedAvatar { display: none !important; }
+
+  /* Drawer close (X) button */
+  .drawerClose {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px; height: 30px;
+    border-radius: 8px;
+    background: rgba(230, 81, 0, 0.1);
+    border: none;
+    cursor: pointer;
+    color: var(--orange);
+    font-size: 1rem;
+    margin-left: auto;
+    transition: background var(--transition);
+    flex-shrink: 0;
+  }
+  .drawerClose:hover { background: rgba(230, 81, 0, 0.2); }
+
+  .sidebarWatermark img {
+    width: 58px !important;
+    height: 58px !important;
+  }
 }

@@ -5,12 +5,12 @@ import {
   FaCircleUser,
   FaArrowRightFromBracket,
   FaBars,
-  FaMagnifyingGlass,
+  FaXmark,
 } from "react-icons/fa6";
 import styles from "../../pages/facultyPages/facultyStyles/TopNavbar.module.css";
 import LogoutModal from "../LogoutModal";
 
-export default function TopBar({ notifCount = 0, onMenuClick }) {
+export default function TopBar({ notifCount = 0, onMenuClick, mobileOpen }) {
   const navigate = useNavigate();
   const [showLogout, setShowLogout] = useState(false);
 
@@ -28,13 +28,26 @@ export default function TopBar({ notifCount = 0, onMenuClick }) {
       >
         {/* Left: Hamburger (mobile) + Brand */}
         <div className="d-flex align-items-center gap-3">
-          <FaBars
-            className={`${styles.hamburgerIcon} d-lg-none text-white`}
-            size={22}
-            onClick={onMenuClick}
-            style={{ pointerEvents: "auto", zIndex: 1040 }}
-          />
-          <div className="d-flex flex-column justify-content: center">
+          {mobileOpen ? (
+            <FaXmark
+              className={`${styles.hamburgerIcon} d-lg-none text-white`}
+              size={22}
+              onClick={onMenuClick}
+              style={{ pointerEvents: "auto", zIndex: 1040 }}
+            />
+          ) : (
+            <FaBars
+              className={`${styles.hamburgerIcon} d-lg-none text-white`}
+              size={22}
+              onClick={onMenuClick}
+              style={{ pointerEvents: "auto", zIndex: 1040 }}
+            />
+          )}
+
+          <div
+            className="d-flex flex-column"
+            style={{ justifyContent: "center" }}
+          >
             <span className={styles.brandTitle}>CCS</span>
             <span className={`${styles.brandSub} d-none d-sm-block`}>
               Comprehensive Profiling System
@@ -42,11 +55,8 @@ export default function TopBar({ notifCount = 0, onMenuClick }) {
           </div>
         </div>
 
-        {/* Right: Search + Icons */}
+        {/* Right: Icons */}
         <div className={styles.iconGroup}>
-       
-      
-
           {/* Bell */}
           <div className={styles.notifWrap}>
             <div className={styles.iconBtn}>

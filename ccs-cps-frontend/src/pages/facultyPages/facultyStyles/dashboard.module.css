@@ -44,9 +44,8 @@
   gap: 16px;
 }
 
-
+/* ── Welcome Banner ── */
 .welcomeBanner {
-
   background: linear-gradient(135deg, #7b1a00 0%, #c0390a 50%, #e65100 100%);
   border-radius: var(--radius);
   padding: 24px 28px;
@@ -55,9 +54,8 @@
   overflow: hidden;
   min-height: 150px;
   display: flex;
-  align-items: center;   
+  align-items: center;
 }
-
 
 .welcomeBannerInner {
   display: flex;
@@ -133,6 +131,7 @@
   z-index: 1;
   align-self: flex-start;
   border: 1px solid rgba(255,255,255,0.18);
+  flex-shrink: 0;
 }
 .welcomeStat {
   display: flex;
@@ -562,23 +561,179 @@
 .quickBtn:hover .quickBtnIcon { color: #ffffff; }
 .quickBtnIcon { font-size: 1.1rem; color: var(--orange); transition: color var(--transition); }
 
-/* ── Responsive ── */
+/* ── Skeleton loading ── */
+.skeletonNum {
+  display: inline-block;
+  width: 48px;
+  height: 1.4rem;
+  border-radius: 6px;
+  background: linear-gradient(90deg, #f0e8e0 25%, #e8d8cc 50%, #f0e8e0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.2s infinite;
+}
+.skeletonRows { display: flex; flex-direction: column; gap: 8px; }
+.skeletonRow {
+  height: 44px;
+  border-radius: 10px;
+  background: linear-gradient(90deg, #f0e8e0 25%, #e8d8cc 50%, #f0e8e0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.2s infinite;
+}
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ── Empty state ── */
+.emptyStudents {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 24px;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+.emptyStudents i { font-size: 2rem; opacity: 0.4; }
+
+/* ════════════════════════════════════════
+   RESPONSIVE BREAKPOINTS
+   ════════════════════════════════════════ */
+
+/* ── Large tablet (≤1100px) ── */
 @media (max-width: 1100px) {
   .statRow { grid-template-columns: repeat(2, 1fr); }
 }
+
+/* ── Tablet portrait (≤900px): stack columns ── */
 @media (max-width: 900px) {
-  .dashboardContent { flex-direction: column; }
-  .dashboardRight { width: 100%; flex-direction: row; flex-wrap: wrap; }
+  .dashboardContent {
+    flex-direction: column;
+    padding: 16px 14px;
+  }
+  .dashboardRight {
+    width: 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
   .calendarCard { flex: 1; min-width: 220px; }
   .eventsCard { flex: 1; min-width: 220px; }
   .quickCard { width: 100%; }
   .midRow { grid-template-columns: 1fr; }
 }
+
+/* ── Small phones (≤600px) ── */
 @media (max-width: 600px) {
-  .statRow { grid-template-columns: 1fr 1fr; }
-  .studentTableHead, .studentRow { grid-template-columns: 2fr 1fr 1fr; }
+  .dashboardContent {
+    padding: 12px 10px;
+    gap: 12px;
+  }
+
+  /* Banner: stack text + stats vertically */
+  .welcomeBanner {
+    padding: 18px 16px;
+    min-height: unset;
+  }
+  .welcomeBannerInner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .welcomeCcs {
+    font-size: clamp(1.6rem, 8vw, 2rem);
+  }
+  .welcomeStats {
+    align-self: stretch;
+    justify-content: space-around;
+    padding: 10px 12px;
+  }
+  .welcomeStat {
+    padding: 0;
+  }
+  .welcomeStatNum {
+    font-size: 1.25rem;
+  }
+
+  /* 2-column stat cards on small phones */
+  .statRow {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+  .statCard {
+    padding: 12px 12px;
+    gap: 10px;
+  }
+  .statValue { font-size: 1.2rem; }
+  .statIconWrap { width: 34px; height: 34px; }
+  .statIcon { font-size: 0.95rem; }
+
+  /* Mid row single column */
+  .midRow { grid-template-columns: 1fr; gap: 12px; }
+
+  /* Schedule: hide room, stack time below subject */
+  .scheduleItem { flex-wrap: wrap; gap: 6px; }
+  .scheduleTime { width: 100%; text-align: left; }
+  .scheduleTimeText { display: inline; }
+  .scheduleDay { margin-left: 6px; }
+
+  /* Student table: show only Name + Status */
+  .studentTableHead {
+    grid-template-columns: 1fr auto;
+    padding: 6px 8px;
+  }
   .studentTableHead span:nth-child(2),
   .studentTableHead span:nth-child(3),
+  .studentTableHead span:nth-child(4) {
+    display: none;
+  }
+  .studentRow {
+    grid-template-columns: 1fr auto;
+    padding: 8px 8px;
+  }
   .studentRow span:nth-child(2),
-  .studentRow span:nth-child(3) { display: none; }
+  .studentRow span:nth-child(3),
+  .studentRow span:nth-child(4) {
+    display: none;
+  }
+  .studentName { font-size: 0.74rem; }
+
+  /* Right column items stack vertically on tiny screens */
+  .dashboardRight {
+    flex-direction: column;
+  }
+  .calendarCard { min-width: unset; }
+  .eventsCard { min-width: unset; }
+
+  /* Quick actions: 4 buttons in a row on small */
+  .quickGrid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+  }
+  .quickBtn {
+    padding: 10px 4px;
+    font-size: 0.58rem;
+    gap: 4px;
+  }
+  .quickBtnIcon { font-size: 1rem; }
+
+  /* Cards */
+  .dashboardCard { padding: 14px 12px; }
+  .cardTitle { font-size: 0.82rem; }
+}
+
+/* ── Very small phones (≤380px) ── */
+@media (max-width: 380px) {
+  .statRow { grid-template-columns: 1fr 1fr; gap: 6px; }
+  .statCard { padding: 10px 10px; gap: 8px; }
+  .statValue { font-size: 1.1rem; }
+  .statLabel { font-size: 0.6rem; }
+  .statSub { display: none; }
+
+  .welcomeStatNum { font-size: 1.1rem; }
+  .welcomeStatLbl { font-size: 0.55rem; }
+
+  /* Collapse quick actions to 2x2 */
+  .quickGrid { grid-template-columns: repeat(2, 1fr); }
+
+  .announcementTitle { font-size: 0.72rem; }
 }
