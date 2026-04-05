@@ -1,14 +1,12 @@
-/* ── Top bar shell ── */
 .topNav {
   background-color: #e65100;
   min-height: clamp(50px, 7vw, 65px);
   flex-shrink: 0;
-   position: sticky;
+  position: sticky;
   top: 0;
   z-index: 1000;
 }
 
-/* ── Brand title ── */
 .brandTitle {
   font-family: "Gabarito", sans-serif;
   font-size: clamp(1.5rem, 2.8vw, 2.2rem);
@@ -19,7 +17,6 @@
   margin: 0;
 }
 
-/* ── Brand subtitle ── */
 .brandSub {
   font-family: "Gabarito", sans-serif;
   font-size: clamp(0.55rem, 0.9vw, 0.72rem);
@@ -30,10 +27,9 @@
   margin: 0;
 }
 
-/* ── Action icons ── */
 .actionIcon {
   font-size: clamp(1.15rem, 2vw, 1.5rem);
-  color: #ffffff !important;  /* ✅ Force white */
+  color: #ffffff !important;
   cursor: pointer !important;
   pointer-events: auto !important;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
@@ -45,7 +41,7 @@
 .actionIcon:hover {
   opacity: 0.9 !important;
   transform: scale(1.08) !important;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)) !important;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3)) !important;
 }
 
 .actionIcon:active {
@@ -61,53 +57,25 @@
   border-radius: 50%;
   transition: all 0.2s ease;
   pointer-events: auto !important;
+  cursor: pointer;
 }
 
-.iconBtn:hover {
-  background: rgba(255,255,255,0.15) !important;
+.iconBtn:hover,
+.iconBtnActive {
+  background: rgba(255, 255, 255, 0.15) !important;
 }
 
-/* ── Notification bell wrapper ── */
-.notifWrap {
-  position: relative;
-  display: inline-flex;
-}
-
-/* ── Notification count badge ── */
-.notifBadge {
-  font-family: "Gabarito", sans-serif;
-  font-size: 0.5rem;
-  font-weight: 700;
-  color: #e65100;
-  background-color: #ffffff;
-  border-radius: 999px;
-  padding: 1px 5px;
-  line-height: 1.4;
-  position: absolute;
-  top: -5px;
-  right: -8px;
-}
-
-/* ── Right icon group spacing ── */
 .iconGroup {
   display: flex;
   align-items: center;
   gap: clamp(10px, 2vw, 30px);
 }
 
-
-
-/* ══════════════════════════════════════════
-   NEW — Profile trigger + dropdown
-   ══════════════════════════════════════════ */
-
-/* Wrapper that holds trigger + dropdown together */
 .profileWrap {
   position: relative;
   display: inline-flex;
 }
 
-/* Clickable profile area: avatar icon + chevron */
 .profileTrigger {
   display: flex;
   align-items: center;
@@ -115,7 +83,6 @@
   cursor: pointer;
 }
 
-/* Avatar image (when provided) */
 .profileAvatarImg {
   width: clamp(26px, 2.4vw, 32px);
   height: clamp(26px, 2.4vw, 32px);
@@ -124,7 +91,6 @@
   border: 2px solid rgba(255, 255, 255, 0.7);
 }
 
-/* Chevron arrow next to avatar */
 .chevron {
   font-size: 0.6rem;
   color: rgba(255, 255, 255, 0.85);
@@ -136,7 +102,6 @@
   transform: rotate(180deg);
 }
 
-/* ── Dropdown panel ── */
 .dropdown {
   position: absolute;
   top: calc(100% + 12px);
@@ -152,11 +117,17 @@
 }
 
 @keyframes dropIn {
-  from { opacity: 0; transform: translateY(-6px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-/* Header: avatar + name + id */
 .dropdownHeader {
   display: flex;
   align-items: center;
@@ -198,14 +169,12 @@
   margin: 0;
 }
 
-/* Divider */
 .dropdownDivider {
   border: none;
   border-top: 1px solid #f5e8e0;
   margin: 0;
 }
 
-/* Meta rows: Type, Status, Year, Section */
 .dropdownMeta {
   padding: 10px 14px;
   display: flex;
@@ -233,7 +202,6 @@
   color: #444;
 }
 
-/* Action rows: View Profile, Sign Out */
 .dropdownAction {
   display: flex;
   align-items: center;
@@ -265,7 +233,6 @@
   flex-shrink: 0;
 }
 
-/* MOBILE  */
 .hamburgerIcon {
   cursor: pointer !important;
   pointer-events: auto !important;
@@ -275,4 +242,221 @@
 
 .hamburgerIcon:hover {
   transform: scale(1.1);
+}
+
+.notifWrap {
+  position: relative;
+  display: inline-flex;
+}
+
+.notifBadge {
+  font-family: "Gabarito", sans-serif;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #e65100;
+  background-color: #ffffff;
+  border-radius: 999px;
+  padding: 2px 5px;
+  line-height: 1;
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.notifDropdown {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: -50px;
+  width: 440px;
+  background: #ffffff;
+  border: 1px solid #EDD8CA;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(230, 81, 0, 0.15);
+  z-index: 500;
+  overflow: hidden;
+  animation: dropIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+  display: flex;
+  flex-direction: column;
+}
+
+.notifHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  background: #FAFAFA;
+  border-bottom: 1px dashed #EDD8CA;
+}
+
+.notifHeaderTitle {
+  font-family: "Gabarito", sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #2D1F15;
+}
+
+.notifMarkRead {
+  font-family: "Gabarito", sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #E65100;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.notifMarkRead:hover {
+  opacity: 0.7;
+  text-decoration: underline;
+}
+
+.notifList {
+  display: flex;
+  flex-direction: column;
+  max-height: 320px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #FFB74D transparent;
+}
+
+.notifList::-webkit-scrollbar {
+  width: 6px;
+}
+
+.notifList::-webkit-scrollbar-thumb {
+  background-color: #FFB74D;
+  border-radius: 4px;
+}
+
+.notifItem {
+  padding: 12px;
+  border-bottom: 1px dashed #EDD8CA;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.notifItem:last-child {
+  border-bottom: none;
+}
+
+.notifItem:hover {
+  background-color: #FFFAF8;
+}
+
+.unreadBg {
+  background-color: #FFF3E0;
+}
+
+.unreadBg:hover {
+  background-color: #FFE8CC;
+}
+
+.notifIconWrap {
+  background-color: #FFFFFF;
+  color: #E65100;
+  border: 1px solid #FFB74D;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.unreadBg .notifIconWrap {
+  background-color: #FFB74D;
+  color: #FFFFFF;
+  border-color: #FFB74D;
+}
+
+.notifContent {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.notifItemHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 4px;
+}
+
+.notifItemTitle {
+  font-family: "Gabarito", sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #2D1F15;
+  line-height: 1.2;
+}
+
+.unreadDot {
+  margin-top: 4px;
+  flex-shrink: 0;
+}
+
+.notifItemMsg {
+  font-family: "Gabarito", sans-serif;
+  font-size: 0.85rem;
+  color: #7A4F35;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.notifTime {
+  font-family: "Gabarito", sans-serif;
+  font-size: 0.75rem;
+  color: #B07050;
+  margin-top: 6px;
+  font-weight: 500;
+}
+
+.emptyNotif {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+  gap: 12px;
+}
+
+.emptyNotifIcon {
+  color: #EDD8CA;
+}
+
+.emptyNotifText {
+  font-family: "Gabarito", sans-serif;
+  font-size: 0.9rem;
+  color: #B07050;
+  font-weight: 500;
+}
+
+.notifFooter {
+  padding: 14px;
+  text-align: center;
+  font-family: "Gabarito", sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #E65100;
+  background: #FFFFFF;
+  border-top: 1px dashed #EDD8CA;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.notifFooter:hover {
+  background-color: #FFF3E0;
+}
+
+@media (max-width: 480px) {
+  .notifDropdown {
+    width: 290px;
+    right: -70px;
+  }
 }

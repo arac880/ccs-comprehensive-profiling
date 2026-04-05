@@ -2,14 +2,12 @@
 
 :root {
   --orange:       #E65100;
-  --orange-light: #FF6D00;
   --orange-pale:  #FFF3E0;
   --orange-muted: #FFB74D;
   --cream:        #FDF6F0;
   --white:        #FFFFFF;
-  --warm-gray:    #F5EDE5;
   --border:       #EDD8CA;
-  --shadow:       rgba(230, 81, 0, 0.10);
+  --shadow:       rgba(230, 81, 0, 0.06);
   --text-dark:    #2D1F15;
   --text-mid:     #7A4F35;
   --text-muted:   #B07050;
@@ -25,7 +23,7 @@
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 24px;
 }
 
 @keyframes fadeUp {
@@ -68,13 +66,6 @@
   font-family: var(--font-ui);
 }
 
-.headerControls {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
 .headerNote {
   font-family: var(--font-ui);
   font-size: 0.85rem;
@@ -86,410 +77,347 @@
   border: 1px dashed var(--orange-muted);
 }
 
-/* ── Legend ── */
-.legendWrap {
-  display: flex;
-  align-items: center;
-  gap: 14px;
+/* ── Main Agenda Widget ── */
+.agendaWidget {
   background: var(--white);
-  padding: 6px 14px;
-  border-radius: 8px;
-  border: 1px dashed var(--border);
-  height: 100%;
-  flex-wrap: wrap;
-}
-
-.legendItem {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-family: var(--font-ui);
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--text-mid);
-}
-
-.legendColorDot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  display: inline-block;
-}
-
-.legendDivider {
-  width: 1px;
-  height: 16px;
-  background-color: var(--border);
-  margin: 0 4px;
-}
-
-.legendLecBox, .legendLabBox {
-  font-size: 0.65rem;
-  font-weight: 700;
-  padding: 2px 6px;
-  border-radius: 4px;
-  letter-spacing: 0.05em;
-}
-
-.legendLecBox {
-  background-color: #E3F2FD;
-  border: 1px solid #90CAF9;
-  color: #1976D2;
-}
-
-.legendLabBox {
-  background-color: var(--white);
-  border: 1px dashed var(--text-muted);
-  color: var(--text-mid);
-}
-
-/* ── Calendar Table Wrapper (Responsive) ── */
-.calendarOuterLayer {
-  background: var(--white);
-  border-radius: var(--radius-md);
+  border-radius: 16px;
   border: 1px solid var(--border);
   box-shadow: 0 4px 20px var(--shadow);
-  overflow: hidden;
-  width: 100%;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
-/* The element that actually scrolls horizontally */
-.calendarScrollArea {
+/* ── Interactive Day Picker ── */
+.dayNavScroll {
   width: 100%;
   overflow-x: auto;
-  overflow-y: hidden;
-  scrollbar-width: thin;
-  scrollbar-color: var(--orange-muted) var(--orange-pale);
-  -webkit-overflow-scrolling: touch; 
+  border-bottom: 1px dashed var(--border);
+  background-color: #FAFAFA;
+  scrollbar-width: none; /* Hide scrollbar for cleaner look */
+}
+.dayNavScroll::-webkit-scrollbar {
+  display: none;
 }
 
-.calendarScrollArea::-webkit-scrollbar {
-  height: 8px;
+.dayNav {
+  display: flex;
+  padding: 16px 20px;
+  gap: 12px;
+  min-width: max-content;
 }
-.calendarScrollArea::-webkit-scrollbar-track {
+
+.dayBtn {
+  background: var(--white);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 10px 24px;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dayBtn:hover {
   background: var(--orange-pale);
-}
-.calendarScrollArea::-webkit-scrollbar-thumb {
-  background-color: var(--orange-muted);
-  border-radius: 4px;
+  color: var(--orange);
+  border-color: var(--orange-muted);
 }
 
-/* Ensures the table doesn't squish below 900px on desktop/tablets */
-.calendarTable {
+.activeDayBtn {
+  background: var(--orange) !important;
+  color: var(--white) !important;
+  border-color: var(--orange) !important;
+  box-shadow: 0 4px 12px rgba(230, 81, 0, 0.2);
+}
+
+.dayNameShort {
+  display: none; /* Hidden on desktop */
+}
+
+.classIndicatorDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--orange-muted);
+}
+
+.activeDayBtn .classIndicatorDot {
+  background-color: var(--white);
+}
+
+/* ── Timeline Layout ── */
+.agendaContent {
+  padding: 32px;
+  background-color: var(--white);
+  min-height: 400px;
+}
+
+.timeline {
   display: flex;
   flex-direction: column;
-  min-width: 900px; 
-  width: 100%;
 }
 
-/* ── Sticky Header ── */
-.calendarHeader {
-  display: grid;
-  grid-template-columns: 110px repeat(7, 1fr);
-  background-color: var(--orange-light);
-  color: var(--white);
-  text-align: center;
-  position: sticky;
-  top: 0;
-  z-index: 20;
-  border-bottom: 2px solid var(--border);
+.timelineRow {
+  display: flex;
+  min-height: 120px;
 }
 
-.timeHeaderBlock {
-  padding: 14px 0;
-  border-right: 1px dashed var(--border);
+/* Left Time Column */
+.timeTrack {
+  width: 100px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  padding-right: 20px;
+  padding-top: 16px;
+  flex-shrink: 0;
+}
+
+.timeStart {
   font-family: var(--font-display);
+  font-size: 1.05rem;
+  color: var(--text-dark);
+  line-height: 1;
+}
+
+.timeEnd {
+  font-family: var(--font-ui);
   font-size: 0.85rem;
-  letter-spacing: 0.06em;
-  background-color: var(--orange-light);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: sticky;
-  left: 0;
-  z-index: 21; /* Keeps top-left corner locked in place while scrolling */
-}
-
-.dayHeaderBlock {
-  padding: 14px 8px;
-  border-right: 1px dashed var(--border);
-  font-family: var(--font-ui);
-  font-size: 0.9rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.dayHeaderBlock:last-child {
-  border-right: none;
-}
-
-.dayHeaderToday {
-  background-color: var(--orange);
-  color: var(--white);
-}
-
-/* ── Grid Body ── */
-.calendarBody {
-  display: grid;
-  grid-template-columns: 110px repeat(7, 1fr);
-  position: relative;
-}
-
-/* ── Sticky Time Column ── */
-.timeColumn {
-  border-right: 1px dashed var(--border);
-  background-color: #FAFAFA;
-  text-align: center;
-  position: sticky;
-  left: 0; /* Keeps time column locked in place while scrolling */
-  z-index: 8;
-}
-
-.periodDivider {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 7px;
-  color: var(--orange);
-  font-size: 0.65rem;
-  font-weight: 700;
-  font-family: var(--font-ui);
-  letter-spacing: 0.12em;
-  height: 36px;
-  background-color: var(--orange-pale);
-  border-bottom: 1px dashed var(--border);
-  border-top: 1px dashed var(--border);
-  box-sizing: border-box;
-}
-
-.periodLine {
-  height: 1.5px;
-  width: 14px;
-  background-color: var(--orange-muted);
-  border-radius: 2px;
-}
-
-.timeText {
-  height: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.75rem;
   color: var(--text-muted);
   font-weight: 600;
-  font-family: var(--font-ui);
-  box-sizing: border-box;
+  margin-top: 4px;
 }
 
-/* ── Day Columns ── */
-.dayColumn {
-  border-right: 1px dashed var(--border);
+/* Center Line & Node */
+.nodeTrack {
+  width: 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   position: relative;
+  flex-shrink: 0;
 }
 
-.dayColumn:last-child {
-  border-right: none;
-}
-
-.dayColumnToday {
-  background-color: #FFFAF8;
-}
-
-.periodSpacer {
-  height: 36px;
-  background-color: #FAFAFA;
-  width: 100%;
-  border-bottom: 1px dashed var(--border);
-  border-top: 1px dashed var(--border);
-  box-sizing: border-box;
-}
-
-.gridLine {
-  height: 30px;
-  border-bottom: 1px dashed var(--border);
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.gridLineAlt {
-  background-color: rgba(253, 246, 240, 0.3);
-}
-
-/* ── Modern Translucent Class Cards ── */
-.classCard {
+.nodeLine {
   position: absolute;
-  left: 6px;
-  right: 6px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: repeating-linear-gradient(
+    to bottom,
+    var(--border),
+    var(--border) 6px,
+    transparent 6px,
+    transparent 12px
+  );
+}
+
+.timelineRow:last-child .nodeLine {
+  bottom: 50%; /* Stops the line at the last node */
+}
+
+.nodeDot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background-color: var(--white);
+  border: 4px solid var(--orange);
+  margin-top: 18px;
+  z-index: 2;
+}
+
+/* Right Card Column */
+.cardTrack {
+  flex: 1;
+  padding-left: 24px;
+  padding-bottom: 24px;
+}
+
+/* ── Modern Agenda Cards ── */
+.agendaCard {
+  border-radius: 12px;
+  padding: 20px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  padding: 10px 12px;
-  z-index: 5;
-  border-radius: 8px;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
-  cursor: pointer;
-  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.02);
 }
 
-.classCard:hover {
-  transform: translateY(-2px) scale(1.02);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
-  z-index: 15;
+.agendaCard:hover {
+  transform: translateX(4px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.06);
 }
 
-.cardTop {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-}
-
-.courseHeaderRow {
+.cardHeaderRow {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  width: 100%;
-  margin-bottom: 4px;
+  align-items: center;
+  margin-bottom: 8px;
 }
 
 .courseCode {
   font-family: var(--font-display);
-  font-size: 1rem;
+  font-size: 1.15rem;
   letter-spacing: 0.02em;
 }
 
-.courseName {
+.courseTitle {
   font-family: var(--font-ui);
-  font-size: 0.8rem;
-  line-height: 1.2;
-  font-weight: 600;
+  font-size: 1rem;
+  font-weight: 700;
   color: var(--text-dark);
+  margin: 0 0 16px 0;
 }
 
-.cardBottom {
+.cardMetaRow {
   display: flex;
-  flex-direction: column;
-  width: 100%;
-  gap: 4px;
-  padding-top: 8px;
-  margin-top: 8px;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  padding-top: 14px;
   border-top: 1px dashed rgba(0, 0, 0, 0.1);
 }
 
-.courseDetails {
+.metaItem {
   font-family: var(--font-ui);
-  font-size: 0.75rem;
-  line-height: 1;
+  font-size: 0.85rem;
   font-weight: 600;
   color: var(--text-mid);
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
 }
 
 .tagLec, .tagLab {
   font-family: var(--font-ui);
-  font-size: 0.65rem;
+  font-size: 0.75rem;
   font-weight: 700;
-  padding: 2px 6px;
-  border-radius: 4px;
+  padding: 4px 10px;
+  border-radius: 6px;
   letter-spacing: 0.05em;
   border: 1px solid transparent;
 }
+.tagLab { border-style: dashed; }
 
-.tagLab {
-  border-style: dashed;
+/* ── Beautiful Empty State ── */
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px 20px;
+  height: 100%;
+}
+
+.emptyIconWrap {
+  width: 80px;
+  height: 80px;
+  background-color: var(--orange-pale);
+  color: var(--orange-muted);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.emptyTitle {
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+  color: var(--text-mid);
+  margin: 0 0 8px 0;
+}
+
+.emptyText {
+  font-family: var(--font-ui);
+  font-size: 1.1rem;
+  color: var(--text-muted);
+  max-width: 400px;
+  line-height: 1.5;
+  margin: 0;
 }
 
 /* ══════════════════════════════════════════════
-   MOBILE RESPONSIVE ADJUSTMENTS
+   MOBILE RESPONSIVENESS
    ══════════════════════════════════════════════ */
 
-@media (max-width: 992px) {
-  .legendWrap {
-    display: none; 
-  }
-}
-
 @media (max-width: 768px) {
-  .scheduleContainer {
-    gap: 16px;
-  }
-
   .pageHeader {
     flex-direction: column;
     align-items: flex-start;
     gap: 12px;
   }
-
+  
   .headerControls {
     width: 100%;
-    justify-content: space-between;
+  }
+  
+  .agendaContent {
+    padding: 20px 16px;
+  }
+  
+  /* Switch from Timeline to Stacked Cards on Mobile */
+  .timelineRow {
+    flex-direction: column;
+    margin-bottom: 20px;
+    min-height: auto;
   }
 
-  /* Reduce minimum width slightly for smaller mobile devices,
-     so the cards aren't unnecessarily wide while scrolling */
-  .calendarTable {
-    min-width: 750px; 
+  .timeTrack {
+    width: 100%;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 12px;
+    padding: 0 0 12px 0;
   }
 
-  /* Shrink the grid column widths for mobile */
-  .calendarHeader {
-    grid-template-columns: 75px repeat(7, 1fr);
+  .timeStart {
+    font-size: 1.1rem;
   }
 
-  .calendarBody {
-    grid-template-columns: 75px repeat(7, 1fr);
+  .timeEnd {
+    margin-top: 0;
+    font-size: 0.95rem;
   }
 
-  .timeHeaderBlock {
-    font-size: 0.75rem;
+  .nodeTrack {
+    display: none; /* Hide the timeline line on mobile */
   }
 
-  .dayHeaderBlock {
-    font-size: 0.8rem;
-    padding: 10px 4px;
+  .cardTrack {
+    padding-left: 0;
+    padding-bottom: 0;
   }
 
-  .timeText {
-    font-size: 0.7rem;
+  .agendaCard {
+    padding: 16px;
   }
 
-  .periodDivider {
-    font-size: 0.55rem;
+  .cardMetaRow {
+    gap: 12px;
+    flex-direction: column;
+    align-items: flex-start;
   }
 
-  /* Adjust padding and font sizes inside cards to fit tighter columns */
-  .classCard {
-    padding: 6px 8px;
-    left: 4px;
-    right: 4px;
+  /* Shrink Day Buttons */
+  .dayNav {
+    padding: 12px 16px;
+    gap: 8px;
   }
 
-  .courseCode {
-    font-size: 0.85rem;
+  .dayBtn {
+    padding: 8px 16px;
+    font-size: 0.9rem;
   }
 
-  .courseName {
-    font-size: 0.7rem;
-  }
-
-  .courseDetails {
-    font-size: 0.65rem;
-  }
-
-  .tagLec, .tagLab {
-    font-size: 0.55rem;
-    padding: 2px 4px;
-  }
-}
-
-@media (max-width: 480px) {
-  .calendarOuterLayer {
-    border-radius: var(--radius-sm);
-  }
+  .dayNameFull { display: none; }
+  .dayNameShort { display: block; }
 }

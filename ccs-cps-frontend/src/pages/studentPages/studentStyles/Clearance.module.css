@@ -78,14 +78,14 @@
   background: #FFF3E0; 
   padding: 8px 16px;
   border-radius: 20px;
-  border: 1px dashed var(--orange-muted); 
+  border: 1px dashed var(--text-soft); 
 }
 
 /* ── Main Status Banner ── */
 .statusBanner {
   display: flex;
   justify-content: center; 
-  background-color: #fff7ea; 
+  background-color: #FFF3E0; 
   border: 1px dashed #ff944d;
   border-radius: 16px;
   padding: 24px 32px;
@@ -111,6 +111,7 @@
   color: #E65100; 
   font-family: "Freeman", sans-serif;
   font-size: 1.6rem;
+  font-weight: 600;
   letter-spacing: 0.02em;
   line-height: 1;
   text-transform: uppercase;
@@ -289,7 +290,7 @@
   color: #e25e1c;
   background: #fcf0ea;
   padding: 4px 12px;
-  border-radius: 10px;
+  border-radius: 20px;
   border: 1px solid #e25e1cb4;
 }
 
@@ -311,6 +312,7 @@
   margin: 0 0 6px 0;
   font-family: "Freeman", sans-serif;
   font-size: 1.4rem;
+  font-weight: 600;
   letter-spacing: 0.02em;
 }
 
@@ -319,6 +321,8 @@
   margin: 0 0 6px 0;
   font-family: "Freeman", sans-serif;
   font-size: 1.4rem;
+    font-weight: 600;
+
   letter-spacing: 0.02em;
 }
 
