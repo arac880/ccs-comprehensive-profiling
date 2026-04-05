@@ -32,12 +32,7 @@ const navItems = [
     icon: "bi-calendar-event",
     path: "/faculty/events",
   },
-  {
-    name: "SignOut",
-    label: "Sign Out",
-    icon: "bi-arrow-left-circle",
-    path: "/login",
-  },
+
 ];
 
 export default function SidebarNav({ activeNav = "Dashboard", onNavigate }) {

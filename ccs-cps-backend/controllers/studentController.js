@@ -92,6 +92,33 @@ const updateStudent = async (req, res) => {
   }
 };
 
+// ── NEW: Delete student ──────────────────────────────────────
+const deleteStudent = async (req, res) => {
+  try {
+    const db = getDB();
+    const { id } = req.params;
+
+    if (!ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid student ID format" });
+    }
+
+    const result = await db
+      .collection("students")
+      .deleteOne({ _id: new ObjectId(id) });
+
+    if (result.deletedCount === 0) {
+      return res.status(404).json({ message: "Student not found" });
+    }
+
+    res.status(200).json({ message: "Student deleted successfully" });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Failed to delete student", error: error.message });
+  }
+};
+// ─────────────────────────────────────────────────────────────
+
 const addViolation = async (req, res) => {
   try {
     const db = getDB();
@@ -210,6 +237,7 @@ module.exports = {
   addStudent,
   getStudentById,
   updateStudent,
+  deleteStudent,
   addViolation,
   deleteViolation,
   changePassword,
