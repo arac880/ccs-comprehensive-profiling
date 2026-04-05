@@ -25,7 +25,7 @@ import StudentSchedule from "./pages/studentPages/studentSchedule";
 import StudentEvents from "./pages/studentPages/studentEvents";
 import StudentClearance from "./pages/studentPages/studentClearance";
 import CollegeResearch from "./pages/studentPages/collegeResearch";
-import StudentProfile from "./pages/studentPages/studentProfile";
+import StudentProfile from "./pages/studentPages/StudentProfile";
 
 function App() {
   return (
@@ -47,7 +47,7 @@ function App() {
         >
           {/* Automatically goes to dashboard if user just hits /faculty */}
           <Route index element={<Navigate to="dashboard" replace />} />
-          
+
           <Route path="dashboard" element={<FacultyDashboard />} />
           <Route path="student-list" element={<FacultyStudentList />} />
           <Route path="schedule" element={<FacultySchedule />} />
@@ -68,7 +68,7 @@ function App() {
         >
           {/* Automatically goes to dashboard if user just hits /student */}
           <Route index element={<Navigate to="dashboard" replace />} />
-          
+
           <Route path="dashboard" element={<StudentDashboard />} />
           <Route path="schedule" element={<StudentSchedule />} />
           <Route path="events" element={<StudentEvents />} />
