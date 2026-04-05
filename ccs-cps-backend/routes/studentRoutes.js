@@ -5,6 +5,7 @@ const {
   addStudent,
   getStudentById,
   updateStudent,
+  deleteStudent, // ✅ added
   addViolation,
   deleteViolation,
 } = require("../controllers/studentController");
@@ -20,6 +21,9 @@ router.get("/:id", getStudentById);
 
 // PUT    /api/students/:id                   → update student profile fields
 router.put("/:id", updateStudent);
+
+// DELETE /api/students/:id                   → delete a student
+router.delete("/:id", deleteStudent);
 
 // POST   /api/students/:id/violations        → add a violation
 router.post("/:id/violations", addViolation);

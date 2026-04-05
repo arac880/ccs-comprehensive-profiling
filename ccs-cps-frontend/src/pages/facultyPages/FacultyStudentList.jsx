@@ -41,7 +41,9 @@ const FacultyStudentList = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 10;
-  const [deleteTarget, setDeleteTarget] = useState(null);
+
+  // deleteTarget now stores the raw MongoDB _id string
+  const [deleteTarget, setDeleteTarget] = useState(null); // { _id, name }
 
   const fetchStudents = async () => {
     try {
@@ -75,17 +77,23 @@ const FacultyStudentList = () => {
 
   const handleDeleteClick = (e, student) => {
     e.stopPropagation();
-    setDeleteTarget({ id: student.id, name: student.name });
+    // ✅ Store the raw _id (not the formatted displayId)
+    setDeleteTarget({ _id: student._id, name: student.name });
   };
 
   const handleDeleteConfirm = async () => {
     if (!deleteTarget) return;
     try {
+      // ✅ Use _id directly in the URL
       const response = await fetch(
-        `http://localhost:5000/api/students/${deleteTarget.id}`,
+        `http://localhost:5000/api/students/${deleteTarget._id}`,
         { method: "DELETE" },
       );
-      if (!response.ok) throw new Error("Failed to delete student");
+      if (!response.ok) {
+        const errText = await response.text();
+        console.error("Delete failed:", response.status, errText);
+        throw new Error("Failed to delete student");
+      }
       setDeleteTarget(null);
       fetchStudents();
     } catch (error) {
@@ -93,8 +101,10 @@ const FacultyStudentList = () => {
     }
   };
 
+  // ✅ Keep raw _id alongside formatted fields
   const formattedStudents = students.map((s) => ({
-    id: s._id,
+    _id: s._id, // raw MongoDB _id — used for delete & navigate
+    id: s._id, // keep for backwards compat
     studentId: s.studentId,
     displayId: s.studentId ? s.studentId.slice(-7).toUpperCase() : "—",
     name: `${s.firstName || ""} ${s.lastName || ""}`.trim(),
@@ -270,9 +280,8 @@ const FacultyStudentList = () => {
           </div>
         </div>
 
-        {/* ── Filter Rows ── */}
+        {/* ── Filter Section ── */}
         <div className={styles.filterSection}>
-          {/* Type */}
           <div className={styles.filterGroup}>
             <span className={styles.filterGroupLabel}>Type</span>
             <div className={styles.filterRow}>
@@ -287,10 +296,7 @@ const FacultyStudentList = () => {
               ))}
             </div>
           </div>
-
           <div className={styles.filterDivider} />
-
-          {/* Status */}
           <div className={styles.filterGroup}>
             <span className={styles.filterGroupLabel}>Status</span>
             <div className={styles.filterRow}>
@@ -305,10 +311,7 @@ const FacultyStudentList = () => {
               ))}
             </div>
           </div>
-
           <div className={styles.filterDivider} />
-
-          {/* Skills */}
           <div className={styles.filterGroup}>
             <span className={styles.filterGroupLabel}>Skill</span>
             <select
@@ -339,10 +342,7 @@ const FacultyStudentList = () => {
               ))}
             </select>
           </div>
-
           <div className={styles.filterDivider} />
-
-          {/* Activities */}
           <div className={styles.filterGroup}>
             <span className={styles.filterGroupLabel}>Activity</span>
             <select
@@ -373,8 +373,6 @@ const FacultyStudentList = () => {
               ))}
             </select>
           </div>
-
-          {/* Clear all */}
           {hasActiveFilters && (
             <button
               className={styles.clearAllBtn}
@@ -419,9 +417,9 @@ const FacultyStudentList = () => {
                 ) : (
                   paginated.map((s) => (
                     <tr
-                      key={s.id}
+                      key={s._id}
                       className={styles.hoverRow}
-                      onClick={() => navigate(`/faculty/student/${s.id}`)}
+                      onClick={() => navigate(`/faculty/student/${s._id}`)}
                     >
                       <td>
                         <div className={styles.studentCell}>
@@ -454,17 +452,18 @@ const FacultyStudentList = () => {
                             className={styles.viewBtn}
                             onClick={(e) => {
                               e.stopPropagation();
-                              navigate(`/faculty/student/${s.id}`);
+                              navigate(`/faculty/student/${s._id}`);
                             }}
                           >
                             View <FiArrowRight size={13} />
                           </button>
+                          {/* ✅ Pass full student object so _id is available */}
                           <button
                             className={styles.deleteBtn}
                             onClick={(e) => handleDeleteClick(e, s)}
                             title="Delete student"
                           >
-                            <FiTrash2 size={13} />
+                            <FiTrash2 size={16} />
                           </button>
                         </div>
                       </td>
@@ -523,6 +522,7 @@ const FacultyStudentList = () => {
           fetchStudents();
         }}
       />
+      {/* ✅ Pass _id-based name to modal */}
       <ConfirmationModal
         isOpen={!!deleteTarget}
         studentName={deleteTarget?.name}
