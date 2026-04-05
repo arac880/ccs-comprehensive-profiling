@@ -77,23 +77,32 @@ const FacultyStudentList = () => {
 
   const handleDeleteClick = (e, student) => {
     e.stopPropagation();
-    // ✅ Store the raw _id (not the formatted displayId)
     setDeleteTarget({ _id: student._id, name: student.name });
   };
 
   const handleDeleteConfirm = async () => {
     if (!deleteTarget) return;
     try {
-      // ✅ Use _id directly in the URL
       const response = await fetch(
         `http://localhost:5000/api/students/${deleteTarget._id}`,
-        { method: "DELETE" },
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            isDeleted: true,
+            deletedAt: new Date().toISOString(),
+          }),
+        },
       );
+
       if (!response.ok) {
         const errText = await response.text();
         console.error("Delete failed:", response.status, errText);
         throw new Error("Failed to delete student");
       }
+
       setDeleteTarget(null);
       fetchStudents();
     } catch (error) {

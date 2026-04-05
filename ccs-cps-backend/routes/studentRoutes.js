@@ -24,7 +24,7 @@ router.get("/:id", getStudentById);
 router.put("/:id", updateStudent);
 
 // DELETE /api/students/:id                   → delete a student
-router.delete("/:id", deleteStudent);
+router.patch("/:id", deleteStudent);
 
 // POST   /api/students/:id/violations        → add a violation
 router.post("/:id/violations", addViolation);

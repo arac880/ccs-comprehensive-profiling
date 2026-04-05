@@ -72,6 +72,14 @@ const AddStudentModal = ({ isOpen, onClose }) => {
       nextValue = value.replace(/[0-9]/g, "");
     }
 
+    // Restriction: Student ID - 7 characters max and numbers only
+    if (name === "studentId") {
+      // Remove any non-numeric characters and slice to 7
+      const numericValue = value.replace(/[^0-9]/g, "");
+      if (numericValue.length > 7) return;
+      nextValue = numericValue;
+    }
+
     // Restriction: Only allow numbers in Phone
     if (name === "phone") {
       nextValue = value.replace(/[^0-9]/g, "");
@@ -587,14 +595,46 @@ const AddStudentModal = ({ isOpen, onClose }) => {
                   />
                   Phone Number <RequiredMark />
                 </label>
-                <input
-                  type="tel"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  placeholder="e.g. 09123456789"
-                  style={{ borderColor: errors.phone ? "#dc3545" : "" }}
-                />
+
+                {/* Wrap prefix and input together */}
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    border: `1px solid ${errors.phone ? "#dc3545" : "#ccc"}`,
+                    borderRadius: "4px",
+                    overflow: "hidden",
+                  }}
+                >
+                  <span
+                    style={{
+                      padding: "0 10px",
+                      backgroundColor: "#f8f9fa",
+                      borderRight: "1px solid #ccc",
+                      color: "#555",
+                      height: "100%",
+                      display: "flex",
+                      alignItems: "center",
+                      userSelect: "none",
+                    }}
+                  >
+                    +63
+                  </span>
+                  <input
+                    type="tel"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    placeholder="912 345 6789"
+                    maxLength={10} // Limits user to the 10 digits after +63
+                    style={{
+                      border: "none", // Remove border from input since container has it
+                      outline: "none",
+                      flex: 1,
+                      padding: "8px",
+                    }}
+                  />
+                </div>
                 <ErrorText message={errors.phone} />
               </div>
             </div>

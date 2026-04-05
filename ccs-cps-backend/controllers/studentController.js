@@ -5,7 +5,10 @@ const bcrypt = require("bcryptjs");
 const getStudents = async (req, res) => {
   try {
     const db = getDB();
-    const students = await db.collection("students").find({}).toArray();
+    const students = await db
+      .collection("students")
+      .find({ isDeleted: { $ne: true } })
+      .toArray();
     res.status(200).json(students);
   } catch (error) {
     res
@@ -56,10 +59,15 @@ const getStudentById = async (req, res) => {
     const { id } = req.params;
     if (!ObjectId.isValid(id))
       return res.status(400).json({ message: "Invalid student ID format" });
+
     const student = await db
       .collection("students")
-      .findOne({ _id: new ObjectId(id) });
-    if (!student) return res.status(404).json({ message: "Student not found" });
+      .findOne({ _id: new ObjectId(id), isDeleted: { $ne: true } });
+
+    if (!student)
+      return res
+        .status(404)
+        .json({ message: "Student not found or has been removed" });
     res.status(200).json(student);
   } catch (error) {
     res
@@ -92,21 +100,29 @@ const updateStudent = async (req, res) => {
   }
 };
 
-// ── NEW: Delete student ──────────────────────────────────────
 const deleteStudent = async (req, res) => {
   try {
     const db = getDB();
     const { id } = req.params;
 
+    // Extract the deleted data sent from your frontend
+    const { isDeleted, deletedAt } = req.body;
+
     if (!ObjectId.isValid(id)) {
       return res.status(400).json({ message: "Invalid student ID format" });
     }
 
-    const result = await db
-      .collection("students")
-      .deleteOne({ _id: new ObjectId(id) });
+    const result = await db.collection("students").updateOne(
+      { _id: new ObjectId(id) },
+      {
+        $set: {
+          isDeleted: isDeleted || true,
+          deletedAt: deletedAt || new Date(),
+        },
+      },
+    );
 
-    if (result.deletedCount === 0) {
+    if (result.matchedCount === 0) {
       return res.status(404).json({ message: "Student not found" });
     }
 
@@ -117,7 +133,6 @@ const deleteStudent = async (req, res) => {
       .json({ message: "Failed to delete student", error: error.message });
   }
 };
-// ─────────────────────────────────────────────────────────────
 
 const addViolation = async (req, res) => {
   try {
