@@ -10,16 +10,28 @@ const login = async (req, res) => {
     let user = null;
     let role = null;
 
-    user = await db.collection("students").findOne({ studentId: id });
+    // Filter out deleted students
+    user = await db.collection("students").findOne({
+      studentId: id,
+      isDeleted: { $ne: true },
+    });
+
     if (user) role = "student";
 
     if (!user) {
-      user = await db.collection("faculty").findOne({ facultyId: id });
+      // Added same check for faculty just in case you apply soft-delete there too
+      user = await db.collection("faculty").findOne({
+        facultyId: id,
+        isDeleted: { $ne: true },
+      });
       if (user) role = user.isDean ? "dean" : "faculty";
     }
 
     if (!user) {
-      return res.status(404).json({ message: "Account not found." });
+      // If the student is soft-deleted, they hit this block
+      return res
+        .status(404)
+        .json({ message: "Account not found or deactivated." });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
@@ -41,8 +53,9 @@ const login = async (req, res) => {
             program: user.program,
             year: user.year,
             section: user.section,
-            type: user.type || "Regular", // ADDED THIS
-            status: user.status || "Enrolled", // ADDED THIS
+            type: user.type || "Regular",
+            status: user.status || "Enrolled",
+            isDeleted: user.isDeleted || false, //Pass this to the frontend
             email: user.email,
             gender: user.gender,
             address: user.address,

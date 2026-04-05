@@ -15,8 +15,8 @@ export default function Login({ onLoginSuccess, onForgotPassword }) {
   const [errors, setErrors] = useState({ id: "", password: "" });
   const [isLoading, setIsLoading] = useState(false);
   const [loginProgress, setLoginProgress] = useState(0);
-  const [loginRole, setLoginRole] = useState("student"); 
-  const [userName, setUserName] = useState(""); 
+  const [loginRole, setLoginRole] = useState("student");
+  const [userName, setUserName] = useState("");
   const [serverError, setServerError] = useState("");
   // const [toast, setToast] = useState({
   //   isVisible: false,
@@ -50,7 +50,7 @@ export default function Login({ onLoginSuccess, onForgotPassword }) {
 
     setIsLoading(true);
     setLoginProgress(10);
-    setUserName(""); 
+    setUserName("");
 
     const progressInterval = setInterval(() => {
       setLoginProgress((prev) => {
@@ -61,6 +61,7 @@ export default function Login({ onLoginSuccess, onForgotPassword }) {
 
     try {
       const res = await fetch("http://localhost:5000/api/auth/login", {
+        // ... headers and body remain the same ...
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: form.id, password: form.password }),
@@ -71,29 +72,35 @@ export default function Login({ onLoginSuccess, onForgotPassword }) {
       if (!res.ok) {
         clearInterval(progressInterval);
         setLoginProgress(0);
-        setServerError(data.message || "Invalid credentials. Please try again.");
+
+        setServerError(
+          data.message || "Invalid credentials. Please try again.",
+        );
+
+        setIsLoading(false);
+        return;
+      }
+
+      if (data.user?.isDeleted) {
+        clearInterval(progressInterval);
+        setLoginProgress(0);
+        setServerError(
+          "This account has been deactivated. Please contact the Faculty.",
+        );
         setIsLoading(false);
         return;
       }
 
       const fullName = `${data.user.firstName} ${data.user.lastName}`;
-      
+
       setLoginRole(data.role);
-      setUserName(fullName); 
+      setUserName(fullName);
       setLoginProgress(100);
       clearInterval(progressInterval);
 
       localStorage.setItem("token", data.token);
       localStorage.setItem("role", data.role);
       localStorage.setItem("user", JSON.stringify(data.user));
-
-      const roleLabel = data.role === "student" ? "Student" : "Faculty";
-
-      // setToast({
-      //   isVisible: true,
-      //   message: `Welcome ${roleLabel}! Redirecting...`,
-      //   type: "success",
-      // });
 
       setTimeout(() => {
         onLoginSuccess?.(data.user);
@@ -103,7 +110,6 @@ export default function Login({ onLoginSuccess, onForgotPassword }) {
           navigate("/faculty/dashboard", { replace: true });
         }
       }, 2000);
-
     } catch (err) {
       clearInterval(progressInterval);
       setLoginProgress(0);
@@ -145,7 +151,9 @@ export default function Login({ onLoginSuccess, onForgotPassword }) {
               label="Password"
               autoComplete="current-password"
               value={form.password}
-              onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
+              onChange={(e) =>
+                setForm((f) => ({ ...f, password: e.target.value }))
+              }
               error={errors.password}
               disabled={isLoading}
             />
@@ -164,7 +172,10 @@ export default function Login({ onLoginSuccess, onForgotPassword }) {
                   e.preventDefault();
                   onForgotPassword?.();
                 }}
-                style={{ opacity: isLoading ? 0.5 : 1, pointerEvents: isLoading ? "none" : "auto" }}
+                style={{
+                  opacity: isLoading ? 0.5 : 1,
+                  pointerEvents: isLoading ? "none" : "auto",
+                }}
               >
                 Forgot Password?
               </a>
@@ -208,7 +219,7 @@ export default function Login({ onLoginSuccess, onForgotPassword }) {
         isVisible={isLoading}
         role={loginRole}
         progress={loginProgress}
-        userName={userName} 
+        userName={userName}
       />
     </div>
   );
