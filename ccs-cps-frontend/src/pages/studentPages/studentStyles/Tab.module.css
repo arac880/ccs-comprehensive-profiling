@@ -1,795 +1,186 @@
-/* tab.module.css — shared styles for all tab panels */
+/* ═══════════════════════════════════════════════════════════════
+   Tab.module.css  —  CCS Comprehensive Profiling System
+   Orange × Cream design language
+   Covers: Personal · Violations · NonAcademic · Skills · Affiliations
+═══════════════════════════════════════════════════════════════ */
 
-/* ── Single edit button row at the top of a tab ── */
-.tabTopBar {
+/* ── Wrapper ────────────────────────────────────────────────── */
+.tabWrapper {
   display: flex;
-  justify-content: flex-end;
-  margin-bottom: 1.1rem;
+  flex-direction: column;
+  gap: clamp(12px, 2vw, 20px);
+  animation: fadeUp 0.28s ease both;
 }
 
-/* ── Section wrapper ── */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── Section card ───────────────────────────────────────────── */
 .section {
-  margin-bottom: 1.75rem;
+  background: #ffffff;
+  border: 1.5px solid #f0dccb;
+  border-radius: 14px;
+  padding: clamp(16px, 2.5vw, 26px) clamp(16px, 2.5vw, 28px);
+  box-shadow: 0 1px 4px rgba(200, 100, 30, 0.07);
+  transition: box-shadow 0.18s ease;
+  animation: fadeUp 0.28s ease both;
+  margin-bottom: clamp(10px, 1.8vw, 18px);
 }
 
-/* ── Section header: title left, actions right ── */
+.section:hover {
+  box-shadow: 0 4px 14px rgba(200, 100, 30, 0.11);
+}
+
+/* ── Section header ─────────────────────────────────────────── */
 .sectionHeader {
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  margin-bottom: 0.85rem;
-  gap: 0.75rem;
+  align-items: center;
+  margin-bottom: clamp(14px, 2vw, 20px);
+  padding-bottom: clamp(10px, 1.4vw, 14px);
+  border-bottom: 1.5px solid #f7ece0;
 }
 
 .sectionTitle {
-  font-size: clamp(0.8rem, 1.5vw, 0.9rem);
-  font-weight: 700;
-  color: #e65100;
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
   display: flex;
   align-items: center;
-  gap: 0.4rem;
-  white-space: nowrap;
+  gap: 7px;
+  font-size: clamp(0.7rem, 1.3vw, 0.8rem);
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: #e8500a;
 }
 
-.sectionTitle::after {
-  content: "";
-  display: block;
-  width: clamp(40px, 8vw, 120px);
-  height: 1px;
-  background: #f0f0f0;
-  margin-left: 0.4rem;
-}
-
-/* ── Header action buttons ── */
 .headerActions {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  flex-shrink: 0;
+  gap: 8px;
 }
 
-/* Edit button — text + icon */
-.editBtn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  padding: 0.3rem 0.7rem;
-  border: 1.5px solid #e65100;
-  background: none;
-  color: #e65100;
-  border-radius: 7px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition:
-    background 0.15s,
-    color 0.15s;
-  white-space: nowrap;
-}
-.editBtn:hover {
-  background: #e65100;
-  color: #fff;
-}
+/* ═══════════════════════════════════════════════════════════════
+   PERSONAL TAB — Info grid (4-col, clean label+value)
+═══════════════════════════════════════════════════════════════ */
 
-/* Add button */
-.addBtn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  padding: 0.3rem 0.7rem;
-  border: 1.5px solid #e65100;
-  background: #e65100;
-  color: #fff;
-  border-radius: 7px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.15s;
-  white-space: nowrap;
-}
-.addBtn:hover {
-  background: #bf360c;
-  border-color: #bf360c;
-}
-
-/* Icon-only button (small, inside cards) */
-.iconBtn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 26px;
-  height: 26px;
-  border: 1px solid #e5e7eb;
-  background: none;
-  color: #6b7280;
-  border-radius: 6px;
-  cursor: pointer;
-  transition:
-    border-color 0.15s,
-    color 0.15s,
-    background 0.15s;
-  flex-shrink: 0;
-}
-.iconBtn:hover {
-  border-color: #e65100;
-  color: #e65100;
-  background: #fff3ed;
-}
-
-/* ── Info grid (label + value pairs) ── */
 .infoGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(200px, 100%), 1fr));
-  gap: 0.9rem 2rem;
+  grid-template-columns: repeat(4, 1fr);
+  gap: clamp(20px, 2.8vw, 32px) clamp(16px, 2.2vw, 28px);
 }
 
 .infoField {
   display: flex;
   flex-direction: column;
-  gap: 0.2rem;
+  gap: 4px;
 }
 
 .infoLabel {
-  font-size: 0.62rem;
+  font-size: clamp(0.6rem, 1.05vw, 0.68rem);
   font-weight: 700;
-  text-transform: uppercase;
   letter-spacing: 0.07em;
-  color: #9ca3af;
+  text-transform: uppercase;
+  color: #b07040;
 }
 
 .infoValue {
-  font-size: clamp(0.8rem, 1.5vw, 0.9rem);
-  font-weight: 600;
-  color: #1a1a2e;
-  line-height: 1.35;
-}
-
-/* ── Tables ── */
-.tableWrap {
-  overflow-x: auto;
-  border-radius: 10px;
-  border: 1px solid #e5e7eb;
-}
-
-.table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: clamp(0.72rem, 1.3vw, 0.82rem);
-}
-
-.table thead tr {
-  background: #f9fafb;
-  border-bottom: 2px solid #e5e7eb;
-}
-
-.table thead th {
-  padding: 0.7rem 0.9rem;
-  text-align: left;
-  font-size: 0.65rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
-  color: #6b7280;
-  white-space: nowrap;
-}
-
-.table tbody tr {
-  border-bottom: 1px solid #f3f4f6;
-  transition: background 0.12s;
-}
-.table tbody tr:last-child {
-  border-bottom: none;
-}
-.table tbody tr:hover {
-  background: #fafafa;
-}
-
-.table tbody td {
-  padding: 0.65rem 0.9rem;
-  color: #374151;
+  font-size: clamp(0.86rem, 1.5vw, 0.97rem);
   font-weight: 500;
+  color: #2c1a0e;
+  word-break: break-word;
 }
 
-/* ── Semester block ── */
-.semToggleBtn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: #e65100;
-  font-size: 0.72rem;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  padding: 0;
-  margin-left: auto;
-}
+/* ═══════════════════════════════════════════════════════════════
+   SECURITY TAB
+═══════════════════════════════════════════════════════════════ */
 
-/* ── Badges ── */
-.badge {
-  display: inline-flex;
-  align-items: center;
-  border-radius: 20px;
-  padding: 0.15rem 0.6rem;
-  font-size: 0.65rem;
-  font-weight: 700;
-}
-.badgeOrange {
-  background: #fff3ed;
-  color: #e65100;
-  border: 1px solid #f5c8a8;
-}
-.badgeGreen {
-  background: #f0fdf4;
-  color: #16a34a;
-  border: 1px solid #bbf7d0;
-}
-.badgeBlue {
-  background: #eff6ff;
-  color: #2563eb;
-  border: 1px solid #bfdbfe;
-}
-.badgeAmber {
-  background: #fffbeb;
-  color: #d97706;
-  border: 1px solid #fde68a;
-}
-.badgeRed {
-  background: #fef2f2;
-  color: #dc2626;
-  border: 1px solid #fecaca;
-}
-.badgePurple {
-  background: #faf5ff;
-  color: #7c3aed;
-  border: 1px solid #e9d5ff;
-}
-
-.badgeRow {
-  display: flex;
-  gap: 0.35rem;
-  flex-wrap: wrap;
-  margin-top: 0.45rem;
-}
-
-/* ── Activity / generic cards ── */
-.cardGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(260px, 100%), 1fr));
-  gap: 0.85rem;
-}
-
-.card {
-  background: #fff;
-  border: 1px solid #e5e7eb;
-  border-radius: 10px;
-  padding: 1rem 1.1rem;
-  transition: box-shadow 0.2s;
-  display: flex;
-  flex-direction: column;
-}
-.card:hover {
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.07);
-}
-
-.cardHeader {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 0.5rem;
-  margin-bottom: 0.4rem;
-}
-
-.cardTitle {
-  font-size: clamp(0.82rem, 1.5vw, 0.9rem);
-  font-weight: 700;
-  color: #1a1a2e;
-  flex: 1;
-  line-height: 1.3;
-}
-
-.cardActions {
-  display: flex;
-  gap: 6px;
-  flex-shrink: 0;
-}
-
-.cardMeta {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.72rem;
-  color: #6b7280;
-  margin-bottom: 0.2rem;
-}
-
-.cardMetaYear {
-  font-size: 0.7rem;
-  color: #9ca3af;
-  font-weight: 500;
-}
-
-.cardDesc {
-  font-size: 0.75rem;
-  color: #6b7280;
-  line-height: 1.5;
-  margin: 0.4rem 0 0;
-}
-
-.cardFooter {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: auto;
-  padding-top: 8px;
-}
-
-.cardDate {
-  font-size: 11px;
-  color: var(--color-text-tertiary);
-  text-align: right;
-  margin-top: auto;
-  padding-top: 8px;
-}
-
-/* ============================= */
-/* SKILLS LAYOUT                 */
-/* ============================= */
-
-.skillColumns {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 16px;
-  margin-top: 8px;
-}
-
-.skillColumn {
-  background: #fff;
-  border: 1px solid #e5e7eb;
-  border-radius: 10px;
-  overflow: hidden;
-  min-width: 0;
-}
-
-.skillCat {
-  font-size: 0.72rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
-  color: #e65100;
-  background: #fff8f5;
-  border-bottom: 1px solid #fde8d8;
-  padding: 0.6rem 0.9rem;
-}
-
-.skillList {
-  list-style: none;
-  padding: 0.35rem 0;
-  margin: 0;
-}
-
-.skillItem {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.45rem 0.9rem;
-  gap: 0.5rem;
-  border-bottom: 1px solid #f9fafb;
-  transition: background 0.12s;
-}
-
-.skillItem:last-child {
-  border-bottom: none;
-}
-
-.skillItem:hover {
-  background: #fffaf7;
-}
-
-.skillInfo {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-  min-width: 0;
-}
-
-.skillName {
-  font-size: 0.82rem;
-  font-weight: 500;
-  color: #374151;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.skillActions {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  flex-shrink: 0;
-}
-
-/* ============================= */
-/* RESPONSIVE                    */
-/* ============================= */
-
-@media (max-width: 1024px) {
-  .skillColumns {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 768px) {
-  .skillColumns {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-  }
-}
-
-@media (max-width: 480px) {
-  .skillColumns {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* ── Org card ── */
-.orgCard {
-  background: #fff;
-  border: 1px solid #e5e7eb;
-  border-radius: 10px;
-  overflow: hidden;
-  margin-bottom: 0.85rem;
-}
-
-.orgHeader {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 0.9rem 1.1rem;
-  border-bottom: 1px solid #f0f0f0;
-}
-
-.orgInitials {
-  width: 44px;
-  height: 44px;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1rem;
-  font-weight: 800;
-  color: #fff;
-  flex-shrink: 0;
-}
-
-.orgName {
-  font-size: 0.9rem;
-  font-weight: 700;
-  color: #1a1a2e;
-}
-.orgCollege {
-  font-size: 0.7rem;
-  color: #6b7280;
-  margin-top: 0.1rem;
-}
-
-.orgRecords {
-  padding: 0.6rem 0;
-}
-
-.orgRecord {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.45rem 1.1rem;
-  font-size: 0.78rem;
-  border-bottom: 1px solid #f9f9f9;
-  flex-wrap: wrap;
-}
-.orgRecord:last-child {
-  border-bottom: none;
-}
-
-.recYear {
-  font-size: 0.68rem;
-  color: #6b7280;
-  font-weight: 600;
-  white-space: nowrap;
-  min-width: 80px;
-}
-
-.recPos {
-  font-weight: 600;
-  color: #1a1a2e;
-}
-
-/* ── Violation row ── */
-.violRow {
-  display: flex;
-  align-items: flex-start;
-  gap: 1rem;
-  padding: 0.9rem 1rem;
-  background: #fff;
-  border: 1px solid #e5e7eb;
-  border-radius: 10px;
-  margin-bottom: 0.65rem;
-  flex-wrap: wrap;
-}
-
-.violLeft {
-  display: flex;
-  gap: 0.7rem;
-  flex: 1;
-  min-width: 0;
-}
-.violIcon {
-  color: #e65100;
-  flex-shrink: 0;
-  padding-top: 2px;
-  font-size: 1rem;
-}
-.violTitle {
-  font-size: 0.88rem;
-  font-weight: 700;
-  color: #1a1a2e;
-}
-.violDate {
-  font-size: 0.72rem;
-  color: #6b7280;
-  margin-top: 0.12rem;
-}
-.violSanction {
-  font-size: 0.72rem;
-  color: #374151;
-  margin-top: 0.12rem;
-}
-.violRight {
-  display: flex;
-  gap: 0.45rem;
-  align-items: center;
-}
-
-/* ── Empty / success states ── */
-.empty {
-  text-align: center;
-  padding: 2rem;
-  color: #9ca3af;
-  font-size: 0.85rem;
-}
-
-.emptyState {
-  font-size: 0.85rem;
-  color: #9ca3af;
-  padding: 0.75rem 0;
-}
-
-.emptyGreen {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  background: #f0fdf4;
-  border: 1px solid #bbf7d0;
-  border-radius: 10px;
-  padding: 1rem 1.2rem;
-  color: #16a34a;
-  font-size: 0.85rem;
-  font-weight: 600;
-}
-
-/* Grade colors */
-.gradeHigh {
-  color: #16a34a;
-  font-weight: 700;
-}
-.gradeMid {
-  color: #374151;
-  font-weight: 600;
-}
-.gradeLow {
-  color: #dc2626;
-  font-weight: 700;
-}
-
-/* ── Guardian sub-section label ── */
-.guardianSubLabel {
-  grid-column: 1 / -1;
-  font-size: 0.72rem;
-  font-weight: 700;
-  color: #374151;
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
-  padding: 0.1rem 0 0.15rem;
-  margin-top: 0.1rem;
-}
-
-/* ── Thin rule between guardian sub-sections ── */
-.guardianDivider {
-  grid-column: 1 / -1;
-  height: 1px;
-  background: #f0f0f0;
-  margin: 0.5rem 0 0.75rem;
-}
-
-/* ══════════════════════════════════════════
-   SECURITY TAB — add these to tab.module.css
-══════════════════════════════════════════ */
-
-/* Page root — gives the tab some breathing room */
-.secRoot {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-/* Meta info grid — 3 columns on desktop */
 .secMetaGrid {
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: 1fr;
+  max-width: 260px;
 }
 
-/* ── Change password card ── */
 .secCard {
-  background: #fff;
-  border: 1px solid #e5e7eb;
+  background: #fdf6f0;
+  border: 1.5px solid #f0dccb;
   border-radius: 12px;
-  padding: 1.5rem;
+  padding: clamp(16px, 2.5vw, 26px);
 }
 
-/* Form layout — stacks fields vertically with consistent gap */
 .secForm {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
-}
-
-/* Thin rule between current and new password sections */
-.secDivider {
-  border: none;
-  border-top: 1px solid #f0f0f0;
-  margin: 0;
-}
-
-/* ── Individual field ── */
-.secField {
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
+  gap: clamp(14px, 2.2vw, 20px);
 }
 
 .secFieldTitle {
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: #e65100; /* matches theme */
-  margin-bottom: 10px;
   display: block;
-}
-
-.secLabel {
-  font-size: 0.72rem;
+  font-size: clamp(0.68rem, 1.2vw, 0.76rem);
   font-weight: 700;
-  text-transform: uppercase;
   letter-spacing: 0.07em;
-  color: #6b7280;
+  text-transform: uppercase;
+  color: #b07040;
+  margin-bottom: 7px;
 }
 
-/* Input wrapper — positions the toggle button */
-.secInputWrap {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.secInput {
-  width: 100%;
-  padding: 0.55rem 2.5rem 0.55rem 0.85rem;
-  border: 1.5px solid #e5e7eb;
-  border-radius: 8px;
-  font-size: 0.875rem;
-  color: #1a1a2e;
-  background: #fafafa;
-  outline: none;
-  transition:
-    border-color 0.15s,
-    background 0.15s;
-  box-sizing: border-box;
-}
-.secInput:focus {
-  border-color: #e65100;
-  background: #fff;
-}
-.secInput::placeholder {
-  color: #c4c9d4;
-  font-weight: 400;
-}
-
-/* Show / hide toggle */
-.secToggle {
-  position: absolute;
-  right: 0.7rem;
-  background: none;
+.secDivider {
   border: none;
-  cursor: pointer;
-  color: #9ca3af;
-  display: flex;
-  align-items: center;
-  padding: 0;
-  transition: color 0.15s;
-}
-.secToggle:hover {
-  color: #e65100;
-}
-
-/* Hint text under input */
-.secHint {
-  font-size: 0.7rem;
-  color: #9ca3af;
+  border-top: 1.5px dashed #f0dccb;
   margin: 0;
 }
 
-/* ── Validation messages ── */
-.secError {
-  font-size: 0.72rem;
-  color: #dc2626;
-  margin: 0.25rem 0 0;
-  font-weight: 600;
-}
-
-.secMatch {
-  font-size: 0.72rem;
-  color: #16a34a;
-  margin: 0.25rem 0 0;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
-}
-
-/* ── Strength meter ── */
 .secStrengthWrap {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
-  margin-top: 0.5rem;
+  gap: 10px;
+  margin-top: 8px;
 }
 
 .secStrengthBar {
   display: flex;
   gap: 4px;
   flex: 1;
-  max-width: 160px;
 }
 
 .secStrengthSegment {
-  height: 4px;
-  border-radius: 99px;
+  height: 5px;
   flex: 1;
-  transition: background 0.25s;
+  border-radius: 999px;
+  transition: background 0.25s ease;
 }
 
 .secStrengthLabel {
-  font-size: 0.72rem;
+  font-size: clamp(0.66rem, 1.15vw, 0.74rem);
   font-weight: 700;
-  transition: color 0.25s;
-  min-width: 42px;
+  min-width: 44px;
+  text-align: right;
 }
 
-/* ── Password requirements checklist ── */
-/* Password requirements checklist */
 .secRequirements {
   list-style: none;
-  margin: 8px 0 0 0;
-  padding: 0;
+  margin: 8px 0 2px;
+  padding: clamp(8px, 1.4vw, 12px) clamp(10px, 1.8vw, 14px);
+  background: #fffaf6;
+  border: 1px solid #f7ece0;
+  border-radius: 10px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 5px;
 }
 
 .secRequirementItem {
   display: flex;
   align-items: center;
-  gap: 7px;
-  font-size: 0.78rem;
-  transition: color 0.2s;
+  gap: 8px;
+  font-size: clamp(0.68rem, 1.2vw, 0.76rem);
+  font-weight: 500;
+  transition: color 0.2s ease;
 }
 
 .secRequirementDot {
@@ -797,61 +188,582 @@
   height: 7px;
   border-radius: 50%;
   flex-shrink: 0;
-  transition: background 0.2s;
+  transition: background 0.2s ease;
 }
 
-/* ── Success banner ── */
-.secSuccess {
+.secMatch {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
-  background: #f0fdf4;
-  border: 1px solid #bbf7d0;
-  border-radius: 8px;
-  padding: 0.75rem 1rem;
-  color: #16a34a;
-  font-size: 0.82rem;
+  gap: 5px;
+  font-size: clamp(0.66rem, 1.15vw, 0.74rem);
   font-weight: 600;
-  margin-bottom: 1.25rem;
+  color: #16a34a;
+  margin-top: 6px;
 }
 
-/* ── Action buttons row ── */
 .secActions {
   display: flex;
   justify-content: flex-end;
-  margin-top: 1.5rem;
+  gap: 10px;
+  margin-top: clamp(14px, 2vw, 20px);
+  padding-top: clamp(12px, 1.8vw, 16px);
+  border-top: 1.5px solid #f7ece0;
 }
 
-/* ════════════════════════════════
-   RESPONSIVE BREAKPOINTS
-════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════
+   VIOLATIONS TAB
+═══════════════════════════════════════════════════════════════ */
 
-/* Tablet — collapse meta grid to 2 columns */
+/* Clean all-good banner */
+.emptyGreen {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #f0fdf4;
+  border: 1.5px solid #86efac;
+  border-radius: 12px;
+  padding: clamp(14px, 2vw, 20px) clamp(16px, 2.2vw, 22px);
+  color: #15803d;
+  font-size: clamp(0.82rem, 1.4vw, 0.92rem);
+  font-weight: 600;
+  margin-top: 4px;
+}
+
+/* Violation row */
+.violRow {
+  display: flex;
+  align-items: flex-start;
+  gap: clamp(12px, 1.8vw, 18px);
+  padding: clamp(14px, 2vw, 18px) clamp(14px, 2vw, 20px);
+  border: 1.5px solid #fee2e2;
+  border-radius: 12px;
+  background: #fff9f9;
+  margin-bottom: 10px;
+  transition:
+    box-shadow 0.16s ease,
+    transform 0.16s ease;
+  animation: fadeUp 0.28s ease both;
+}
+
+.violRow:hover {
+  box-shadow: 0 4px 14px rgba(220, 38, 38, 0.1);
+  transform: translateY(-1px);
+}
+
+.violRow:last-child {
+  margin-bottom: 0;
+}
+
+.violLeft {
+  display: flex;
+  align-items: flex-start;
+  gap: clamp(10px, 1.5vw, 14px);
+  flex: 1;
+}
+
+.violIcon {
+  color: #dc2626;
+  flex-shrink: 0;
+  margin-top: 2px;
+  width: clamp(16px, 2vw, 20px);
+  height: clamp(16px, 2vw, 20px);
+}
+
+.violTitle {
+  font-size: clamp(0.86rem, 1.5vw, 0.98rem);
+  font-weight: 700;
+  color: #2c1a0e;
+  margin-bottom: 3px;
+}
+
+.violDate {
+  font-size: clamp(0.68rem, 1.15vw, 0.76rem);
+  color: #b07040;
+  font-weight: 500;
+  margin-bottom: 5px;
+}
+
+.violSanction {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: clamp(0.7rem, 1.2vw, 0.78rem);
+  font-weight: 600;
+  color: #b91c1c;
+  background: #fee2e2;
+  border: 1px solid #fca5a5;
+  border-radius: 6px;
+  padding: 3px 9px;
+  margin-top: 2px;
+}
+
+/* Severity badge on violation rows */
+.violBadge {
+  flex-shrink: 0;
+  align-self: flex-start;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   NON-ACADEMIC · AFFILIATIONS — Card grid
+═══════════════════════════════════════════════════════════════ */
+
+.cardGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(220px, 100%), 1fr));
+  gap: clamp(12px, 1.8vw, 16px);
+}
+
+.card {
+  background: #fffaf6;
+  border: 1.5px solid #f0dccb;
+  border-radius: 12px;
+  padding: clamp(14px, 2vw, 18px);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition:
+    box-shadow 0.16s ease,
+    transform 0.16s ease,
+    border-color 0.16s ease;
+  animation: fadeUp 0.28s ease both;
+}
+
+.card:hover {
+  box-shadow: 0 6px 18px rgba(200, 100, 30, 0.13);
+  transform: translateY(-2px);
+  border-color: #f5874a;
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.cardTitle {
+  font-size: clamp(0.84rem, 1.45vw, 0.96rem);
+  font-weight: 700;
+  color: #2c1a0e;
+  line-height: 1.35;
+  flex: 1;
+}
+
+.cardActions {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.cardMeta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.cardMetaYear {
+  font-size: clamp(0.66rem, 1.1vw, 0.74rem);
+  font-weight: 600;
+  color: #b07040;
+  background: #fde8d8;
+  border-radius: 6px;
+  padding: 2px 7px;
+}
+
+.cardDesc {
+  font-size: clamp(0.74rem, 1.25vw, 0.82rem);
+  color: #6b4226;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.cardFooter {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: auto;
+  padding-top: 6px;
+  border-top: 1px dashed #f0dccb;
+}
+
+.cardDate {
+  font-size: clamp(0.64rem, 1.1vw, 0.72rem);
+  color: #b07040;
+  font-weight: 500;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SKILLS TAB
+═══════════════════════════════════════════════════════════════ */
+
+.skillColumns {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(200px, 100%), 1fr));
+  gap: clamp(12px, 1.8vw, 18px);
+}
+
+.skillColumn {
+  background: #fffaf6;
+  border: 1.5px solid #f0dccb;
+  border-radius: 12px;
+  padding: clamp(12px, 1.8vw, 16px);
+  animation: fadeUp 0.28s ease both;
+}
+
+.skillCat {
+  font-size: clamp(0.64rem, 1.1vw, 0.72rem);
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: #e8500a;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1.5px solid #f0dccb;
+}
+
+.skillList {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+}
+
+.skillItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+  padding: clamp(6px, 1vw, 9px) clamp(8px, 1.2vw, 12px);
+  background: #fff;
+  border: 1px solid #f0dccb;
+  border-radius: 8px;
+  transition:
+    background 0.14s ease,
+    border-color 0.14s ease;
+}
+
+.skillItem:hover {
+  background: #fff4ed;
+  border-color: #f5874a;
+}
+
+.skillInfo {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex: 1;
+  min-width: 0;
+}
+
+.skillName {
+  font-size: clamp(0.78rem, 1.35vw, 0.88rem);
+  font-weight: 600;
+  color: #2c1a0e;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.skillActions {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   BADGES  (shared across tabs)
+═══════════════════════════════════════════════════════════════ */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: clamp(0.6rem, 1.05vw, 0.68rem);
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  border: 1px solid transparent;
+}
+
+.badgeOrange {
+  background: #fde8d8;
+  color: #c2410c;
+  border-color: #fdba74;
+}
+
+.badgeBlue {
+  background: #dbeafe;
+  color: #1d4ed8;
+  border-color: #93c5fd;
+}
+
+.badgeGreen {
+  background: #dcfce7;
+  color: #15803d;
+  border-color: #86efac;
+}
+
+.badgeAmber {
+  background: #fef9c3;
+  color: #92400e;
+  border-color: #fde047;
+}
+
+.badgeRed {
+  background: #fee2e2;
+  color: #b91c1c;
+  border-color: #fca5a5;
+}
+
+.badgePurple {
+  background: #ede9fe;
+  color: #6d28d9;
+  border-color: #c4b5fd;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   LOADING / EMPTY STATES
+═══════════════════════════════════════════════════════════════ */
+
+.loadingState {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(24px, 4vw, 40px);
+  color: #b07040;
+  font-size: clamp(0.78rem, 1.4vw, 0.86rem);
+  font-weight: 500;
+}
+
+.empty {
+  font-size: clamp(0.78rem, 1.35vw, 0.86rem);
+  color: #b07040;
+  padding: clamp(20px, 3vw, 32px) 0;
+  text-align: center;
+  font-style: italic;
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: clamp(24px, 4vw, 40px) 20px;
+  text-align: center;
+}
+
+.emptyStateTitle {
+  font-size: clamp(0.8rem, 1.4vw, 0.9rem);
+  font-weight: 600;
+  color: #b07040;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   TABLE (Academic History etc.)
+═══════════════════════════════════════════════════════════════ */
+
+.tableWrapper {
+  overflow-x: auto;
+  border-radius: 10px;
+  border: 1.5px solid #f0dccb;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+}
+
+.table thead {
+  background: #fff4ed;
+  border-bottom: 2px solid #f0dccb;
+}
+
+.table th {
+  padding: clamp(9px, 1.5vw, 13px) clamp(10px, 1.8vw, 16px);
+  text-align: left;
+  font-size: clamp(0.6rem, 1.05vw, 0.68rem);
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: #b07040;
+  white-space: nowrap;
+}
+
+.table td {
+  padding: clamp(8px, 1.4vw, 12px) clamp(10px, 1.8vw, 16px);
+  border-bottom: 1px solid #f7ece0;
+  color: #2c1a0e;
+  font-size: clamp(0.76rem, 1.3vw, 0.84rem);
+  vertical-align: middle;
+}
+
+.table tbody tr:hover {
+  background: #fff4ed;
+}
+
+.table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   FULL-SCREEN MODAL PORTAL
+═══════════════════════════════════════════════════════════════ */
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(44, 26, 14, 0.45);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: overlayIn 0.2s ease both;
+}
+
+@keyframes overlayIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modalBox {
+  background: #ffffff;
+  border-radius: 18px;
+  box-shadow: 0 20px 60px rgba(44, 26, 14, 0.22);
+  width: 100%;
+  max-width: 680px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  animation: modalUp 0.25s cubic-bezier(0.34, 1.3, 0.64, 1) both;
+  overflow: hidden;
+}
+
+@keyframes modalUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: clamp(16px, 2.5vw, 22px) clamp(18px, 2.8vw, 28px);
+  border-bottom: 1.5px solid #f7ece0;
+  flex-shrink: 0;
+}
+
+.modalTitle {
+  font-size: clamp(0.88rem, 1.6vw, 1.05rem);
+  font-weight: 700;
+  color: #e8500a;
+}
+
+.modalCloseBtn {
+  background: #fff4ed;
+  border: 1.5px solid #f0dccb;
+  border-radius: 8px;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #b07040;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+}
+
+.modalCloseBtn:hover {
+  background: #e8500a;
+  color: #fff;
+  border-color: #e8500a;
+}
+
+.modalBody {
+  overflow-y: auto;
+  padding: clamp(16px, 2.5vw, 24px) clamp(18px, 2.8vw, 28px);
+  flex: 1;
+}
+
+.modalFooter {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: clamp(14px, 2vw, 20px) clamp(18px, 2.8vw, 28px);
+  border-top: 1.5px solid #f7ece0;
+  flex-shrink: 0;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════════════════════════════ */
+
+@media (max-width: 900px) {
+  .infoGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
 @media (max-width: 768px) {
-  .secMetaGrid {
+  .infoGrid {
     grid-template-columns: repeat(2, 1fr);
   }
-
-  .secCard {
-    padding: 1.1rem;
+  .cardGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .skillColumns {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .secMetaGrid {
+    max-width: 100%;
+    grid-template-columns: 1fr;
+  }
+  .secActions {
+    flex-direction: column-reverse;
+  }
+  .secActions > * {
+    width: 100%;
   }
 }
 
-/* Mobile — full single-column layout */
 @media (max-width: 480px) {
-  .secMetaGrid {
+  .section {
+    border-radius: 10px;
+    padding: clamp(12px, 4vw, 16px);
+  }
+  .infoGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px 10px;
+  }
+  .cardGrid {
     grid-template-columns: 1fr;
   }
-
+  .skillColumns {
+    grid-template-columns: 1fr;
+  }
   .secCard {
-    padding: 1rem 0.85rem;
+    padding: clamp(12px, 4vw, 16px);
   }
+}
 
-  .secStrengthBar {
-    max-width: 120px;
-  }
-
-  .secReqs {
-    gap: 0.25rem 0.75rem;
+@media (max-width: 360px) {
+  .infoGrid {
+    grid-template-columns: 1fr;
   }
 }
