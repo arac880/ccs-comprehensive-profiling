@@ -1,26 +1,26 @@
 @import url("https://fonts.googleapis.com/css2?family=Afacad:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Freeman&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap");
 
 :root {
-  --orange:       #E65100;
-  --orange-light: #FF6D00;
-  --orange-pale:  #FFF3E0;
-  --orange-muted: #FFB74D;
-  --cream:        #FDF6F0;
-  --white:        #FFFFFF;
-  --warm-gray:    #F5EDE5;
-  --border:       #EDD8CA;
-  --border-light: #F7ECE0;
-  --shadow:       rgba(230, 81, 0, 0.10);
-  --text-dark:    #2D1F15;
-  --text-mid:     #7A4F35;
-  --text-muted:   #B07050;
-  --text-soft:    #C8956D;
-  --radius-sm:    10px;
-  --radius-md:    16px;
-  --radius-lg:    20px;
-  --font-body:    'Plus Jakarta Sans', sans-serif;
-  --font-display: 'Freeman', sans-serif;
-  --font-ui:      'Afacad', sans-serif;
+  --orange: #e65100;
+  --orange-light: #ff6d00;
+  --orange-pale: #fff3e0;
+  --orange-muted: #ffb74d;
+  --cream: #fdf6f0;
+  --white: #ffffff;
+  --warm-gray: #f5ede5;
+  --border: #edd8ca;
+  --border-light: #f7ece0;
+  --shadow: rgba(230, 81, 0, 0.1);
+  --text-dark: #2d1f15;
+  --text-mid: #7a4f35;
+  --text-muted: #b07050;
+  --text-soft: #c8956d;
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 20px;
+  --font-body: "Plus Jakarta Sans", sans-serif;
+  --font-display: "Freeman", sans-serif;
+  --font-ui: "Afacad", sans-serif;
 }
 
 /* ═══════════════════════════════════════
@@ -59,8 +59,14 @@
 }
 
 @keyframes fadeUp {
-  from { opacity: 0; transform: translateY(14px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* ═══════════════════════════════════════
@@ -96,6 +102,10 @@
   display: none;
 }
 
+.tabBar:hover {
+  color: var(--orange);
+}
+
 /* ── Tab button ──
    v-padding: 9px @ 360px → 13px @ 1440px
    h-padding: 10px @ 360px → 18px @ 1440px
@@ -125,6 +135,7 @@
 
 .tabBtn:hover {
   color: var(--orange);
+  border-bottom-color: var(--orange) !important;
 }
 
 .tabActive {
@@ -183,7 +194,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  box-shadow: 0 4px 12px rgba(230, 81, 0, 0.20);
+  box-shadow: 0 4px 12px rgba(230, 81, 0, 0.2);
   flex-shrink: 0;
 }
 

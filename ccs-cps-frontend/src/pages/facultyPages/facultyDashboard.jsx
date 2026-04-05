@@ -35,7 +35,6 @@ const MiniCalendar = ({ today }) => {
   const isToday = (d) =>
     d === today.day && month === today.month && year === today.year;
   const hasEvent = (d) => [5, 12, 18, 24].includes(d);
-
   return (
     <div className={styles.calendarBody}>
       <div className={styles.calendarNav}>
@@ -195,6 +194,12 @@ function getInitials(name) {
 /* ── Main Dashboard ── */
 const FacultyDashboard = () => {
   const navigate = useNavigate();
+
+  const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
+  const facultyName = storedUser.lastName
+    ? `Prof. ${storedUser.lastName}`
+    : "Faculty";
+
   const now = new Date();
   const DOWS_S = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
   const MONS_S = [
@@ -283,7 +288,7 @@ const FacultyDashboard = () => {
             <div className={styles.welcomeBannerInner}>
               <div className={styles.welcomeText}>
                 <p className={styles.welcomeGreet}>
-                  Good day, <strong>Prof. Mulawin</strong> 👋
+                  Good day, <strong>{facultyName}</strong> 👋
                 </p>
                 <p className={styles.welcomeTitle}>
                   Welcome to the <span className={styles.welcomeCcs}>CCS</span>
