@@ -39,12 +39,10 @@ const addStudent = async (req, res) => {
     };
 
     const result = await db.collection("students").insertOne(newStudent);
-    res
-      .status(201)
-      .json({
-        message: "Student added successfully",
-        studentId: result.insertedId,
-      });
+    res.status(201).json({
+      message: "Student added successfully",
+      studentId: result.insertedId,
+    });
   } catch (error) {
     res
       .status(500)
@@ -196,6 +194,44 @@ const deleteViolation = async (req, res) => {
   }
 };
 
+const changePassword = async (req, res) => {
+  try {
+    const db = getDB();
+    const { id } = req.params;
+    if (!ObjectId.isValid(id))
+      return res.status(400).json({ message: "Invalid student ID format" });
+
+    const { currentPassword, newPassword } = req.body;
+    if (!currentPassword || !newPassword)
+      return res.status(400).json({ message: "Both fields are required." });
+
+    const student = await db
+      .collection("students")
+      .findOne({ _id: new ObjectId(id) });
+    if (!student)
+      return res.status(404).json({ message: "Student not found." });
+
+    const isMatch = await bcrypt.compare(currentPassword, student.password);
+    if (!isMatch)
+      return res
+        .status(401)
+        .json({ message: "Current password is incorrect." });
+
+    const salt = await bcrypt.genSalt(10);
+    const hashed = await bcrypt.hash(newPassword, salt);
+
+    await db
+      .collection("students")
+      .updateOne({ _id: new ObjectId(id) }, { $set: { password: hashed } });
+
+    res.status(200).json({ message: "Password changed successfully." });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Failed to change password", error: error.message });
+  }
+};
+
 module.exports = {
   getStudents,
   addStudent,
@@ -204,4 +240,5 @@ module.exports = {
   deleteStudent,
   addViolation,
   deleteViolation,
+  changePassword,
 };

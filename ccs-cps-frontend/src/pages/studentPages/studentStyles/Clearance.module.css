@@ -1,5 +1,27 @@
 @import url("https://fonts.googleapis.com/css2?family=Afacad:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Freeman&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap");
 
+:root {
+  --orange:       #E65100;
+  --orange-light: #FF6D00;
+  --orange-pale:  #FFF3E0;
+  --orange-muted: #FFB74D;
+  --cream:        #FDF6F0;
+  --white:        #FFFFFF;
+  --warm-gray:    #F5EDE5;
+  --border:       #EDD8CA;
+  --shadow:       rgba(230, 81, 0, 0.10);
+  --text-dark:    #2D1F15;
+  --text-mid:     #7A4F35;
+  --text-muted:   #B07050;
+  --text-soft:    #C8956D;
+  --radius-sm:    10px;
+  --radius-md:    16px;
+  --radius-lg:    20px;
+  --font-body:    'Plus Jakarta Sans', sans-serif;
+  --font-display: 'Freeman', sans-serif;
+  --font-ui:      'Afacad', sans-serif;
+}
+
 .clearanceContainer {
   background-color: #FDF6F0; 
   min-height: 100vh;
@@ -56,15 +78,15 @@
   background: #FFF3E0; 
   padding: 8px 16px;
   border-radius: 20px;
-  border: 1px dashed #EDD8CA; 
+  border: 1px dashed var(--text-soft); 
 }
 
 /* ── Main Status Banner ── */
 .statusBanner {
   display: flex;
   justify-content: center; 
-  background-color: #fff7ea; 
-  border: 1.5px dashed #FFB74D; 
+  background-color: #FFF3E0; 
+  border: 1px dashed #ff944d;
   border-radius: 16px;
   padding: 24px 32px;
   margin-bottom: 32px;
@@ -89,6 +111,7 @@
   color: #E65100; 
   font-family: "Freeman", sans-serif;
   font-size: 1.6rem;
+  font-weight: 600;
   letter-spacing: 0.02em;
   line-height: 1;
   text-transform: uppercase;
@@ -104,7 +127,7 @@
 
 .statusDivider {
   width: 0; 
-  border-left: 2px dashed #FFB74D; 
+  border-left: 1px dashed var(--orange-light); 
   align-self: stretch; 
 }
 
@@ -267,7 +290,7 @@
   color: #e25e1c;
   background: #fcf0ea;
   padding: 4px 12px;
-  border-radius: 10px;
+  border-radius: 20px;
   border: 1px solid #e25e1cb4;
 }
 
@@ -289,6 +312,7 @@
   margin: 0 0 6px 0;
   font-family: "Freeman", sans-serif;
   font-size: 1.4rem;
+  font-weight: 600;
   letter-spacing: 0.02em;
 }
 
@@ -297,6 +321,8 @@
   margin: 0 0 6px 0;
   font-family: "Freeman", sans-serif;
   font-size: 1.4rem;
+    font-weight: 600;
+
   letter-spacing: 0.02em;
 }
 
@@ -315,7 +341,7 @@
   background: #FFF3E0;
   padding: 16px 20px;
   border-radius: 8px;
-  border: 1px dashed #FFB74D;
+  border: 1px dashed #ff944d;
   width: 45%;
 }
 

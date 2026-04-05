@@ -1,71 +1,133 @@
-/* ── ResearchCard.module.css ── */
+@import url("https://fonts.googleapis.com/css2?family=Afacad:wght@400;500;600;700&family=Freeman&display=swap");
 
-.card {
+:root {
+  --orange:      #E65100;
+  --orange-pale: #FFF3E0;
+  --orange-muted:#FFB74D;
+  --white:       #FFFFFF;
+  --warm-gray:   #F5EDE5;
+  --border:      #EDD8CA;
+  --text-dark:   #2D1F15;
+  --text-mid:    #7A4F35;
+  --text-muted:  #B07050;
+  --text-soft:   #C8956D;
+  --radius-sm:   10px;
+  --font-ui:     'Afacad', sans-serif;
+  --font-display:'Freeman', sans-serif;
+}
+
+/* ── Row ── */
+.docRow {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 0;                          /* gap handled by divider + padding */
-  background: #fff8f5;
-  border: 1.5px solid #f0cfc0;
-  border-radius: 12px;
-  padding: 16px 12px 14px;
-  cursor: pointer;
+  gap: 16px;
+  padding: 18px 20px;
+  border-bottom: 1px dashed var(--border);
   text-decoration: none;
-  color: inherit;
-  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
-  overflow: hidden;
+  background-color: var(--white);
+  transition: background-color 0.2s ease, padding-left 0.2s ease;
 }
 
-.card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 20px rgba(230, 81, 0, 0.13);
-  border-color: #e65100;
+.docRow:last-child {
+  border-bottom: none;
 }
 
-/* ── Icon wrapper ── */
-.iconWrap {
-  width: 72px;
-  height: 82px;
-  background: #fde8dc;
-  border-radius: 8px;
+.docRow:hover {
+  background-color: #FFFCFA;
+  padding-left: 26px;
+}
+
+.docRow:hover .actionIcon {
+  transform: translateX(4px);
+}
+
+/* ── Index number ── */
+.docIndex {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  color: var(--border);
+  line-height: 1;
+  min-width: 32px;
+  text-align: center;
+  flex-shrink: 0;
+  transition: color 0.2s ease;
+}
+
+.docRow:hover .docIndex {
+  color: var(--orange-muted);
+}
+
+/* ── PDF icon wrap ── */
+.docIconWrap {
+  background: var(--orange-pale);
+  color: var(--orange);
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  margin-bottom: 14px;
+  border: 1px solid var(--orange-muted);
+  transition: background-color 0.2s ease;
 }
 
-.icon {
-  font-size: 38px;
-  color: #e65100;
+.docRow:hover .docIconWrap {
+  background: #FFE0B2;
 }
 
-/* ── Separator line ── */
-.divider {
-  width: 100%;
-  border: none;
-  border-top: 1.5px solid #f0cfc0;
-  margin: 0 0 12px;
+.docIcon {
+  color: #d32f2f;
 }
 
-/* ── Text ── */
-.info {
-  width: 100%;
-  text-align: center;
+/* ── Text info ── */
+.docInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
 }
 
-.title {
-  font-size: 0.88rem;             /* bumped up from 0.78rem */
+.docTitle {
+  font-family: var(--font-ui);
   font-weight: 700;
-  color: #3d1a00;
-  margin: 0 0 4px;
-  line-height: 1.35;
-  word-break: break-word;
+  color: var(--text-dark);
+  font-size: 1.05rem;
+  margin: 0 0 3px;
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.meta {
-  font-size: 0.72rem;
-  color: #b05a2a;
-  margin: 0;
-  line-height: 1.3;
+.docMeta {
+  font-family: var(--font-ui);
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* ── Action CTA ── */
+.docAction {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  color: var(--orange);
+  flex-shrink: 0;
+}
+
+.actionText {
+  font-family: var(--font-ui);
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+.actionIcon {
+  transition: transform 0.2s ease;
 }

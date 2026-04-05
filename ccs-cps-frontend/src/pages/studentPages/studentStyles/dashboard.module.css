@@ -1,8 +1,5 @@
 @import url("https://fonts.googleapis.com/css2?family=Afacad:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Freeman&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap");
 
-/* ═══════════════════════════════════════════════
-   CSS TOKENS
-   ═══════════════════════════════════════════════ */
 :root {
   --orange:       #E65100;
   --orange-light: #FF6D00;
@@ -416,7 +413,7 @@
 /* ── Not Cleared: Uses your native Orange dashboard tokens ── */
 .notCleared {
   background-color: var(--orange-pale);
-  border: 1.5px dashed var(--orange-muted);
+  border: 1.5px dashed var(--orange-light);
 }
 
 .notCleared .statusTitle,

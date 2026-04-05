@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import tabStyles from "../../pages/studentPages/studentStyles/Tab.module.css";
 import formStyles from "../../pages/facultyPages/facultyStyles/studentList.module.css";
 import AppModal from "../ui/Modal";
@@ -8,57 +9,32 @@ import EditButton from "../../components/ui/EditButton";
 import DeleteButton from "../../components/ui/DeleteButton";
 import ConfirmModal from "../../components/ui/ConfirmModal";
 import AppToast from "../../components/ui/AppToast";
+import { FiUsers, FiShield } from "react-icons/fi";
 
-/* ───────────── Constants ───────────── */
-const MEMBER_TYPES = [
-  "President", "VP", "Secretary", "Treasurer", "Member", "Other",
-];
-
-const SPORT_TYPES = [
-  "Basketball", "Volleyball", "Badminton", "Table Tennis",
-  "Chess", "Swimming", "Athletics", "Football", "Other",
-];
-
-const SPORT_ROLES = [
-  "Player", "Captain", "Co-Captain", "Coach", "Manager", "Other",
-];
+/* ── Constants ───────────────────────────────────────────────── */
+const MEMBER_TYPES = ["President", "VP", "Secretary", "Treasurer", "Member", "Other"];
+const SPORT_TYPES  = ["Basketball", "Volleyball", "Badminton", "Table Tennis", "Chess", "Swimming", "Athletics", "Football", "Other"];
+const SPORT_ROLES  = ["Player", "Captain", "Co-Captain", "Coach", "Manager", "Other"];
 
 const getAutoOrg = (program = "") => {
   const p = program.toLowerCase();
-  if (p.includes("information technology"))
-    return "SITES - Society of Information Technology Students";
-  if (p.includes("computer science"))
-    return "ACCS - Association of Computer Science Students";
+  if (p.includes("information technology")) return "SITES - Society of Information Technology Students";
+  if (p.includes("computer science"))       return "ACCS - Association of Computer Science Students";
   return null;
 };
 
-const EMPTY_ORG_FORM = {
-  organization: "",
-  memberType: "",
-  customMemberType: "",
-};
+const EMPTY_ORG_FORM   = { organization: "", memberType: "", customMemberType: "" };
+const EMPTY_SPORT_FORM = { sport: "", customSport: "", role: "", customRole: "", level: "" };
 
-const EMPTY_SPORT_FORM = {
-  sport: "",
-  customSport: "",
-  role: "",
-  customRole: "",
-  level: "",
-};
-
-/* ───────────── Org Modal ───────────── */
+/* ── Org Modal ──────────────────────────────────────────────── */
 function OrgModal({ isOpen, onClose, onSave, initialData }) {
   const [formData, setFormData] = useState(EMPTY_ORG_FORM);
 
   useEffect(() => {
     if (initialData) {
       const { index: _i, yearAdded: _y, ...rest } = initialData;
-      const isCustomType = rest.memberType && !MEMBER_TYPES.includes(rest.memberType);
-      setFormData({
-        organization: rest.organization || "",
-        memberType: isCustomType ? "Other" : rest.memberType || "",
-        customMemberType: isCustomType ? rest.memberType : "",
-      });
+      const isCustom = rest.memberType && !MEMBER_TYPES.includes(rest.memberType);
+      setFormData({ organization: rest.organization || "", memberType: isCustom ? "Other" : rest.memberType || "", customMemberType: isCustom ? rest.memberType : "" });
     } else {
       setFormData(EMPTY_ORG_FORM);
     }
@@ -66,53 +42,27 @@ function OrgModal({ isOpen, onClose, onSave, initialData }) {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData((p) => ({ ...p, [name]: value }));
   };
 
   const handleSubmit = () => {
-    if (!formData.organization.trim()) {
-      alert("Please enter an organization name.");
-      return;
-    }
-    if (!formData.memberType) {
-      alert("Please select a member type.");
-      return;
-    }
-    if (formData.memberType === "Other" && !formData.customMemberType.trim()) {
-      alert("Please specify the member type.");
-      return;
-    }
-
-    const finalType =
-      formData.memberType === "Other"
-        ? formData.customMemberType.trim()
-        : formData.memberType;
-
+    if (!formData.organization.trim()) { alert("Please enter an organization name."); return; }
+    if (!formData.memberType)          { alert("Please select a member type.");        return; }
+    if (formData.memberType === "Other" && !formData.customMemberType.trim()) { alert("Please specify the member type."); return; }
+    const finalType = formData.memberType === "Other" ? formData.customMemberType.trim() : formData.memberType;
     onSave({ organization: formData.organization.trim(), memberType: finalType });
   };
 
   if (!isOpen) return null;
 
-  return (
-    <AppModal
-      isOpen={isOpen}
-      onClose={onClose}
-      title={initialData ? "Edit Organization" : "Add Organization"}
-      maxWidth="500px"
-    >
+  return createPortal(
+    <AppModal isOpen={isOpen} onClose={onClose} title={initialData ? "Edit Organization" : "Add Organization"} maxWidth="500px">
       <div className={formStyles.modalBody}>
         <div className={formStyles.formGrid}>
           <div className={`${formStyles.formGroup} ${formStyles.fullWidth}`}>
             <label>Organization Name</label>
-            <input
-              name="organization"
-              value={formData.organization}
-              onChange={handleChange}
-              placeholder="e.g. Math Club, Red Cross, Rotaract"
-              disabled={!!initialData}
-            />
+            <input name="organization" value={formData.organization} onChange={handleChange} placeholder="e.g. Math Club, Red Cross, Rotaract" disabled={!!initialData} />
           </div>
-
           <div className={`${formStyles.formGroup} ${formStyles.fullWidth}`}>
             <label>Member Type</label>
             <select name="memberType" value={formData.memberType} onChange={handleChange}>
@@ -120,32 +70,24 @@ function OrgModal({ isOpen, onClose, onSave, initialData }) {
               {MEMBER_TYPES.map((t) => <option key={t}>{t}</option>)}
             </select>
           </div>
-
           {formData.memberType === "Other" && (
             <div className={`${formStyles.formGroup} ${formStyles.fullWidth}`}>
               <label>Specify Member Type</label>
-              <input
-                name="customMemberType"
-                value={formData.customMemberType}
-                onChange={handleChange}
-                placeholder="e.g. Adviser, Volunteer"
-              />
+              <input name="customMemberType" value={formData.customMemberType} onChange={handleChange} placeholder="e.g. Adviser, Volunteer" />
             </div>
           )}
         </div>
       </div>
-
       <div className={formStyles.modalFooter}>
         <AppButton variant="secondary" onClick={onClose}>Cancel</AppButton>
-        <AppButton variant="primary" onClick={handleSubmit}>
-          {initialData ? "Save Changes" : "Add Organization"}
-        </AppButton>
+        <AppButton variant="primary" onClick={handleSubmit}>{initialData ? "Save Changes" : "Add Organization"}</AppButton>
       </div>
-    </AppModal>
+    </AppModal>,
+    document.body
   );
 }
 
-/* ───────────── Sport Modal ───────────── */
+/* ── Sport Modal ────────────────────────────────────────────── */
 function SportModal({ isOpen, onClose, onSave, initialData }) {
   const [formData, setFormData] = useState(EMPTY_SPORT_FORM);
 
@@ -154,13 +96,7 @@ function SportModal({ isOpen, onClose, onSave, initialData }) {
       const { index: _i, yearAdded: _y, ...rest } = initialData;
       const isCustomSport = rest.sport && !SPORT_TYPES.includes(rest.sport);
       const isCustomRole  = rest.role  && !SPORT_ROLES.includes(rest.role);
-      setFormData({
-        sport:       isCustomSport ? "Other" : rest.sport || "",
-        customSport: isCustomSport ? rest.sport : "",
-        role:        isCustomRole  ? "Other" : rest.role  || "",
-        customRole:  isCustomRole  ? rest.role  : "",
-        level:       rest.level || "",
-      });
+      setFormData({ sport: isCustomSport ? "Other" : rest.sport || "", customSport: isCustomSport ? rest.sport : "", role: isCustomRole ? "Other" : rest.role || "", customRole: isCustomRole ? rest.role : "", level: rest.level || "" });
     } else {
       setFormData(EMPTY_SPORT_FORM);
     }
@@ -168,47 +104,25 @@ function SportModal({ isOpen, onClose, onSave, initialData }) {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData((p) => ({ ...p, [name]: value }));
   };
 
   const handleSubmit = () => {
-    if (!formData.sport) {
-      alert("Please select a sport.");
-      return;
-    }
-    if (formData.sport === "Other" && !formData.customSport.trim()) {
-      alert("Please specify the sport.");
-      return;
-    }
-    if (!formData.role) {
-      alert("Please select a role.");
-      return;
-    }
-    if (formData.role === "Other" && !formData.customRole.trim()) {
-      alert("Please specify the role.");
-      return;
-    }
-
-    const finalSport = formData.sport === "Other"
-      ? formData.customSport.trim() : formData.sport;
-    const finalRole  = formData.role  === "Other"
-      ? formData.customRole.trim()  : formData.role;
-
+    if (!formData.sport)                                            { alert("Please select a sport.");      return; }
+    if (formData.sport === "Other" && !formData.customSport.trim()) { alert("Please specify the sport.");   return; }
+    if (!formData.role)                                             { alert("Please select a role.");       return; }
+    if (formData.role  === "Other" && !formData.customRole.trim())  { alert("Please specify the role.");    return; }
+    const finalSport = formData.sport === "Other" ? formData.customSport.trim() : formData.sport;
+    const finalRole  = formData.role  === "Other" ? formData.customRole.trim()  : formData.role;
     onSave({ sport: finalSport, role: finalRole, level: formData.level });
   };
 
   if (!isOpen) return null;
 
-  return (
-    <AppModal
-      isOpen={isOpen}
-      onClose={onClose}
-      title={initialData ? "Edit Sport" : "Add Sport"}
-      maxWidth="500px"
-    >
+  return createPortal(
+    <AppModal isOpen={isOpen} onClose={onClose} title={initialData ? "Edit Sport" : "Add Sport"} maxWidth="500px">
       <div className={formStyles.modalBody}>
         <div className={formStyles.formGrid}>
-
           <div className={`${formStyles.formGroup} ${formStyles.fullWidth}`}>
             <label>Sport</label>
             <select name="sport" value={formData.sport} onChange={handleChange}>
@@ -216,19 +130,12 @@ function SportModal({ isOpen, onClose, onSave, initialData }) {
               {SPORT_TYPES.map((s) => <option key={s}>{s}</option>)}
             </select>
           </div>
-
           {formData.sport === "Other" && (
             <div className={`${formStyles.formGroup} ${formStyles.fullWidth}`}>
               <label>Specify Sport</label>
-              <input
-                name="customSport"
-                value={formData.customSport}
-                onChange={handleChange}
-                placeholder="e.g. Arnis, Sepak Takraw"
-              />
+              <input name="customSport" value={formData.customSport} onChange={handleChange} placeholder="e.g. Arnis, Sepak Takraw" />
             </div>
           )}
-
           <div className={`${formStyles.formGroup} ${formStyles.fullWidth}`}>
             <label>Role</label>
             <select name="role" value={formData.role} onChange={handleChange}>
@@ -236,19 +143,12 @@ function SportModal({ isOpen, onClose, onSave, initialData }) {
               {SPORT_ROLES.map((r) => <option key={r}>{r}</option>)}
             </select>
           </div>
-
           {formData.role === "Other" && (
             <div className={`${formStyles.formGroup} ${formStyles.fullWidth}`}>
               <label>Specify Role</label>
-              <input
-                name="customRole"
-                value={formData.customRole}
-                onChange={handleChange}
-                placeholder="e.g. Statistician, Assistant Coach"
-              />
+              <input name="customRole" value={formData.customRole} onChange={handleChange} placeholder="e.g. Statistician, Assistant Coach" />
             </div>
           )}
-
           <div className={`${formStyles.formGroup} ${formStyles.fullWidth}`}>
             <label>Level</label>
             <select name="level" value={formData.level} onChange={handleChange}>
@@ -259,33 +159,24 @@ function SportModal({ isOpen, onClose, onSave, initialData }) {
               <option>National</option>
             </select>
           </div>
-
         </div>
       </div>
-
       <div className={formStyles.modalFooter}>
         <AppButton variant="secondary" onClick={onClose}>Cancel</AppButton>
-        <AppButton variant="primary" onClick={handleSubmit}>
-          {initialData ? "Save Changes" : "Add Sport"}
-        </AppButton>
+        <AppButton variant="primary" onClick={handleSubmit}>{initialData ? "Save Changes" : "Add Sport"}</AppButton>
       </div>
-    </AppModal>
+    </AppModal>,
+    document.body
   );
 }
 
-/* ───────────── Badge ───────────── */
-function Badge({ label, color }) {
-  return <span className={`${tabStyles.badge} ${color}`}>{label}</span>;
-}
-
-/* ───────────── Main Component ───────────── */
+/* ── Main Component ─────────────────────────────────────────── */
 export default function TabOrganization() {
   const [orgList,   setOrgList]   = useState([]);
   const [sportList, setSportList] = useState([]);
   const [loading,   setLoading]   = useState(true);
   const [saving,    setSaving]    = useState(false);
 
-  // Org modal
   const [isOrgModalOpen,   setIsOrgModalOpen]   = useState(false);
   const [selectedOrg,      setSelectedOrg]      = useState(null);
   const [orgEditIndex,     setOrgEditIndex]      = useState(null);
@@ -294,7 +185,6 @@ export default function TabOrganization() {
   const [isConfirmOrgDel,  setIsConfirmOrgDel]  = useState(false);
   const [orgDelIndex,      setOrgDelIndex]       = useState(null);
 
-  // Sport modal
   const [isSportModalOpen,   setIsSportModalOpen]   = useState(false);
   const [selectedSport,      setSelectedSport]      = useState(null);
   const [sportEditIndex,     setSportEditIndex]     = useState(null);
@@ -303,20 +193,18 @@ export default function TabOrganization() {
   const [isConfirmSportDel,  setIsConfirmSportDel] = useState(false);
   const [sportDelIndex,      setSportDelIndex]      = useState(null);
 
-  // Toast
   const [toast, setToast] = useState({ isVisible: false, message: "", type: "success" });
 
-  const user   = JSON.parse(localStorage.getItem("user"));
-  const id     = user?._id;
+  const user    = JSON.parse(localStorage.getItem("user"));
+  const id      = user?._id;
   const autoOrg = getAutoOrg(user?.program);
 
-  /* ── Fetch on mount ── */
   useEffect(() => {
-    const fetch_ = async () => {
+    const fetchData = async () => {
       if (!id) { setLoading(false); return; }
       try {
         const res  = await fetch(`http://localhost:5000/api/students/${id}`);
-        if (!res.ok) throw new Error("Failed to fetch");
+        if (!res.ok) throw new Error("Failed");
         const data = await res.json();
         setOrgList(data.organizations || []);
         setSportList(data.sports || []);
@@ -326,10 +214,9 @@ export default function TabOrganization() {
         setLoading(false);
       }
     };
-    fetch_();
+    fetchData();
   }, []);
 
-  /* ── Generic save to DB ── */
   const saveToDB = async (payload) => {
     if (!id) return false;
     setSaving(true);
@@ -350,122 +237,77 @@ export default function TabOrganization() {
     }
   };
 
-  /* ════════════ ORG HANDLERS ════════════ */
+  /* Org handlers */
   const handleOrgSave = (data) => {
-    const yearAdded = orgEditIndex !== null
-      ? orgList[orgEditIndex].yearAdded
-      : new Date().getFullYear().toString();
+    const yearAdded = orgEditIndex !== null ? orgList[orgEditIndex].yearAdded : new Date().getFullYear().toString();
     setPendingOrg({ ...data, yearAdded });
     setIsConfirmOrgSave(true);
   };
-
   const handleConfirmOrgSave = async () => {
-    const updated = orgEditIndex !== null
-      ? orgList.map((o, i) => i === orgEditIndex ? pendingOrg : o)
-      : [...orgList, pendingOrg];
-
+    const updated = orgEditIndex !== null ? orgList.map((o, i) => i === orgEditIndex ? pendingOrg : o) : [...orgList, pendingOrg];
     const ok = await saveToDB({ organizations: updated });
     if (ok) {
-      setOrgList(updated);
-      setIsConfirmOrgSave(false);
-      setIsOrgModalOpen(false);
-      setPendingOrg(null);
-      setOrgEditIndex(null);
-      setSelectedOrg(null);
-      setToast({
-        isVisible: true,
-        message: orgEditIndex !== null
-          ? "Organization updated successfully."
-          : "Organization added successfully.",
-        type: "success",
-      });
+      setOrgList(updated); setIsConfirmOrgSave(false); setIsOrgModalOpen(false);
+      setPendingOrg(null); setOrgEditIndex(null); setSelectedOrg(null);
+      setToast({ isVisible: true, message: orgEditIndex !== null ? "Organization updated." : "Organization added.", type: "success" });
     }
   };
-
   const handleConfirmOrgDelete = async () => {
     const updated = orgList.filter((_, i) => i !== orgDelIndex);
     const ok = await saveToDB({ organizations: updated });
-    if (ok) {
-      setOrgList(updated);
-      setIsConfirmOrgDel(false);
-      setOrgDelIndex(null);
-      setToast({ isVisible: true, message: "Organization removed successfully.", type: "success" });
-    }
+    if (ok) { setOrgList(updated); setIsConfirmOrgDel(false); setOrgDelIndex(null); setToast({ isVisible: true, message: "Organization removed.", type: "success" }); }
   };
 
-  /* ════════════ SPORT HANDLERS ════════════ */
+  /* Sport handlers */
   const handleSportSave = (data) => {
-    const yearAdded = sportEditIndex !== null
-      ? sportList[sportEditIndex].yearAdded
-      : new Date().getFullYear().toString();
+    const yearAdded = sportEditIndex !== null ? sportList[sportEditIndex].yearAdded : new Date().getFullYear().toString();
     setPendingSport({ ...data, yearAdded });
     setIsConfirmSportSave(true);
   };
-
   const handleConfirmSportSave = async () => {
-    const updated = sportEditIndex !== null
-      ? sportList.map((s, i) => i === sportEditIndex ? pendingSport : s)
-      : [...sportList, pendingSport];
-
+    const updated = sportEditIndex !== null ? sportList.map((s, i) => i === sportEditIndex ? pendingSport : s) : [...sportList, pendingSport];
     const ok = await saveToDB({ sports: updated });
     if (ok) {
-      setSportList(updated);
-      setIsConfirmSportSave(false);
-      setIsSportModalOpen(false);
-      setPendingSport(null);
-      setSportEditIndex(null);
-      setSelectedSport(null);
-      setToast({
-        isVisible: true,
-        message: sportEditIndex !== null
-          ? "Sport updated successfully."
-          : "Sport added successfully.",
-        type: "success",
-      });
+      setSportList(updated); setIsConfirmSportSave(false); setIsSportModalOpen(false);
+      setPendingSport(null); setSportEditIndex(null); setSelectedSport(null);
+      setToast({ isVisible: true, message: sportEditIndex !== null ? "Sport updated." : "Sport added.", type: "success" });
     }
   };
-
   const handleConfirmSportDelete = async () => {
     const updated = sportList.filter((_, i) => i !== sportDelIndex);
     const ok = await saveToDB({ sports: updated });
-    if (ok) {
-      setSportList(updated);
-      setIsConfirmSportDel(false);
-      setSportDelIndex(null);
-      setToast({ isVisible: true, message: "Sport removed successfully.", type: "success" });
-    }
+    if (ok) { setSportList(updated); setIsConfirmSportDel(false); setSportDelIndex(null); setToast({ isVisible: true, message: "Sport removed.", type: "success" }); }
   };
 
-  /* ── Default orgs ── */
   const defaultOrgs = [
-    { organization: "CCS - College of Computing Studies", memberType: "Member",
-      yearAdded: new Date().getFullYear().toString() },
-    ...(autoOrg ? [{ organization: autoOrg, memberType: "Member",
-      yearAdded: new Date().getFullYear().toString() }] : []),
+    { organization: "CCS - College of Computing Studies", memberType: "Member", yearAdded: new Date().getFullYear().toString() },
+    ...(autoOrg ? [{ organization: autoOrg, memberType: "Member", yearAdded: new Date().getFullYear().toString() }] : []),
   ];
 
-  if (loading) return <div className={tabStyles.section}>Loading...</div>;
+  if (loading) return <div className={tabStyles.section}><div className={tabStyles.loadingState}>Loading…</div></div>;
 
   return (
-    <div>
-      {/* ════════════ ORGANIZATIONS ════════════ */}
+    <div className={tabStyles.tabWrapper}>
+
+      {/* ── Organizations ── */}
       <div className={tabStyles.section}>
         <div className={tabStyles.sectionHeader}>
-          <div className={tabStyles.sectionTitle}>Organizations</div>
+          <div className={tabStyles.sectionTitle}>
+            <FiUsers size={13} /> Organizations
+          </div>
           <div className={tabStyles.headerActions}>
             <AddButton title="Add Organization" onClick={() => { setSelectedOrg(null); setOrgEditIndex(null); setIsOrgModalOpen(true); }} disabled={saving} />
           </div>
         </div>
 
         <div className={tabStyles.cardGrid}>
-          {/* Default orgs */}
           {defaultOrgs.map((org, idx) => (
             <div key={`def-${idx}`} className={tabStyles.card}>
               <div className={tabStyles.cardHeader}>
                 <div className={tabStyles.cardTitle}>{org.organization}</div>
               </div>
               <div className={tabStyles.cardMeta}>
-                <Badge label={org.memberType} color={tabStyles.badgeBlue} />
+                <span className={`${tabStyles.badge} ${tabStyles.badgeBlue}`}>{org.memberType}</span>
               </div>
               <div className={tabStyles.cardFooter}>
                 <span className={tabStyles.cardDate}>Since {org.yearAdded}</span>
@@ -473,7 +315,6 @@ export default function TabOrganization() {
             </div>
           ))}
 
-          {/* User orgs */}
           {orgList.map((org, idx) => (
             <div key={`org-${idx}`} className={tabStyles.card}>
               <div className={tabStyles.cardHeader}>
@@ -484,7 +325,7 @@ export default function TabOrganization() {
                 </div>
               </div>
               <div className={tabStyles.cardMeta}>
-                <Badge label={org.memberType} color={tabStyles.badgeBlue} />
+                <span className={`${tabStyles.badge} ${tabStyles.badgeBlue}`}>{org.memberType}</span>
               </div>
               <div className={tabStyles.cardFooter}>
                 <span className={tabStyles.cardDate}>Since {org.yearAdded}</span>
@@ -493,24 +334,24 @@ export default function TabOrganization() {
           ))}
 
           {orgList.length === 0 && (
-            <p className={tabStyles.empty} style={{ gridColumn: "1 / -1" }}>
-              No additional organizations recorded.
-            </p>
+            <p className={tabStyles.empty} style={{ gridColumn: "1 / -1" }}>No additional organizations recorded.</p>
           )}
         </div>
       </div>
 
-      {/* ════════════ SPORTS ════════════ */}
+      {/* ── Sports ── */}
       <div className={tabStyles.section}>
         <div className={tabStyles.sectionHeader}>
-          <div className={tabStyles.sectionTitle}>Sports</div>
+          <div className={tabStyles.sectionTitle}>
+            <FiShield size={13} /> Sports
+          </div>
           <div className={tabStyles.headerActions}>
             <AddButton title="Add Sport" onClick={() => { setSelectedSport(null); setSportEditIndex(null); setIsSportModalOpen(true); }} disabled={saving} />
           </div>
         </div>
 
         {sportList.length === 0 ? (
-          <p className={tabStyles.empty}>No sports recorded.</p>
+          <p className={tabStyles.empty}>No sports recorded yet.</p>
         ) : (
           <div className={tabStyles.cardGrid}>
             {sportList.map((sp, idx) => (
@@ -523,8 +364,8 @@ export default function TabOrganization() {
                   </div>
                 </div>
                 <div className={tabStyles.cardMeta}>
-                  <Badge label={sp.role}  color={tabStyles.badgeOrange} />
-                  {sp.level && <Badge label={sp.level} color={tabStyles.badgeGreen} />}
+                  <span className={`${tabStyles.badge} ${tabStyles.badgeOrange}`}>{sp.role}</span>
+                  {sp.level && <span className={`${tabStyles.badge} ${tabStyles.badgeGreen}`}>{sp.level}</span>}
                 </div>
                 <div className={tabStyles.cardFooter}>
                   <span className={tabStyles.cardDate}>Since {sp.yearAdded}</span>
@@ -535,32 +376,20 @@ export default function TabOrganization() {
         )}
       </div>
 
-      {/* ── Modals ── */}
-      <OrgModal
-        isOpen={isOrgModalOpen}
-        onClose={() => setIsOrgModalOpen(false)}
-        onSave={handleOrgSave}
-        initialData={selectedOrg}
-      />
-      <SportModal
-        isOpen={isSportModalOpen}
-        onClose={() => setIsSportModalOpen(false)}
-        onSave={handleSportSave}
-        initialData={selectedSport}
-      />
+      {/* ── Portaled Modals ── */}
+      <OrgModal   isOpen={isOrgModalOpen}   onClose={() => setIsOrgModalOpen(false)}   onSave={handleOrgSave}   initialData={selectedOrg} />
+      <SportModal isOpen={isSportModalOpen} onClose={() => setIsSportModalOpen(false)} onSave={handleSportSave} initialData={selectedSport} />
 
-      {/* ── Confirm Modals ── */}
-      <ConfirmModal isOpen={isConfirmOrgSave}  onClose={() => setIsConfirmOrgSave(false)}  onConfirm={handleConfirmOrgSave}    title={orgEditIndex   !== null ? "Confirm Edit" : "Confirm Add"} message={orgEditIndex   !== null ? `Update "${pendingOrg?.organization}"?`  : `Add "${pendingOrg?.organization}"?`}  isProcessing={saving} />
-      <ConfirmModal isOpen={isConfirmOrgDel}   onClose={() => setIsConfirmOrgDel(false)}   onConfirm={handleConfirmOrgDelete}  title="Remove Organization" message={`Remove "${orgList[orgDelIndex]?.organization}"?`}    isProcessing={saving} />
-      <ConfirmModal isOpen={isConfirmSportSave} onClose={() => setIsConfirmSportSave(false)} onConfirm={handleConfirmSportSave} title={sportEditIndex !== null ? "Confirm Edit" : "Confirm Add"} message={sportEditIndex !== null ? `Update "${pendingSport?.sport}"?`        : `Add "${pendingSport?.sport}"?`}        isProcessing={saving} />
-      <ConfirmModal isOpen={isConfirmSportDel}  onClose={() => setIsConfirmSportDel(false)}  onConfirm={handleConfirmSportDelete} title="Remove Sport"  message={`Remove "${sportList[sportDelIndex]?.sport}"?`}          isProcessing={saving} />
+      {isConfirmOrgSave  && createPortal(<ConfirmModal isOpen onClose={() => setIsConfirmOrgSave(false)}  onConfirm={handleConfirmOrgSave}    title={orgEditIndex   !== null ? "Confirm Edit" : "Confirm Add"} message={orgEditIndex   !== null ? `Update "${pendingOrg?.organization}"?`  : `Add "${pendingOrg?.organization}"?`}  isProcessing={saving} />, document.body)}
+      {isConfirmOrgDel   && createPortal(<ConfirmModal isOpen onClose={() => setIsConfirmOrgDel(false)}   onConfirm={handleConfirmOrgDelete}  title="Remove Organization" message={`Remove "${orgList[orgDelIndex]?.organization}"?`}   isProcessing={saving} />, document.body)}
+      {isConfirmSportSave && createPortal(<ConfirmModal isOpen onClose={() => setIsConfirmSportSave(false)} onConfirm={handleConfirmSportSave} title={sportEditIndex !== null ? "Confirm Edit" : "Confirm Add"} message={sportEditIndex !== null ? `Update "${pendingSport?.sport}"?` : `Add "${pendingSport?.sport}"?`} isProcessing={saving} />, document.body)}
+      {isConfirmSportDel  && createPortal(<ConfirmModal isOpen onClose={() => setIsConfirmSportDel(false)}  onConfirm={handleConfirmSportDelete} title="Remove Sport" message={`Remove "${sportList[sportDelIndex]?.sport}"?`} isProcessing={saving} />, document.body)}
 
-      {/* ── Toast ── */}
       <AppToast
         isVisible={toast.isVisible}
         message={toast.message}
         type={toast.type}
-        onClose={() => setToast((prev) => ({ ...prev, isVisible: false }))}
+        onClose={() => setToast((p) => ({ ...p, isVisible: false }))}
       />
     </div>
   );

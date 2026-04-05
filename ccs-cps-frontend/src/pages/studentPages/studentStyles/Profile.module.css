@@ -1,10 +1,12 @@
-/* Profile.module.css */
+/* ── Profile.module.css ── */
 
+/* ═══════════════════════════════════════
+   PAGE ROOT
+═══════════════════════════════════════ */
 .pageRoot {
   display: flex;
   min-height: 100vh;
-  background: #f5f5f5;
-  font-family: "Segoe UI", system-ui, sans-serif;
+  background: #fdf4ef;
 }
 
 .sidebarArea {
@@ -18,20 +20,23 @@
   flex-direction: column;
 }
 
+/* ── Scrollable content area ── */
 .scrollArea {
   flex: 1;
   overflow-y: auto;
-  padding: clamp(1rem, 2.5vw, 1.75rem) clamp(1rem, 3vw, 2rem);
+  padding: 24px 28px;
   display: flex;
   flex-direction: column;
-  gap: clamp(0.75rem, 1.5vw, 1rem);
+  gap: 16px;
 }
 
-/* ── Content card (tabs + panel) — full width below profile banner ── */
+/* ═══════════════════════════════════════
+   TAB CONTENT CARD
+═══════════════════════════════════════ */
 .contentArea {
-  background: #fff;
-  border-radius: 12px;
-  border: 1px solid #e5e7eb;
+  background: #ffffff;
+  border-radius: 14px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.07);
   overflow: hidden;
 }
 
@@ -40,51 +45,78 @@
   display: flex;
   overflow-x: auto;
   scrollbar-width: none;
-  border-bottom: 2px solid #f0f0f0;
-  background: #fafafa;
-  padding: 0 1rem;
+  border-bottom: 2px solid #f5e8e0;
+  background: #fffaf7;
+  padding: 0 16px;
+  gap: 2px;
 }
+
 .tabBar::-webkit-scrollbar {
   display: none;
 }
 
 .tabBtn {
   flex-shrink: 0;
-  padding: 0.85rem 1.1rem;
+  padding: 12px 16px;
   border: none;
   background: none;
-  font-size: clamp(0.74rem, 1.3vw, 0.84rem);
+  font-size: 0.82rem;
   font-weight: 600;
-  color: #6b7280;
+  color: #9a6a50;
   cursor: pointer;
-  border-bottom: 3px solid transparent;
+  border-bottom: 2.5px solid transparent;
   margin-bottom: -2px;
   transition:
-    color 0.2s,
-    border-color 0.2s;
+    color 0.18s,
+    border-color 0.18s;
   display: flex;
   align-items: center;
-  gap: 0.35rem;
+  gap: 6px;
   white-space: nowrap;
+  font-family: inherit;
 }
+
 .tabBtn:hover {
   color: #e65100;
 }
+
 .tabActive {
   color: #e65100 !important;
   border-bottom-color: #e65100 !important;
 }
 
+/* Violation count badge on tab */
 .tabBadge {
   background: #e65100;
   color: #fff;
-  border-radius: 20px;
-  padding: 0.05rem 0.48rem;
+  border-radius: 999px;
+  padding: 1px 7px;
   font-size: 0.65rem;
   font-weight: 700;
+  line-height: 1.6;
 }
 
 /* ── Content panel ── */
 .panel {
-  padding: clamp(1rem, 2.5vw, 1.5rem);
+  padding: 24px;
+}
+
+/* ═══════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════ */
+@media (max-width: 768px) {
+  .scrollArea {
+    padding: 16px;
+  }
+
+  .panel {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .scrollArea {
+    padding: 12px;
+    gap: 12px;
+  }
 }

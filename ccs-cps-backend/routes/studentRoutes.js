@@ -8,6 +8,7 @@ const {
   deleteStudent, // ✅ added
   addViolation,
   deleteViolation,
+  changePassword,
 } = require("../controllers/studentController");
 
 // GET    /api/students                       → all students
@@ -30,5 +31,7 @@ router.post("/:id/violations", addViolation);
 
 // DELETE /api/students/:id/violations/:index → remove a violation by index
 router.delete("/:id/violations/:index", deleteViolation);
+
+router.patch("/:id/change-password", changePassword);
 
 module.exports = router;

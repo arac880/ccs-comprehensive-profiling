@@ -1,29 +1,25 @@
 import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import styles from "../../pages/studentPages/studentStyles/Tab.module.css";
 import EditButton from "../../components/ui/EditButton";
 import EditStudentModal from "../../components/studentComponents/EditStudentModal";
 import AppToast from "../../components/ui/AppToast";
 
-/* ───────────── Helpers ───────────── */
+/* ───────────── Field: just label + value, no card ───────────── */
 function Field({ label, value }) {
   return (
     <div className={styles.infoField}>
       <span className={styles.infoLabel}>{label}</span>
-      <span className={styles.infoValue}>{value ?? ""}</span>
+      <span className={styles.infoValue}>{value || "—"}</span>
     </div>
   );
 }
 
+/* ───────────── Section block ───────────── */
 function SectionBlock({ title, children, action }) {
   return (
     <div className={styles.section}>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
+      <div className={styles.sectionHeader}>
         <div className={styles.sectionTitle}>{title}</div>
         {action && <div>{action}</div>}
       </div>
@@ -51,7 +47,6 @@ export default function TabPersonal() {
         setLoading(false);
         return;
       }
-
       try {
         const res = await fetch(`http://localhost:5000/api/students/${id}`);
         if (!res.ok) throw new Error("Failed to fetch student");
@@ -63,30 +58,38 @@ export default function TabPersonal() {
         setLoading(false);
       }
     };
-
     fetchStudent();
   }, []);
 
   const handleSave = (updatedData) => {
     setStudent((prev) => ({ ...prev, ...updatedData }));
-
-    // Show toast here in TabPersonal after modal closes
     setToast({
       isVisible: true,
-      message: "Successfully updated Personal Info.",
+      message: "Personal info updated successfully.",
       type: "success",
     });
   };
 
   if (loading)
-    return <div className={styles.section}>Loading student data...</div>;
+    return (
+      <div className={styles.section}>
+        <div className={styles.loadingState}>Loading student data…</div>
+      </div>
+    );
+
   if (!student)
     return (
-      <div className={styles.section}>Unable to load student information.</div>
+      <div className={styles.section}>
+        <div className={styles.emptyState}>
+          <p className={styles.emptyStateTitle}>
+            Unable to load student information.
+          </p>
+        </div>
+      </div>
     );
 
   return (
-    <div>
+    <div className={styles.tabWrapper}>
       {/* ── Basic Information ── */}
       <SectionBlock
         title="Basic Information"
@@ -151,15 +154,18 @@ export default function TabPersonal() {
         <Field label="Email Address" value={student.guardianEmail} />
       </SectionBlock>
 
-      {/* ── Edit Modal ── */}
-      <EditStudentModal
-        isOpen={isEditOpen}
-        onClose={() => setIsEditOpen(false)}
-        student={student}
-        onSave={handleSave}
-      />
+      {/* ── Edit Modal — portaled to body so it covers full screen ── */}
+      {isEditOpen &&
+        createPortal(
+          <EditStudentModal
+            isOpen={isEditOpen}
+            onClose={() => setIsEditOpen(false)}
+            student={student}
+            onSave={handleSave}
+          />,
+          document.body,
+        )}
 
-      {/* ── Toast — lives here so it survives modal close ── */}
       <AppToast
         isVisible={toast.isVisible}
         message={toast.message}
