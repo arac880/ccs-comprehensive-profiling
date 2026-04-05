@@ -28,7 +28,7 @@ const FacultyLayout = () => {
           {" "}
           <Outlet />
         </div>
-        <CCSFooter version="v1.0.2" />{" "}
+        <CCSFooter />{" "}
       </div>
     </div>
   );

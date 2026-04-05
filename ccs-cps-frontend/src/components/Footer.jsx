@@ -1,6 +1,6 @@
 import styles from "./styles/Footer.module.css";
 
-export default function CCSFooter({ version = "v1.0" }) {
+export default function CCSFooter() {
   const year = new Date().getFullYear();
 
   return (
@@ -11,7 +11,7 @@ export default function CCSFooter({ version = "v1.0" }) {
           <span className={styles.bold}>CCS</span>
           <span className={styles.sep}>|</span>
           <span className={styles.thin}>Comprehensive Profiling System</span>
-          <span className={styles.version}>{version}</span>
+          <span className={styles.version}>v1.0.3</span>
         </div>
       </div>
 
