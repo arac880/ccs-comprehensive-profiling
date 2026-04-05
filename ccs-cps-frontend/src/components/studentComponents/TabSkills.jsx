@@ -1,3 +1,4 @@
+// components/studentComponents/TabSkills.jsx
 import { useState, useEffect, useMemo } from "react";
 import { createPortal } from "react-dom";
 import tabStyles from "../../pages/studentPages/studentStyles/Tab.module.css";
@@ -25,18 +26,20 @@ const CATEGORIES = [
   "Other",
 ];
 
-const CAT_COLOR = {
-  Programming: tabStyles.badgeOrange,
-  "Web Development": tabStyles.badgeBlue,
-  Database: tabStyles.badgeGreen,
-  Design: tabStyles.badgePurple,
-  Networking: tabStyles.badgeAmber,
-};
-
 /* ───────────────────────────── */
 /* MODAL */
-function SkillModal({ isOpen, onClose, onConfirmOpen }) {
+/* ───────────────────────────── */
+/* MODAL (self-contained, no AppModal) */
+function SkillModal({ isOpen, onClose, onConfirmOpen, initialData }) {
   const [formData, setFormData] = useState(EMPTY_FORM);
+
+  useEffect(() => {
+    if (initialData) {
+      setFormData(initialData);
+    } else if (isOpen) {
+      setFormData(EMPTY_FORM);
+    }
+  }, [initialData, isOpen]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -44,51 +47,73 @@ function SkillModal({ isOpen, onClose, onConfirmOpen }) {
   };
 
   const handleSubmit = () => {
-    if (!formData.name.trim()) return alert("Enter skill name");
-    if (!formData.category) return alert("Select category");
+    if (!formData.name.trim()) return alert("Please enter a skill name");
+    if (!formData.category) return alert("Please select a category");
 
     const finalCategory =
       formData.category === "Other"
         ? formData.customCategory.trim() || "Other"
         : formData.category;
 
-    onConfirmOpen({
-      name: formData.name.trim(),
-      category: finalCategory,
-    });
+    onConfirmOpen({ ...formData, category: finalCategory });
   };
 
   if (!isOpen) return null;
 
   return createPortal(
-    <AppModal title="Add Skill" onClose={onClose}>
+    <AppModal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={initialData ? "Edit Skill" : "Add Skill"}
+      maxWidth="450px"
+    >
       <div className={formStyles.modalBody}>
-        <input
-          name="name"
-          value={formData.name}
-          onChange={handleChange}
-          placeholder="Skill (e.g. React)"
-        />
+        <div className={formStyles.formGrid}>
+          <div className={formStyles.formGroup}>
+            <label>Skill Name</label>
+            <input
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              placeholder="e.g. React, Node.js"
+            />
+          </div>
 
-        <select name="category" onChange={handleChange}>
-          <option value="">Select Category</option>
-          {CATEGORIES.filter((c) => c !== "All").map((c) => (
-            <option key={c}>{c}</option>
-          ))}
-        </select>
+          <div className={formStyles.formGroup}>
+            <label>Category</label>
+            <select
+              name="category"
+              value={formData.category}
+              onChange={handleChange}
+            >
+              <option value="">Select Category</option>
+              {CATEGORIES.filter((c) => c !== "All").map((c) => (
+                <option key={c}>{c}</option>
+              ))}
+            </select>
+          </div>
 
-        {formData.category === "Other" && (
-          <input
-            name="customCategory"
-            placeholder="Custom category"
-            onChange={handleChange}
-          />
-        )}
+          {formData.category === "Other" && (
+            <div className={`${formStyles.formGroup} ${formStyles.fullWidth}`}>
+              <label>Custom Category</label>
+              <input
+                name="customCategory"
+                value={formData.customCategory}
+                onChange={handleChange}
+                placeholder="Enter custom category"
+              />
+            </div>
+          )}
+        </div>
       </div>
 
       <div className={formStyles.modalFooter}>
-        <AppButton onClick={onClose}>Cancel</AppButton>
-        <AppButton onClick={handleSubmit}>Add</AppButton>
+        <AppButton variant="secondary" onClick={onClose}>
+          Cancel
+        </AppButton>
+        <AppButton variant="primary" onClick={handleSubmit}>
+          {initialData ? "Save Changes" : "Add Skill"}
+        </AppButton>
       </div>
     </AppModal>,
     document.body,
@@ -193,7 +218,6 @@ export default function TabSkills() {
 
   if (loading) return <div>Loading skills...</div>;
 
-  /* Add counts to dropdown options */
   const categoryOptionsWithCount = CATEGORIES.map((cat) => {
     if (cat === "All") return `${cat} (${skillList.length})`;
     return `${cat} (${countByCategory[cat] || 0})`;
@@ -217,28 +241,26 @@ export default function TabSkills() {
               }}
               options={categoryOptionsWithCount}
             />
+
             <AddButton onClick={() => setIsModalOpen(true)} />
           </div>
         </div>
 
-        {/* NUMBERED LIST */}
+        {/* LIST */}
         <div className={tabStyles.skillNumberedList}>
           {filteredSkills.length === 0 ? (
             <p className={tabStyles.empty}>No skills found.</p>
           ) : (
             filteredSkills.map((skill, i) => (
               <div key={i} className={tabStyles.skillNumberedRow}>
-                {/* Number */}
                 <span className={tabStyles.skillRowNumber}>
                   {String(i + 1).padStart(2, "0")}
                 </span>
 
-                {/* Icon box */}
                 <div className={tabStyles.skillIconBox}>
                   <FiCode size={16} />
                 </div>
 
-                {/* Info */}
                 <div className={tabStyles.skillRowInfo}>
                   <span className={tabStyles.skillRowName}>{skill.name}</span>
                   <span className={tabStyles.skillCategoryPill}>
@@ -246,7 +268,6 @@ export default function TabSkills() {
                   </span>
                 </div>
 
-                {/* Delete */}
                 <DeleteButton
                   iconOnly
                   onClick={() => {
@@ -260,7 +281,7 @@ export default function TabSkills() {
         </div>
       </div>
 
-      {/* MODALS */}
+      {/* MODAL */}
       <SkillModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
@@ -268,8 +289,10 @@ export default function TabSkills() {
           setPendingSkill(data);
           setIsConfirmOpen(true);
         }}
+        initialData={null} // set skill object here if editing
       />
 
+      {/* CONFIRM ADD */}
       {isConfirmOpen &&
         createPortal(
           <ConfirmModal
@@ -281,6 +304,7 @@ export default function TabSkills() {
           document.body,
         )}
 
+      {/* CONFIRM DELETE */}
       {isConfirmDeleteOpen &&
         createPortal(
           <ConfirmModal
@@ -292,6 +316,7 @@ export default function TabSkills() {
           document.body,
         )}
 
+      {/* TOAST */}
       {toast.isVisible &&
         createPortal(
           <AppToast
