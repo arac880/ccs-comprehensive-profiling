@@ -5,7 +5,7 @@ const {
   addStudent,
   getStudentById,
   updateStudent,
-  deleteStudent, // ✅ added
+  deleteStudent,
   addViolation,
   deleteViolation,
   changePassword,
