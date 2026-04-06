@@ -8,6 +8,7 @@ import styles from "../styles/Login.module.css";
 
 import ccsBanner from "../assets/CCS_Banner.png";
 import ccsHero from "../assets/CCS_CPS_Login_Picture.png";
+import { useAuth } from "../context/AuthContext";
 
 export default function Login({ onLoginSuccess, onForgotPassword }) {
   const navigate = useNavigate();
@@ -18,11 +19,7 @@ export default function Login({ onLoginSuccess, onForgotPassword }) {
   const [loginRole, setLoginRole] = useState("student");
   const [userName, setUserName] = useState("");
   const [serverError, setServerError] = useState("");
-  // const [toast, setToast] = useState({
-  //   isVisible: false,
-  //   message: "",
-  //   type: "success",
-  // });
+  const { login } = useAuth();
 
   function validate() {
     const newErrors = { id: "", password: "" };
@@ -103,6 +100,7 @@ export default function Login({ onLoginSuccess, onForgotPassword }) {
       localStorage.setItem("user", JSON.stringify(data.user));
 
       setTimeout(() => {
+        login(data.user, data.role); //
         onLoginSuccess?.(data.user);
         if (data.role === "student") {
           navigate("/student/dashboard", { replace: true });
