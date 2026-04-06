@@ -15,6 +15,7 @@ app.use(
     origin: [
       "http://localhost:5173",
       "https://ccs-comprehensive-profiling-alpha.vercel.app",
+      "https://ccs-comprehensive-profiling-beta.vercel.app",
     ],
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
     credentials: true,
