@@ -60,12 +60,15 @@ export default function Login({ onLoginSuccess, onForgotPassword }) {
     }, 150);
 
     try {
-      const res = await fetch("http://localhost:5000/api/auth/login", {
-        // ... headers and body remain the same ...
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: form.id, password: form.password }),
-      });
+      const res = await fetch(
+        "https://ccs-comprehensive-profiling-beta.vercel.app/api/auth/login",
+        {
+          // ... headers and body remain the same ...
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: form.id, password: form.password }),
+        },
+      );
 
       const data = await res.json();
 
