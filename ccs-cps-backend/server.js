@@ -11,7 +11,6 @@ const PORT = process.env.PORT || 5000;
 // Middleware configuration
 app.use(
   cors({
-    // Replace the URL below with your actual Vercel Frontend URL
     origin: [
       "http://localhost:5173",
       "https://ccs-comprehensive-profiling-alpha.vercel.app",
@@ -24,10 +23,23 @@ app.use(
 
 app.use(express.json());
 
-// Connect to Database
-// In a serverless environment, this call initializes the connection
-// and reuses it across function invocations.
-connectDB();
+/**
+ * SERVERLESS OPTIMIZATION:
+ * We use a middleware to ensure the database is connected before
+ * any request reaches the routes. This prevents the "Call connectDB first"
+ * error that causes serverless crashes.
+ */
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (err) {
+    console.error("Database middleware error:", err);
+    res
+      .status(500)
+      .json({ message: "Internal Server Error: Database Connection Failed" });
+  }
+});
 
 // Routes
 app.use("/api/students", studentRoutes);
@@ -38,13 +50,12 @@ app.get("/", (req, res) => {
   res.send("Student Profiling API is running...");
 });
 
-// Conditional Listen: Vercel handles execution via exports in production.
-// This block allows the server to still run normally on your local machine.
+// Start server for local development
 if (process.env.NODE_ENV !== "production") {
   app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
   });
 }
 
-// Export the app for Vercel Serverless Functions
+// Export for Vercel
 module.exports = app;
