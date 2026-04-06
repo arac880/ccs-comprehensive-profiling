@@ -2,75 +2,87 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "../../pages/studentPages/studentStyles/SideBarNav.module.css";
 import ccsLogo from "../../assets/ccs_logo.png";
+import { useAuth } from "../../context/AuthContext"; // ← ADD THIS
 
 import { RiDashboardHorizontalFill } from "react-icons/ri";
-import { FaCalendarDays, FaCalendarCheck, FaBookOpen, FaClipboardCheck, FaBars, FaXmark, FaCircleUser } from "react-icons/fa6";
+import {
+  FaCalendarDays,
+  FaCalendarCheck,
+  FaBookOpen,
+  FaClipboardCheck,
+  FaBars,
+  FaXmark,
+  FaCircleUser,
+} from "react-icons/fa6";
 
 const NAV_ITEMS = [
-  { name: "Dashboard", label: "Dashboard", Icon: RiDashboardHorizontalFill, path: "/student/dashboard" },
-  { name: "Clearance", label: "Clearance", Icon: FaClipboardCheck, path: "/student/clearance" },
-  { name: "Schedule", label: "Schedule", Icon: FaCalendarDays, path: "/student/schedule" },
-  { name: "Events", label: "Events", Icon: FaCalendarCheck, path: "/student/events" },
-  { name: "CollegeResearch", label: "College Research", Icon: FaBookOpen, path: "/student/research" },
+  {
+    name: "Dashboard",
+    label: "Dashboard",
+    Icon: RiDashboardHorizontalFill,
+    path: "/student/dashboard",
+  },
+  {
+    name: "Clearance",
+    label: "Clearance",
+    Icon: FaClipboardCheck,
+    path: "/student/clearance",
+  },
+  {
+    name: "Schedule",
+    label: "Schedule",
+    Icon: FaCalendarDays,
+    path: "/student/schedule",
+  },
+  {
+    name: "Events",
+    label: "Events",
+    Icon: FaCalendarCheck,
+    path: "/student/events",
+  },
+  {
+    name: "CollegeResearch",
+    label: "College Research",
+    Icon: FaBookOpen,
+    path: "/student/research",
+  },
 ];
 
-// Fallback if localStorage has nothing yet
-const DEFAULT_STUDENT = {
-  name: "—",
-  id: "—",
-  status: "—",
-  year: "—",
-  section: "—",
-  avatarUrl: null,
-};
-
 const MOBILE_BREAKPOINT = 992;
-
-function getStoredStudent() {
-  try {
-    const raw = localStorage.getItem("user");
-    if (!raw) return DEFAULT_STUDENT;
-    const u = JSON.parse(raw);
-    return {
-      name: `${u.firstName ?? ""} ${u.lastName ?? ""}`.trim() || "—",
-      id: u.id ?? "—",
-      type: u.type ?? "",      
-      status: u.status ?? "", 
-      year: u.year ?? "—", 
-      section: u.section ?? "—", 
-      avatarUrl: u.avatarUrl ?? null,
-    };
-  } catch {
-    return DEFAULT_STUDENT;
-  }
-}
 
 export default function SideNavbar({
   activeNav = "Dashboard",
   onNavigate,
-  student: studentProp,
-  drawerOpen: externalDrawerOpen,  // NEW: External control
-  onDrawerToggle,                  // NEW: Callback to parent
+  drawerOpen: externalDrawerOpen,
+  onDrawerToggle,
 }) {
   const navigate = useNavigate();
+  const { user } = useAuth(); // ← ADD THIS
 
-  const [student, setStudent] = useState(studentProp ?? getStoredStudent());
+  // ← REMOVE getStoredStudent() and DEFAULT_STUDENT
+  // ← REMOVE const [student, setStudent] = useState(...)
+  // ← Build student object directly from context
+  const student = {
+    name: `${user?.firstName ?? ""} ${user?.lastName ?? ""}`.trim() || "—",
+    id: user?.id ?? "—",
+    type: user?.type ?? "—",
+    status: user?.status ?? "—",
+    year: user?.year ?? "—",
+    section: user?.section ?? "—",
+    avatarUrl: user?.avatarUrl ?? null,
+  };
+
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(window.innerWidth < MOBILE_BREAKPOINT);
+  const [isMobile, setIsMobile] = useState(
+    window.innerWidth < MOBILE_BREAKPOINT,
+  );
 
-  // NEW: Sync with external drawer control
   useEffect(() => {
     if (externalDrawerOpen !== undefined) {
       setDrawerOpen(externalDrawerOpen);
     }
   }, [externalDrawerOpen]);
-
-  useEffect(() => {
-    if (!studentProp) {
-      setStudent(getStoredStudent());
-    }
-  }, [studentProp]);
 
   useEffect(() => {
     const onResize = () => {
@@ -85,7 +97,6 @@ export default function SideNavbar({
     return () => window.removeEventListener("resize", onResize);
   }, [onDrawerToggle]);
 
-  // NEW: Toggle function
   const toggleDrawer = () => {
     const newState = !drawerOpen;
     setDrawerOpen(newState);
@@ -105,7 +116,11 @@ export default function SideNavbar({
     <div className={styles.profileCard}>
       <div className={styles.avatar}>
         {student.avatarUrl ? (
-          <img src={student.avatarUrl} alt={student.name} className={styles.avatarImg} />
+          <img
+            src={student.avatarUrl}
+            alt={student.name}
+            className={styles.avatarImg}
+          />
         ) : (
           <FaCircleUser className={styles.avatarIcon} />
         )}
@@ -113,7 +128,7 @@ export default function SideNavbar({
       <p className={styles.studentName}>{student.name}</p>
       <p className={styles.studentId}>{student.id}</p>
       <hr className={styles.profileDivider} />
-      
+
       <div className={styles.metaRow}>
         <span className={styles.metaChip}>
           <span className={styles.metaKey}>Type:</span> {student.type}
@@ -134,7 +149,7 @@ export default function SideNavbar({
       </div>
     </div>
   );
-  
+
   const NavList = () => (
     <div className={styles.navWrapper}>
       <span className={styles.navSectionLabel}>Navigation</span>
@@ -146,12 +161,18 @@ export default function SideNavbar({
             className={`${styles.navItem} ${isActive ? styles.navItemActive : ""}`}
             onClick={() => go(item)}
           >
-            <item.Icon className={`${styles.navIcon} ${isActive ? styles.navIconActive : ""}`} />
-            <span className={`${styles.navLabel} ${isActive ? styles.navLabelActive : ""}`}>
+            <item.Icon
+              className={`${styles.navIcon} ${isActive ? styles.navIconActive : ""}`}
+            />
+            <span
+              className={`${styles.navLabel} ${isActive ? styles.navLabelActive : ""}`}
+            >
               {item.label}
             </span>
             {isActive && <span className={styles.navActiveDot} />}
-            {item.badge && <span className={styles.navBadge}>{item.badge}</span>}
+            {item.badge && (
+              <span className={styles.navBadge}>{item.badge}</span>
+            )}
           </div>
         );
       })}
@@ -169,21 +190,20 @@ export default function SideNavbar({
     </div>
   );
 
-// ── MOBILE LAYOUT ──
+  // ── MOBILE LAYOUT ──
   if (isMobile) {
     return (
-      <>        
-        <div 
-          className={`${styles.drawerBackdrop} ${drawerOpen ? styles.drawerBackdropShow : ""}`} 
-          onClick={toggleDrawer}  // FIXED: Now uses toggleDrawer
+      <>
+        <div
+          className={`${styles.drawerBackdrop} ${drawerOpen ? styles.drawerBackdropShow : ""}`}
+          onClick={toggleDrawer}
         />
-        <div className={`${styles.drawer} ${drawerOpen ? styles.drawerOpen : ""}`}>
+        <div
+          className={`${styles.drawer} ${drawerOpen ? styles.drawerOpen : ""}`}
+        >
           <div className={styles.drawerHeader}>
             <span className={styles.drawerTitle}>Student</span>
-            <FaXmark 
-              className={styles.closeIcon} 
-              onClick={toggleDrawer}  // FIXED: Now uses toggleDrawer
-            />
+            <FaXmark className={styles.closeIcon} onClick={toggleDrawer} />
           </div>
           <ProfileCard />
           <NavList />
@@ -191,13 +211,16 @@ export default function SideNavbar({
         </div>
       </>
     );
-  }  
+  }
 
-  // ── DESKTOP COLLAPSED (unchanged)
+  // ── DESKTOP COLLAPSED ──
   if (isCollapsed) {
     return (
       <div className={styles.sidebarCollapsed}>
-        <div className={styles.collapsedToggle} onClick={() => setIsCollapsed(false)}>
+        <div
+          className={styles.collapsedToggle}
+          onClick={() => setIsCollapsed(false)}
+        >
           <FaBars className={styles.menuIcon} />
         </div>
         <hr className={styles.collapsedDivider} />
@@ -211,7 +234,9 @@ export default function SideNavbar({
                 onClick={() => go(item)}
                 title={item.label}
               >
-                <item.Icon className={`${styles.collapsedNavIcon} ${isActive ? styles.collapsedNavIconActive : ""}`} />
+                <item.Icon
+                  className={`${styles.collapsedNavIcon} ${isActive ? styles.collapsedNavIconActive : ""}`}
+                />
                 <span className={styles.collapsedTooltip}>{item.label}</span>
               </div>
             );
@@ -222,12 +247,15 @@ export default function SideNavbar({
     );
   }
 
-  // ── DESKTOP EXPANDED 
+  // ── DESKTOP EXPANDED ──
   return (
     <div className={styles.sidebar}>
       <div className={styles.sidebarHeader}>
         <span className={styles.sidebarTitle}>Student</span>
-        <div className={styles.hamburgerBtn} onClick={() => setIsCollapsed(true)}>
+        <div
+          className={styles.hamburgerBtn}
+          onClick={() => setIsCollapsed(true)}
+        >
           <FaBars className={styles.menuIcon} />
         </div>
       </div>

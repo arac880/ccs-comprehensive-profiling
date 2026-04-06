@@ -4,6 +4,7 @@ import { FaBars, FaXmark } from "react-icons/fa6";
 import styles from "../../pages/facultyPages/facultyStyles/SideNavbar.module.css";
 import ccsLogo from "../../assets/ccs_logo.png";
 import LogoutModal from "../LogoutModal";
+import { useAuth } from "../../context/AuthContext";
 
 const TABLET_BREAKPOINT = 992;
 const MOBILE_BREAKPOINT = 768;
@@ -42,16 +43,14 @@ export default function SidebarNav({
   setMobileOpen,
 }) {
   const navigate = useNavigate();
+  const { user, logout } = useAuth(); //using auth
 
-  const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
   const faculty = {
     name:
-      `${storedUser.firstName || ""} ${storedUser.lastName || ""}`.trim() ||
-      "Faculty",
-    id: storedUser.id || "—",
-    isDean: storedUser.isDean || false,
+      `${user?.firstName || ""} ${user?.lastName || ""}`.trim() || "Faculty",
+    id: user?.id || "—",
+    isDean: user?.isDean || false,
   };
-
   const isMobile = () => window.innerWidth <= MOBILE_BREAKPOINT;
 
   const [collapsed, setCollapsed] = useState(
@@ -79,9 +78,7 @@ export default function SidebarNav({
   }, [mobileOpen]);
 
   const handleLogout = () => {
-    localStorage.removeItem("user");
-    localStorage.removeItem("token");
-    localStorage.removeItem("role");
+    logout(); //
     navigate("/login");
   };
 
