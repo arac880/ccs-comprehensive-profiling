@@ -32,4 +32,17 @@ app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
 
+const cors = require("cors");
+
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173", // Local development
+      "https://ccs-comprehensive-profiling-alpha.vercel.app", // Your live frontend URL
+    ],
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+    credentials: true,
+  }),
+);
+
 module.exports = app;
