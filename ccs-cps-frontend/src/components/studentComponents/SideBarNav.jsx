@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "../../pages/studentPages/studentStyles/SideBarNav.module.css";
 import ccsLogo from "../../assets/ccs_logo.png";
-import { useAuth } from "../../context/AuthContext"; // ← ADD THIS
+import { useAuth } from "../../context/AuthContext"; //importing the AuthContext
 
 import { RiDashboardHorizontalFill } from "react-icons/ri";
 import {
