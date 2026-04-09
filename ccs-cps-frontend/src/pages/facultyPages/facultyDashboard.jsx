@@ -259,7 +259,7 @@ const FacultyDashboard = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/students")
+    fetch(`${import.meta.env.VITE_API_URL}/api/students`)
       .then((r) => r.json())
       .then((data) => {
         setStudents(Array.isArray(data) ? data : []);
@@ -298,9 +298,7 @@ const FacultyDashboard = () => {
           <div className={styles.welcomeOrb2} />
           <div className={styles.welcomeBannerInner}>
             <div className={styles.welcomeText}>
-              <p className={styles.welcomeGreet}>
-              Dangal Greetings!
-              </p>
+              <p className={styles.welcomeGreet}>Dangal Greetings!</p>
               <p className={styles.welcomeTitle}>
                 Welcome to the <span className={styles.welcomeCcs}>CCS</span>
               </p>

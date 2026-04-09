@@ -189,11 +189,14 @@ const AddStudentModal = ({ isOpen, onClose }) => {
         section: formData.section.trim(),
       };
 
-      const response = await fetch("http://localhost:5000/api/students", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(sanitizedData),
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/students`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(sanitizedData),
+        },
+      );
 
       const data = await response.json();
 

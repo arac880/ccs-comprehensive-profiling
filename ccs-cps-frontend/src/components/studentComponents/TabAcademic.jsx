@@ -192,7 +192,9 @@ export default function TabAcademic() {
         return;
       }
       try {
-        const res = await fetch(`http://localhost:5000/api/students/${id}`);
+        const res = await fetch(
+          `${import.meta.env.VITE_API_URL}/api/students/${id}`,
+        );
         if (!res.ok) throw new Error("Failed to fetch student");
         const data = await res.json();
         setHistory(data.academicHistory || []);

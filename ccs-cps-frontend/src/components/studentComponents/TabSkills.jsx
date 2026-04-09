@@ -147,7 +147,9 @@ export default function TabSkills() {
   useEffect(() => {
     const fetchSkills = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/api/students/${id}`);
+        const res = await fetch(
+          `${import.meta.env.VITE_API_URL}/api/students/${id}`,
+        );
         if (!res.ok) throw new Error("Fetch failed");
         const data = await res.json();
         setSkillList(data.skills || []);
@@ -180,7 +182,7 @@ export default function TabSkills() {
     const updated = [...skillList, pendingSkill];
 
     try {
-      await fetch(`http://localhost:5000/api/students/${id}`, {
+      await fetch(`${import.meta.env.VITE_API_URL}/api/students/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ skills: updated }),
@@ -201,7 +203,7 @@ export default function TabSkills() {
     const updated = skillList.filter((_, i) => i !== deleteIndex);
 
     try {
-      await fetch(`http://localhost:5000/api/students/${id}`, {
+      await fetch(`${import.meta.env.VITE_API_URL}/api/students/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ skills: updated }),

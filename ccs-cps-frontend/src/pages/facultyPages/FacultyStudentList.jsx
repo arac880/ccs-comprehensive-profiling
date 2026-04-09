@@ -48,7 +48,9 @@ const FacultyStudentList = () => {
   const fetchStudents = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch("http://localhost:5000/api/students");
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/students`,
+      );
       if (!response.ok) throw new Error("Failed to fetch data");
       const data = await response.json();
       setStudents(data);
@@ -84,7 +86,7 @@ const FacultyStudentList = () => {
     if (!deleteTarget) return;
     try {
       const response = await fetch(
-        `http://localhost:5000/api/students/${deleteTarget._id}`,
+        `${import.meta.env.VITE_API_URL}/api/students/${deleteTarget._id}`,
         {
           method: "PATCH",
           headers: {

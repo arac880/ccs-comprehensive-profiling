@@ -89,7 +89,7 @@ export default function TabSecurity({ student }) {
     setLoading(true);
     try {
       const res = await fetch(
-        `http://localhost:5000/api/students/${id}/change-password`,
+        `${import.meta.env.VITE_API_URL}/api/students/${id}/change-password`,
         {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },

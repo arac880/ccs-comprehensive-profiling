@@ -443,7 +443,9 @@ export default function TabOrganization() {
         return;
       }
       try {
-        const res = await fetch(`http://localhost:5000/api/students/${id}`);
+        const res = await fetch(
+          `${import.meta.env.VITE_API_URL}/api/students/${id}`,
+        );
         if (!res.ok) throw new Error("Failed");
         const data = await res.json();
         setOrgList(data.organizations || []);
@@ -461,11 +463,14 @@ export default function TabOrganization() {
     if (!id) return false;
     setSaving(true);
     try {
-      const res = await fetch(`http://localhost:5000/api/students/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/students/${id}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        },
+      );
       if (!res.ok) throw new Error((await res.json()).message || "Failed");
       localStorage.setItem("user", JSON.stringify({ ...user, ...payload }));
       return true;
