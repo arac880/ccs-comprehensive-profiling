@@ -12,7 +12,11 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
-app.use(cors()); // Allows frontend to make requests to this backend
+app.use(
+  cors({
+    origin: "https://ccs-cps-beta.vercel.app", // replace with your actual Vercel URL
+  }),
+); // Allows frontend to make requests to this backend
 app.use(express.json()); // Allows the server to accept JSON data in the req.body
 
 // Connect to Database
