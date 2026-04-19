@@ -1,6 +1,6 @@
 // components/facultyComponents/FacultyProfileCard.jsx
 import { useRef, useState, useEffect } from "react";
-import styles from "../../pages/facultyPages/facultyStyles/FacultyProfileCard.module.css";
+import styles from "../../pages/facultyPages/facultyStyles/facultyProfileCard.module.css";
 
 const ROLE_COLOR = {
   Dean: { bg: "#fff3e0", color: "#e65100", border: "#ffb74d" },
