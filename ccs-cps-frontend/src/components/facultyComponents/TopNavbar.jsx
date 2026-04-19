@@ -68,7 +68,10 @@ export default function TopBar({ notifCount = 0, onMenuClick, mobileOpen }) {
           </div>
 
           {/* Profile */}
-          <div className={styles.iconBtn}>
+          <div
+            className={styles.iconBtn}
+            onClick={() => navigate("/faculty/profile")}
+          >
             <FaCircleUser size={22} className={styles.actionIcon} />
           </div>
 

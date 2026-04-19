@@ -31,12 +31,15 @@ const seed = async () => {
   for (const f of facultyList) {
     if (f.birthdate) {
       const hashed = await bcrypt.hash(f.birthdate, 10);
-      await db
-        .collection("faculty")
-        .updateOne(
-          { _id: f._id },
-          { $set: { password: hashed, role: f.isDean ? "dean" : "faculty" } },
-        );
+      await db.collection("faculty").updateOne(
+        { _id: f._id },
+        {
+          $set: {
+            password: hashed,
+            role: f.isDean ? "dean" : f.isChair ? "chair" : "faculty",
+          },
+        },
+      );
       console.log(`✅ Faculty: ${f.facultyId} → password: ${f.birthdate}`);
     } else {
       console.log(`⚠️  No birthdate for faculty ${f.facultyId}, skipping...`);

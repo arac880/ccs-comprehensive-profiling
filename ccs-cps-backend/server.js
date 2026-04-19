@@ -7,6 +7,8 @@ require("dotenv").config();
 const { connectDB } = require("./config/db");
 const studentRoutes = require("./routes/studentRoutes");
 const authRoutes = require("./routes/authRoutes");
+const eventRoutes = require("./routes/eventRoutes");
+const facultyRoutes = require("./routes/facultyRoutes");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -25,6 +27,8 @@ connectDB();
 // Routes
 app.use("/api/students", studentRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/events", eventRoutes);
+app.use("/api/faculty", facultyRoutes);
 
 // Root Endpoint (Just for testing)
 app.get("/", (req, res) => {

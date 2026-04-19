@@ -50,6 +50,8 @@ export default function SidebarNav({
       `${user?.firstName || ""} ${user?.lastName || ""}`.trim() || "Faculty",
     id: user?.id || "—",
     isDean: user?.isDean || false,
+    isChair: storedUser.isChair || false,
+    department: storedUser.department || " ",
   };
   const isMobile = () => window.innerWidth <= MOBILE_BREAKPOINT;
 

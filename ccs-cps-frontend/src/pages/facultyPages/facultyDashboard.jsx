@@ -105,58 +105,6 @@ const StatCard = ({ icon, label, value, sub, color, loading }) => (
   </div>
 );
 
-/* ── Static sample data ── */
-const ANNOUNCEMENTS = [
-  {
-    id: 1,
-    title: "Enrollment for 2nd Semester Now Open",
-    date: "Apr 1, 2025",
-    tag: "Enrollment",
-    urgent: true,
-  },
-  {
-    id: 2,
-    title: "Faculty Meeting — Wednesday 3PM, Room 301",
-    date: "Mar 30, 2025",
-    tag: "Meeting",
-    urgent: false,
-  },
-  {
-    id: 3,
-    title: "Submission of Grades Deadline Extended to Apr 10",
-    date: "Mar 28, 2025",
-    tag: "Grades",
-    urgent: false,
-  },
-];
-
-const EVENTS = [
-  {
-    id: 1,
-    title: "CCS Week Celebration",
-    date: "Apr 10–14",
-    time: "All Day",
-    color: "#e65100",
-    icon: "bi-stars",
-  },
-  {
-    id: 2,
-    title: "Capstone Defense — BSCpE 4A",
-    date: "Apr 18, 2025",
-    time: "8:00 AM",
-    color: "#c0390a",
-    icon: "bi-mortarboard-fill",
-  },
-  {
-    id: 3,
-    title: "Faculty Dev Training",
-    date: "Apr 22, 2025",
-    time: "1:00 PM",
-    color: "#ff7d2e",
-    icon: "bi-person-workspace",
-  },
-];
-
 const SCHEDULE = [
   {
     subject: "Data Structures",
@@ -254,9 +202,11 @@ const FacultyDashboard = () => {
     year: now.getFullYear(),
     fullMonth: MONS_FULL[now.getMonth()],
   };
-
+  const [events, setEvents] = useState([]);
+  const [eventsLoading, setEventsLoading] = useState(true);
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
+  const upcomingEvents = events.filter((e) => e.isUpcoming);
 
   useEffect(() => {
     fetch(`${import.meta.env.VITE_API_URL}/api/students`)
@@ -287,6 +237,51 @@ const FacultyDashboard = () => {
       type: s.type || "Regular",
       status: s.status || "Enrolled",
     }));
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const res = await fetchfetch(
+          `${import.meta.env.VITE_API_URL}/api/events`,
+        );
+        const data = await res.json();
+
+        const now = new Date();
+
+        const mapped = (Array.isArray(data) ? data : [])
+          .map((e) => {
+            const d = new Date(e.date);
+
+            return {
+              id: e._id,
+              title: e.title,
+              date: d.toDateString(),
+              time: e.time || "All Day",
+              type: e.type,
+              color:
+                e.type === "Meeting"
+                  ? "#e65100"
+                  : e.type === "Deadline"
+                    ? "#c0390a"
+                    : e.type === "Academic"
+                      ? "#1565c0"
+                      : "#2d7a3c",
+              icon: e.icon || "bi-calendar-event-fill",
+              isUpcoming: d >= now,
+            };
+          })
+          .sort((a, b) => new Date(a.date) - new Date(b.date));
+
+        setEvents(mapped);
+      } catch (err) {
+        console.error("Failed to fetch events:", err);
+      } finally {
+        setEventsLoading(false);
+      }
+    };
+
+    fetchEvents();
+  }, []);
 
   return (
     <div className={styles.dashboardContent}>
@@ -375,23 +370,27 @@ const FacultyDashboard = () => {
                 Announcements
               </div>
               <span className={styles.cardBadge}>
-                {ANNOUNCEMENTS.length} new
+                {eventsLoading ? "..." : upcomingEvents.length} new
               </span>
             </div>
             <div className={styles.announcementList}>
-              {ANNOUNCEMENTS.map((a) => (
-                <div
-                  key={a.id}
-                  className={`${styles.announcementItem} ${a.urgent ? styles.announcementUrgent : ""}`}
-                >
-                  <div className={styles.announcementLeft}>
-                    <span className={styles.announcementTag}>{a.tag}</span>
-                    <p className={styles.announcementTitle}>{a.title}</p>
-                    <span className={styles.announcementDate}>{a.date}</span>
+              {eventsLoading ? (
+                <p>Loading...</p>
+              ) : events.slice(0, 3).length === 0 ? (
+                <p>No announcements</p>
+              ) : (
+                events.slice(0, 3).map((e) => (
+                  <div key={e.id} className={styles.announcementItem}>
+                    <div className={styles.announcementLeft}>
+                      <span className={styles.announcementTag}>
+                        {e.type || "Event"}
+                      </span>
+                      <p className={styles.announcementTitle}>{e.title}</p>
+                      <span className={styles.announcementDate}>{e.date}</span>
+                    </div>
                   </div>
-                  {a.urgent && <span className={styles.urgentPip}>!</span>}
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </div>
 
@@ -525,23 +524,35 @@ const FacultyDashboard = () => {
             </div>
           </div>
           <div className={styles.eventList}>
-            {EVENTS.map((ev) => (
-              <div
-                key={ev.id}
-                className={styles.eventItem}
-                style={{ "--ev-color": ev.color }}
-              >
-                <div className={styles.eventIconWrap}>
-                  <i className={`bi ${ev.icon}`} style={{ color: ev.color }} />
-                </div>
-                <div className={styles.eventInfo}>
-                  <p className={styles.eventTitle}>{ev.title}</p>
-                  <p className={styles.eventMeta}>
-                    {ev.date} · {ev.time}
-                  </p>
-                </div>
-              </div>
-            ))}
+            {eventsLoading ? (
+              <p>Loading events...</p>
+            ) : events.filter((e) => e.isUpcoming).slice(0, 5).length === 0 ? (
+              <p>No upcoming events</p>
+            ) : (
+              events
+                .filter((e) => e.isUpcoming)
+                .slice(0, 5)
+                .map((ev) => (
+                  <div
+                    key={ev.id}
+                    className={styles.eventItem}
+                    style={{ "--ev-color": ev.color }}
+                  >
+                    <div className={styles.eventIconWrap}>
+                      <i
+                        className={`bi ${ev.icon}`}
+                        style={{ color: ev.color }}
+                      />
+                    </div>
+                    <div className={styles.eventInfo}>
+                      <p className={styles.eventTitle}>{ev.title}</p>
+                      <p className={styles.eventMeta}>
+                        {ev.date} · {ev.time}
+                      </p>
+                    </div>
+                  </div>
+                ))
+            )}
           </div>
         </div>
 

@@ -69,6 +69,12 @@ export default function Login({ onLoginSuccess, onForgotPassword }) {
 
       const data = await res.json();
 
+      console.log("FULL RESPONSE:", JSON.stringify(data, null, 2));
+      console.log(
+        "includes check:",
+        ["faculty", "dean", "chair"].includes(data.role),
+      );
+
       if (!res.ok) {
         clearInterval(progressInterval);
         setLoginProgress(0);
