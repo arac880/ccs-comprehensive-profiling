@@ -20,6 +20,7 @@ import FacultyStudentList from "./pages/facultyPages/FacultyStudentList";
 import FacultySchedule from "./pages/facultyPages/facultySchedule";
 import FacultyEvents from "./pages/facultyPages/facultyEvents";
 import FacultyStudentProfile from "./pages/facultyPages/FacultyStudentProfile";
+import FacultyProfile from "./pages/facultyPages/facultyProfile";
 
 // Student pages
 import StudentDashboard from "./pages/studentPages/studentDashboard";
@@ -53,6 +54,7 @@ function App() {
             <Route path="student-list" element={<FacultyStudentList />} />
             <Route path="schedule" element={<FacultySchedule />} />
             <Route path="events" element={<FacultyEvents />} />
+            <Route path="profile" element={<FacultyProfile />} />
             <Route path="student/:id" element={<FacultyStudentProfile />} />
           </Route>
 
