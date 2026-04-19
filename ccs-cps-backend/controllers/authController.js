@@ -19,12 +19,22 @@ const login = async (req, res) => {
     if (user) role = "student";
 
     if (!user) {
-      // Added same check for faculty just in case you apply soft-delete there too
       user = await db.collection("faculty").findOne({
         facultyId: id,
         isDeleted: { $ne: true },
       });
-      if (user) role = user.isDean ? "dean" : "faculty";
+
+      if (user) {
+        role = user.isDean
+          ? "dean"
+          : user.isChair
+            ? "chair"
+            : user.role === "dean" ||
+                user.role === "chair" ||
+                user.role === "faculty"
+              ? user.role
+              : "faculty";
+      }
     }
 
     if (!user) {
@@ -70,6 +80,8 @@ const login = async (req, res) => {
             lastName: user.lastName,
             email: user.email,
             isDean: user.isDean || false,
+            isChair: user.isChair || false,
+            department: user.department || "",
           };
 
     res.json({ token, role, user: userProfile });

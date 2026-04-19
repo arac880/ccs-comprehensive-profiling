@@ -50,6 +50,8 @@ export default function SidebarNav({
       "Faculty",
     id: storedUser.id || "—",
     isDean: storedUser.isDean || false,
+    isChair: storedUser.isChair || false,
+    department: storedUser.department || " ",
   };
 
   const isMobile = () => window.innerWidth <= MOBILE_BREAKPOINT;
@@ -167,6 +169,12 @@ export default function SidebarNav({
                 <p className={styles.profileId}>{faculty.id}</p>
                 {faculty.isDean && (
                   <span className={styles.deanBadge}>Dean</span>
+                )}
+                {faculty.isChair && (
+                  <>
+                    <span className={styles.deanBadge}>Department Chair</span>
+                    <p className={styles.profileId}>{faculty.department}</p>
+                  </>
                 )}
               </div>
               <hr className={styles.profileDivider} />

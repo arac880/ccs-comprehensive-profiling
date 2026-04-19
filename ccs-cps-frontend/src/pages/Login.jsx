@@ -69,6 +69,12 @@ export default function Login({ onLoginSuccess, onForgotPassword }) {
 
       const data = await res.json();
 
+      console.log("FULL RESPONSE:", JSON.stringify(data, null, 2));
+      console.log(
+        "includes check:",
+        ["faculty", "dean", "chair"].includes(data.role),
+      );
+
       if (!res.ok) {
         clearInterval(progressInterval);
         setLoginProgress(0);
@@ -104,10 +110,14 @@ export default function Login({ onLoginSuccess, onForgotPassword }) {
 
       setTimeout(() => {
         onLoginSuccess?.(data.user);
+        const facultyRoles = ["faculty", "dean", "chair"];
+
         if (data.role === "student") {
           navigate("/student/dashboard", { replace: true });
-        } else {
+        } else if (facultyRoles.includes(data.role)) {
           navigate("/faculty/dashboard", { replace: true });
+        } else {
+          navigate("/login");
         }
       }, 2000);
     } catch (err) {
