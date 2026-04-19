@@ -47,9 +47,10 @@ export default function SidebarNav({
 
   const faculty = {
     name:
-      `${user?.firstName || ""} ${user?.lastName || ""}`.trim() || "Faculty",
-    id: user?.id || "—",
-    isDean: user?.isDean || false,
+      `${storedUser.firstName || ""} ${storedUser.lastName || ""}`.trim() ||
+      "Faculty",
+    id: storedUser.id || "—",
+    isDean: storedUser.isDean || false,
     isChair: storedUser.isChair || false,
     department: storedUser.department || " ",
   };
