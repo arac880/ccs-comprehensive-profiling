@@ -1,0 +1,186 @@
+/* components/facultyComponents/FacultyProfileCard.module.css */
+@import url("https://fonts.googleapis.com/css2?family=Afacad:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Freeman&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap");
+
+:root {
+  --orange: #e65100;
+  --orange-light: #ff6d00;
+  --orange-pale: #fff3e0;
+  --orange-muted: #ffb74d;
+  --cream: #fdf6f0;
+  --white: #ffffff;
+  --warm-gray: #f5ede5;
+  --border: #edd8ca;
+  --border-light: #f7ece0;
+  --shadow: rgba(230, 81, 0, 0.1);
+  --text-dark: #2d1f15;
+  --text-mid: #7a4f35;
+  --text-muted: #b07050;
+  --text-soft: #c8956d;
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 20px;
+  --font-body: "Plus Jakarta Sans", sans-serif;
+  --font-display: "Freeman", sans-serif;
+  --font-ui: "Afacad", sans-serif;
+}
+
+/* ── Hero card ── */
+.heroCard {
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: clamp(10px, 1.2vw, 16px);
+  box-shadow: 0 1px 4px var(--shadow);
+  overflow: hidden;
+  transition: box-shadow 0.18s ease;
+}
+
+.heroCard:hover {
+  box-shadow: 0 4px 14px rgba(200, 100, 30, 0.11);
+}
+
+.heroInner {
+  display: flex;
+  align-items: center;
+  gap: clamp(12px, 1.6vw, 24px);
+  padding: clamp(14px, 1.6vw + 4px, 28px) clamp(16px, 1.8vw + 4px, 32px);
+  flex-wrap: wrap;
+}
+
+/* ── Avatar ── */
+.heroAvatarWrap {
+  position: relative;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.heroAvatar {
+  width: clamp(56px, 5vw + 30px, 88px);
+  height: clamp(56px, 5vw + 30px, 88px);
+  border-radius: 50%;
+  background: linear-gradient(
+    135deg,
+    var(--orange) 0%,
+    var(--orange-light) 100%
+  );
+  color: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: clamp(1.2rem, 1.6vw + 0.4rem, 2rem);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  user-select: none;
+  box-shadow: 0 4px 14px rgba(230, 81, 0, 0.25);
+  transition: box-shadow 0.18s;
+}
+
+.heroAvatarImg {
+  width: clamp(56px, 5vw + 30px, 88px);
+  height: clamp(56px, 5vw + 30px, 88px);
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+  box-shadow: 0 4px 14px rgba(230, 81, 0, 0.2);
+}
+
+.editOverlay {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.18s ease;
+}
+
+.heroAvatarWrap:hover .editOverlay {
+  opacity: 1;
+}
+
+.editBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.editBtn svg {
+  width: clamp(18px, 1.6vw + 6px, 26px);
+  height: clamp(18px, 1.6vw + 6px, 26px);
+  fill: #ffffff;
+}
+
+/* ── Info ── */
+.heroInfo {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(4px, 0.5vw, 8px);
+}
+
+.heroName {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.05rem, 1.4vw + 0.3rem, 1.7rem);
+  color: var(--text-dark);
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.heroMeta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: clamp(4px, 0.5vw, 8px);
+}
+
+.heroMetaItem {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--font-ui);
+  font-size: clamp(0.72rem, 0.5vw + 0.4rem, 0.88rem);
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.heroMetaItem i {
+  font-size: 0.85em;
+  color: var(--orange-muted);
+}
+
+.heroMetaDivider {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--border);
+  flex-shrink: 0;
+}
+
+/* ── Badges ── */
+.badgeWrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: clamp(4px, 0.5vw, 8px);
+  flex-shrink: 0;
+}
+
+.badge {
+  font-family: var(--font-ui);
+  font-size: clamp(0.68rem, 0.4vw + 0.38rem, 0.82rem);
+  font-weight: 700;
+  padding: clamp(3px, 0.3vw, 5px) clamp(10px, 1vw, 16px);
+  border-radius: 20px;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
