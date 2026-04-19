@@ -47,12 +47,11 @@ export default function SidebarNav({
 
   const faculty = {
     name:
-      `${storedUser.firstName || ""} ${storedUser.lastName || ""}`.trim() ||
-      "Faculty",
-    id: storedUser.id || "—",
-    isDean: storedUser.isDean || false,
-    isChair: storedUser.isChair || false,
-    department: storedUser.department || " ",
+      `${user?.firstName || ""} ${user?.lastName || ""}`.trim() || "Faculty",
+    id: user?.id || user?.id || "—",
+    isDean: user?.role === "Dean" || false,
+    isChair: user?.role === "Department Chair" || false,
+    department: user?.department || " ",
   };
   const isMobile = () => window.innerWidth <= MOBILE_BREAKPOINT;
 
