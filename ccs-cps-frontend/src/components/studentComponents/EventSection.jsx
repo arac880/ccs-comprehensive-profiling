@@ -22,7 +22,32 @@ function getBadgeClass(status) {
   return styles.badgeUpcoming;
 }
 
-function EventItem({ event }) {
+function getDriveFileId(link) {
+  if (!link) return null;
+
+  const match = link.match(/\/d\/([^/]+)/);
+  return match ? match[1] : null;
+}
+
+function getDrivePreviewLink(link) {
+  const id = getDriveFileId(link);
+  if (!id) return null;
+
+  return `https://drive.google.com/file/d/${id}/preview`;
+}
+
+function getDriveFileName(link) {
+  if (!link) return "View PDF";
+
+  const match = link.match(/\/d\/(.*?)\//);
+  if (match && match[1]) {
+    return `PDF File (${match[1].slice(0, 6)})`;
+  }
+
+  return "View PDF";
+}
+
+function EventItem({ event, onPreview }) {
   const [expanded, setExpanded] = useState(false);
 
   const { month, day } =
@@ -45,7 +70,8 @@ function EventItem({ event }) {
           <h3 className={styles.eventTitle}>{event.title}</h3>
           {event.status && (
             <span
-              className={`${styles.eventBadge} ${getBadgeClass(event.status)}`}>
+              className={`${styles.eventBadge} ${getBadgeClass(event.status)}`}
+            >
               {event.status}
             </span>
           )}
@@ -62,28 +88,37 @@ function EventItem({ event }) {
         </div>
 
         <p
-          className={`${styles.eventBody} ${isLong && !expanded ? styles.eventBodyCollapsed : ""}`}>
+          className={`${styles.eventBody} ${isLong && !expanded ? styles.eventBodyCollapsed : ""}`}
+        >
           {body}
         </p>
 
         {isLong && (
           <button
             className={styles.readMoreBtn}
-            onClick={() => setExpanded((v) => !v)}>
+            onClick={() => setExpanded((v) => !v)}
+          >
             {expanded ? "Show less ↑" : "Read more ↓"}
           </button>
         )}
 
         <div className={styles.eventFooter}>
-          {event.attachment ? (
+          {event.driveLink && (
             <button
-              className={styles.attachmentBtn}
-              onClick={() => window.open(event.attachment.url, "_blank")}>
+              className={styles.previewBtn}
+              onClick={() => {
+                const link = getDrivePreviewLink(event.driveLink);
+
+                console.log("PDF LINK:", link); // 👈 DEBUG
+
+                if (onPreview && link) {
+                  onPreview(link);
+                }
+              }}
+            >
               <i className="bi bi-file-earmark-pdf-fill" />
-              {event.attachment.name}
+              <span>{getDriveFileName(event.driveLink)}</span>
             </button>
-          ) : (
-            <span />
           )}
           {event.date && (
             <span className={styles.eventDate}>
@@ -112,9 +147,9 @@ const SAMPLE_EVENTS = [
 ];
 
 export default function EventsSection({
-  events = SAMPLE_EVENTS,
-  onShowMore,
+  events = [],
   showMore = true,
+  onPreview,
 }) {
   return (
     <div className={styles.eventsCard}>

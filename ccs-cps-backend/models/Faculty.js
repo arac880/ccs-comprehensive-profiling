@@ -14,6 +14,7 @@ const eventSchema = new mongoose.Schema({
     enum: ["Meeting", "Event", "Deadline", "Academic", "Assembly"],
   },
   icon: { type: String, default: "bi-calendar-event-fill" },
+  driveLink: { type: String, default: "" },
   createdAt: { type: Date, default: Date.now },
 });
 

@@ -2,34 +2,69 @@ import React, { useState, useEffect } from "react";
 import styles from "../../pages/facultyPages/facultyStyles/events.module.css";
 
 const FILTERS = ["All", "Meeting", "Event", "Deadline", "Academic", "Assembly"];
-const TYPES   = ["Meeting", "Event", "Deadline", "Academic", "Assembly"];
+const TYPES = ["Meeting", "Event", "Deadline", "Academic", "Assembly"];
 
 const TYPE_BADGE = {
-  Meeting:  { bg: "#e65100", light: "#fff0e0", text: "#7a3800" },
-  Event:    { bg: "#2d7a3c", light: "#e6f4ea", text: "#1a4a24" },
+  Meeting: { bg: "#e65100", light: "#fff0e0", text: "#7a3800" },
+  Event: { bg: "#2d7a3c", light: "#e6f4ea", text: "#1a4a24" },
   Deadline: { bg: "#c0390a", light: "#fde8e8", text: "#7b1a00" },
   Academic: { bg: "#185fa5", light: "#e6f1fb", text: "#0c3a6b" },
-  Assembly: { bg: "#666",    light: "#f0f0f0", text: "#333"    },
+  Assembly: { bg: "#666", light: "#f0f0f0", text: "#333" },
 };
 
 const TYPE_ICON = {
-  Meeting:  "bi-people-fill",
-  Event:    "bi-stars",
+  Meeting: "bi-people-fill",
+  Event: "bi-stars",
   Deadline: "bi-exclamation-circle-fill",
   Academic: "bi-mortarboard-fill",
   Assembly: "bi-megaphone-fill",
 };
 
 const EMPTY_FORM = {
-  title: "", description: "", date: "",
-  time: "", location: "", type: "Event",
+  title: "",
+  description: "",
+  date: "",
+  time: "",
+  location: "",
+  type: "Event",
+  driveLink: "",
 };
+
+function getDriveFileName(link) {
+  if (!link) return "View PDF";
+
+  try {
+    // If filename exists in URL (rare)
+    const url = new URL(link);
+
+    // fallback: generic name with ID
+    const match = link.match(/\/d\/(.*?)\//);
+    if (match && match[1]) {
+      return `PDF File (${match[1].slice(0, 6)})`;
+    }
+
+    return "View PDF";
+  } catch {
+    return "View PDF";
+  }
+}
+
+function getDrivePreviewLink(link) {
+  if (!link) return "";
+
+  const match = link.match(/\/d\/(.*?)\//);
+  if (match && match[1]) {
+    return `https://drive.google.com/file/d/${match[1]}/preview`;
+  }
+
+  return link; // fallback
+}
 
 /* ── Add Event Modal ── */
 function AddEventModal({ isOpen, onClose, onSuccess }) {
-  const [form, setForm]               = useState(EMPTY_FORM);
-  const [errors, setErrors]           = useState({});
-  const [loading, setLoading]         = useState(false);
+  const [form, setForm] = useState(EMPTY_FORM);
+  const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
   const [serverError, setServerError] = useState("");
 
   useEffect(() => {
@@ -48,7 +83,7 @@ function AddEventModal({ isOpen, onClose, onSuccess }) {
   function validate() {
     const e = {};
     if (!form.title.trim()) e.title = "Title is required.";
-    if (!form.date)         e.date  = "Date is required.";
+    if (!form.date) e.date = "Date is required.";
     setErrors(e);
     return Object.keys(e).length === 0;
   }
@@ -83,7 +118,6 @@ function AddEventModal({ isOpen, onClose, onSuccess }) {
   return (
     <div className={styles.modalOverlay} onClick={onClose}>
       <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-
         <div className={styles.modalHeader}>
           <h3 className={styles.modalTitle}>Add New Event</h3>
           <button className={styles.modalCloseBtn} onClick={onClose}>
@@ -101,18 +135,22 @@ function AddEventModal({ isOpen, onClose, onSuccess }) {
             <label>Event Type</label>
             <div className={styles.typePillsWrap}>
               {TYPES.map((t) => {
-                const c      = TYPE_BADGE[t];
+                const c = TYPE_BADGE[t];
                 const active = form.type === t;
                 return (
                   <button
                     key={t}
                     type="button"
                     className={styles.typePill}
-                    style={active ? {
-                      background:  c.light,
-                      color:       c.text,
-                      borderColor: c.bg,
-                    } : {}}
+                    style={
+                      active
+                        ? {
+                            background: c.light,
+                            color: c.text,
+                            borderColor: c.bg,
+                          }
+                        : {}
+                    }
                     onClick={() => setForm((f) => ({ ...f, type: t }))}
                   >
                     {t}
@@ -124,7 +162,9 @@ function AddEventModal({ isOpen, onClose, onSuccess }) {
 
           <div className={styles.formGrid}>
             <div className={`${styles.formGroup} ${styles.fullWidth}`}>
-              <label>Title <span style={{ color: "#c0390a" }}>*</span></label>
+              <label>
+                Title <span style={{ color: "#c0390a" }}>*</span>
+              </label>
               <input
                 placeholder="e.g. CCS Department Meeting"
                 className={errors.title ? styles.inputError : ""}
@@ -146,7 +186,9 @@ function AddEventModal({ isOpen, onClose, onSuccess }) {
             </div>
 
             <div className={styles.formGroup}>
-              <label>Date <span style={{ color: "#c0390a" }}>*</span></label>
+              <label>
+                Date <span style={{ color: "#c0390a" }}>*</span>
+              </label>
               <input
                 type="date"
                 className={errors.date ? styles.inputError : ""}
@@ -177,17 +219,29 @@ function AddEventModal({ isOpen, onClose, onSuccess }) {
             </div>
           </div>
 
+          <div className={`${styles.formGroup} ${styles.fullWidth}`}>
+            <label>Google Drive PDF Link</label>
+            <input
+              placeholder="Paste Google Drive share link..."
+              value={form.driveLink}
+              onChange={set("driveLink")}
+            />
+          </div>
+
           {/* Live preview */}
           <div
             className={styles.previewStrip}
             style={{ borderLeftColor: colors.bg, background: colors.light }}
           >
-            <span className={styles.previewTitle} style={{ color: colors.text }}>
+            <span
+              className={styles.previewTitle}
+              style={{ color: colors.text }}
+            >
               {form.title || "Event title preview"}
             </span>
             <span className={styles.previewMeta} style={{ color: colors.text }}>
               {form.date || "Date"}
-              {form.time     ? ` · ${form.time}`     : ""}
+              {form.time ? ` · ${form.time}` : ""}
               {form.location ? ` · ${form.location}` : ""}
             </span>
           </div>
@@ -218,18 +272,19 @@ function AddEventModal({ isOpen, onClose, onSuccess }) {
 /* ── Main Page ── */
 const FacultyEvents = () => {
   const [activeFilter, setActiveFilter] = useState("All");
-  const [search, setSearch]             = useState("");
-  const [events, setEvents]             = useState([]);
-  const [loading, setLoading]           = useState(true);
-  const [modalOpen, setModalOpen]       = useState(false);
+  const [search, setSearch] = useState("");
+  const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [previewLink, setPreviewLink] = useState(null);
 
-  const role   = localStorage.getItem("role");
+  const role = localStorage.getItem("role");
   const canAdd = role === "dean" || role === "chair";
 
   const fetchEvents = async () => {
     try {
       setLoading(true);
-      const res  = await fetch("http://localhost:5000/api/events");
+      const res = await fetch("http://localhost:5000/api/events");
       const data = await res.json();
       setEvents(Array.isArray(data) ? data : []);
     } catch (err) {
@@ -239,11 +294,14 @@ const FacultyEvents = () => {
     }
   };
 
-  useEffect(() => { fetchEvents(); }, []);
+  useEffect(() => {
+    fetchEvents();
+  }, []);
 
   const filtered = events.filter((e) => {
     const matchFilter = activeFilter === "All" || e.type === activeFilter;
-    const matchSearch = !search ||
+    const matchSearch =
+      !search ||
       e.title.toLowerCase().includes(search.toLowerCase()) ||
       e.location?.toLowerCase().includes(search.toLowerCase());
     return matchFilter && matchSearch;
@@ -316,12 +374,16 @@ const FacultyEvents = () => {
         <div className={styles.eventsList}>
           {filtered.map((e, i) => {
             const colors = TYPE_BADGE[e.type] || TYPE_BADGE.Assembly;
-            const icon   = e.icon || TYPE_ICON[e.type] || "bi-calendar-event-fill";
+            const icon =
+              e.icon || TYPE_ICON[e.type] || "bi-calendar-event-fill";
             return (
               <div key={e._id || i} className={styles.eventCard}>
                 <div
                   className={styles.eventDateCol}
-                  style={{ "--ev-accent": colors.bg, "--ev-light": colors.light }}
+                  style={{
+                    "--ev-accent": colors.bg,
+                    "--ev-light": colors.light,
+                  }}
                 >
                   <div className={styles.eventIconCircle}>
                     <i className={`bi ${icon}`} />
@@ -339,8 +401,8 @@ const FacultyEvents = () => {
                         className={styles.badge}
                         style={{
                           background: colors.light,
-                          color:      colors.text,
-                          border:     `1px solid ${colors.bg}33`,
+                          color: colors.text,
+                          border: `1px solid ${colors.bg}33`,
                         }}
                       >
                         {e.type}
@@ -362,6 +424,20 @@ const FacultyEvents = () => {
                       <i className="bi bi-geo-alt-fill" /> {e.location}
                     </span>
                   </div>
+
+                  {e.driveLink && (
+                    <button
+                      className={styles.previewBtn}
+                      onClick={() =>
+                        setPreviewLink(getDrivePreviewLink(e.driveLink))
+                      }
+                    >
+                      <i className="bi bi-file-earmark-pdf-fill" />
+                      <span className={styles.previewText}>
+                        {getDriveFileName(e.driveLink)}
+                      </span>
+                    </button>
+                  )}
                 </div>
               </div>
             );
@@ -374,6 +450,30 @@ const FacultyEvents = () => {
         onClose={() => setModalOpen(false)}
         onSuccess={fetchEvents}
       />
+
+      {previewLink && (
+        <div
+          className={styles.pdfModalOverlay}
+          onClick={() => setPreviewLink(null)}
+        >
+          <div
+            className={styles.pdfModalContent}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className={styles.pdfHeader}>
+              <span className={styles.pdfTitle}>PDF Preview</span>
+              <button
+                className={styles.pdfCloseBtn}
+                onClick={() => setPreviewLink(null)}
+              >
+                ✕
+              </button>
+            </div>
+
+            <iframe src={previewLink} className={styles.pdfFrame} />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

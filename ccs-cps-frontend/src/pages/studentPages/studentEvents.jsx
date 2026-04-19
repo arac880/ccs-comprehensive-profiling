@@ -7,6 +7,17 @@ import FilterDropdown from "../../components/ui/FilterDropdown";
 import styles from "./studentStyles/event.module.css";
 import { FaCalendarAlt } from "react-icons/fa";
 
+function getDrivePreviewLink(link) {
+  if (!link) return null;
+
+  const match = link.match(/\/d\/(.*?)\//);
+  if (match && match[1]) {
+    return `https://drive.google.com/file/d/${match[1]}/preview`;
+  }
+
+  return null;
+}
+
 const FILTER_OPTIONS = ["All Events", "Upcoming", "Ongoing", "Past"];
 
 export default function StudentEvents() {
@@ -14,6 +25,12 @@ export default function StudentEvents() {
   const [search, setSearch] = useState("");
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [previewLink, setPreviewLink] = useState(null);
+
+  function handlePreview(link) {
+    if (!link) return;
+    setPreviewLink(link);
+  }
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -37,7 +54,7 @@ export default function StudentEvents() {
             day: e.day,
             status,
             body: e.description || "",
-            attachment: null,
+            driveLink: e.driveLink || null,
             location: e.location,
             time: e.time,
             type: e.type,
@@ -131,7 +148,40 @@ export default function StudentEvents() {
               {loading ? (
                 <p>Loading events...</p>
               ) : (
-                <EventSection events={filtered} showMore={false} />
+                <EventSection
+                  events={filtered}
+                  showMore={false}
+                  onPreview={handlePreview}
+                />
+              )}
+
+              {previewLink && (
+                <div
+                  className={styles.pdfModalOverlay}
+                  onClick={() => setPreviewLink(null)}
+                >
+                  <div
+                    className={styles.pdfModalContent}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <div className={styles.pdfHeader}>
+                      <span className={styles.pdfTitle}>Event Attachment</span>
+                      <button
+                        className={styles.pdfCloseBtn}
+                        onClick={() => setPreviewLink(null)}
+                      >
+                        ✕
+                      </button>
+                    </div>
+
+                    <iframe
+                      src={previewLink}
+                      className={styles.pdfFrame}
+                      title="PDF Preview"
+                      allow="autoplay"
+                    />
+                  </div>
+                </div>
               )}
             </div>
           </main>

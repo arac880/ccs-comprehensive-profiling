@@ -56,7 +56,7 @@ const createEvent = async (req, res) => {
       return res.status(403).json({ message: "Access denied." });
     }
 
-    const { title, description, date, time, location, type } = req.body;
+    const { title, description, date, time, location, type, driveLink } = req.body;
 
     if (!title || !date || !type) {
       return res.status(400).json({ message: "Missing fields." });
@@ -75,6 +75,7 @@ const createEvent = async (req, res) => {
       location: location || "TBA",
       type,
       icon: TYPE_ICONS[type] || "bi-calendar-event-fill",
+      driveLink: driveLink || "",
       createdBy: decoded.id,
       createdAt: new Date(),
     };
