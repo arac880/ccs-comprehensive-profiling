@@ -1,6 +1,11 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom"; 
-import { FaCalendarAlt, FaCheckCircle, FaClock, FaTimesCircle } from "react-icons/fa";
+import { Link } from "react-router-dom";
+import {
+  FaCalendarAlt,
+  FaCheckCircle,
+  FaClock,
+  FaTimesCircle,
+} from "react-icons/fa";
 import { BsArrowRightShort } from "react-icons/bs";
 
 import WelcomeBanner from "../../components/studentComponents/WelcomeBanner";
@@ -31,37 +36,41 @@ function DashWidget({ title, icon, actionText, actionTo, children }) {
 }
 
 export default function StudentDashboard() {
+  const [upcomingEvent, setUpcomingEvent] = useState(null);
+  const [loadingEvent, setLoadingEvent] = useState(true);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 992);
-  
+
   const [bannerData, setBannerData] = useState({
     name: "Student",
     programLabel: "Loading...",
-    semesterLabel: "2nd Semester • A.Y. 2025–2026" 
+    semesterLabel: "2nd Semester • A.Y. 2025–2026",
   });
 
-  const isCleared = false; 
+  const isCleared = false;
 
   useEffect(() => {
     const onResize = () => setIsMobile(window.innerWidth < 992);
     window.addEventListener("resize", onResize);
-    
+
     try {
       const storedUser = localStorage.getItem("user");
       if (storedUser) {
         const parsedUser = JSON.parse(storedUser);
-        
+
         let programAbbr = "CCS";
         if (parsedUser.program) {
-          if (parsedUser.program.includes("Information Technology")) programAbbr = "BSIT";
-          if (parsedUser.program.includes("Computer Science")) programAbbr = "BSCS";
+          if (parsedUser.program.includes("Information Technology"))
+            programAbbr = "BSIT";
+          if (parsedUser.program.includes("Computer Science"))
+            programAbbr = "BSCS";
         }
-        
+
         const formattedProgram = `${programAbbr} — ${parsedUser.year || ""}`;
 
         setBannerData({
-          name: parsedUser.firstName + " " + parsedUser.lastName|| "Student",
+          name: parsedUser.firstName + " " + parsedUser.lastName || "Student",
           programLabel: formattedProgram,
-          semesterLabel: "2nd Semester • A.Y. 2025–2026"
+          semesterLabel: "2nd Semester • A.Y. 2025–2026",
         });
       }
     } catch (error) {
@@ -71,11 +80,56 @@ export default function StudentDashboard() {
     return () => window.removeEventListener("resize", onResize);
   }, []);
 
+  useEffect(() => {
+    const fetchUpcomingEvent = async () => {
+      try {
+        const res = await fetch("http://localhost:5000/api/events");
+        const data = await res.json();
+
+        if (!Array.isArray(data)) return;
+
+        const today = new Date();
+
+        // 🔥 filter only upcoming
+        const upcoming = data
+          .map((e) => ({
+            ...e,
+            dateObj: new Date(e.date),
+          }))
+          .filter((e) => e.dateObj >= today)
+          .sort((a, b) => a.dateObj - b.dateObj); // nearest first
+
+        if (upcoming.length > 0) {
+          const e = upcoming[0];
+
+          // map to your EventSection format
+          setUpcomingEvent({
+            id: e._id,
+            title: e.title,
+            date: e.dateObj.toDateString(),
+            month: e.month,
+            day: e.day,
+            status: "Upcoming",
+            body: e.description || "",
+            location: e.location,
+            time: e.time,
+            type: e.type,
+          });
+        }
+      } catch (err) {
+        console.error("Failed to fetch upcoming event:", err);
+      } finally {
+        setLoadingEvent(false);
+      }
+    };
+
+    fetchUpcomingEvent();
+  }, []);
+
   const DashboardContent = () => (
     <div className={styles.dashLayout}>
-
       <div className={styles.heroRow}>
-        <WelcomeBanner 
+        <WelcomeBanner
           studentName={bannerData.name}
           program={bannerData.programLabel}
           semester={bannerData.semesterLabel}
@@ -83,11 +137,10 @@ export default function StudentDashboard() {
       </div>
 
       <div className={styles.widgetsRow}>
-        
-        <DashWidget 
-          title="Next Class" 
-          icon={<FaClock />} 
-          actionText="Full Schedule" 
+        <DashWidget
+          title="Next Class"
+          icon={<FaClock />}
+          actionText="Full Schedule"
           actionTo="/student/schedule"
         >
           <div className={styles.scheduleWidget}>
@@ -102,27 +155,32 @@ export default function StudentDashboard() {
           </div>
         </DashWidget>
 
-        <DashWidget 
-          title="Clearance Status" 
+        <DashWidget
+          title="Clearance Status"
           icon={<FaCheckCircle />}
           actionText="Overall Clearance"
           actionTo="/student/clearance"
         >
-          <div className={`${styles.clearanceDisplay} ${isCleared ? styles.cleared : styles.notCleared}`}>
+          <div
+            className={`${styles.clearanceDisplay} ${isCleared ? styles.cleared : styles.notCleared}`}
+          >
             <div className={styles.statusMain}>
-              {isCleared ? <FaCheckCircle size={28} /> : <FaTimesCircle size={28} />}
+              {isCleared ? (
+                <FaCheckCircle size={28} />
+              ) : (
+                <FaTimesCircle size={28} />
+              )}
               <span className={styles.statusTitle}>
                 {isCleared ? "CLEARED" : "NOT YET CLEARED"}
               </span>
             </div>
             <p className={styles.statusDesc}>
-              {isCleared 
-                ? "You have fully settled all requirements." 
+              {isCleared
+                ? "You have fully settled all requirements."
                 : "You have pending requirements to settle."}
             </p>
           </div>
         </DashWidget>
-
       </div>
 
       <div className={styles.bottomRow}>
@@ -134,7 +192,13 @@ export default function StudentDashboard() {
             textColor="#7A4F35"
           />
           <div className={styles.eventsList}>
-            <EventsSection />
+            {loadingEvent ? (
+              <p>Loading event...</p>
+            ) : upcomingEvent ? (
+              <EventsSection events={[upcomingEvent]} showMore={false} />
+            ) : (
+              <p>No upcoming events.</p>
+            )}
           </div>
         </div>
 
@@ -142,7 +206,12 @@ export default function StudentDashboard() {
           <CalendarWidget />
           <div style={{ marginTop: "24px" }}>
             <TitlePages
-              icon={<i className="bi bi-link-45deg" style={{ fontSize: 16, color: "#fff" }} />}
+              icon={
+                <i
+                  className="bi bi-link-45deg"
+                  style={{ fontSize: 16, color: "#fff" }}
+                />
+              }
               title="CCS Links"
               iconBg="#E65100"
               textColor="#7A4F35"
@@ -151,7 +220,6 @@ export default function StudentDashboard() {
           </div>
         </div>
       </div>
-
     </div>
   );
 

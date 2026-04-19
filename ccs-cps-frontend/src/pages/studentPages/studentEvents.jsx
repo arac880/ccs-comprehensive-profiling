@@ -14,6 +14,12 @@ export default function StudentEvents() {
   const [search, setSearch] = useState("");
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [previewLink, setPreviewLink] = useState(null);
+
+  function handlePreview(link) {
+    if (!link) return;
+    setPreviewLink(link);
+  }
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -37,7 +43,7 @@ export default function StudentEvents() {
             day: e.day,
             status,
             body: e.description || "",
-            attachment: null,
+            driveLink: e.driveLink || null,
             location: e.location,
             time: e.time,
             type: e.type,
@@ -131,7 +137,11 @@ export default function StudentEvents() {
               {loading ? (
                 <p>Loading events...</p>
               ) : (
-                <EventSection events={filtered} showMore={false} />
+                <EventSection
+                  events={filtered}
+                  showMore={false}
+                  onPreview={handlePreview}
+                />
               )}
             </div>
           </main>
@@ -144,6 +154,28 @@ export default function StudentEvents() {
           </aside>
         </div>
       </div>
+      {previewLink && (
+        <div
+          className={styles.pdfModalOverlay}
+          onClick={() => setPreviewLink(null)}
+        >
+          <div
+            className={styles.pdfModalContent}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className={styles.pdfHeader}>
+              <button
+                className={styles.pdfCloseBtn}
+                onClick={() => setPreviewLink(null)}
+              >
+                ✕
+              </button>
+            </div>
+
+            <iframe src={previewLink} className={styles.pdfFrame} />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

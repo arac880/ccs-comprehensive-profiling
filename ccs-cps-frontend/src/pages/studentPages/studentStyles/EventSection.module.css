@@ -236,7 +236,7 @@
 }
 
 /* ── Attachment Button ── */
-.attachmentBtn {
+.previewBtn{
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -256,13 +256,13 @@
   white-space: nowrap;
 }
 
-.attachmentBtn i {
+.previewBtn i {
   color: #d32f2f;
   font-size: 1rem;
   flex-shrink: 0;
 }
 
-.attachmentBtn:hover {
+.previewBtn:hover {
   background-color: var(--orange-pale);
   border-color: var(--orange-muted);
   color: var(--orange);
