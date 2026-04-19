@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import CalendarWidget from "../../components/ui/CalendarWidget";
 import CcsLinks from "../../components/studentComponents/CcsLinks";
 import EventSection from "../../components/studentComponents/EventSection";
@@ -7,56 +7,73 @@ import FilterDropdown from "../../components/ui/FilterDropdown";
 import styles from "./studentStyles/event.module.css";
 import { FaCalendarAlt } from "react-icons/fa";
 
-const ALL_EVENTS = [
-  {
-    id: 1,
-    title: "CSG — Meeting on January 12, 2025",
-    createdAt: "March 2, 2026, 3:45 PM",
-    date: "April 10, 2026",
-    month: "JAN",
-    day: "12",
-    status: "Past",
-    body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem vitae justo at sapien facilisis bibendum. Integer vehicula, lorem a hendrerit varius, risus elit ultrices neque, at dignissim libero sapien nec erat. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam.\n\nCurabitur non lorem vel orci pulvinar tincidunt. Nulla facilisi. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Donec vel mauris quam.",
-    attachment: { name: "CSG-Meeting.pdf", url: "#" },
-  },
-  {
-    id: 2,
-    title: "CCS Night (General Assembly) 2026",
-    createdAt: "March 8, 2026, 8:00 AM",
-    date: "April 10, 2026",
-    month: "APR",
-    day: "10",
-    status: "Upcoming",
-    body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem vitae justo at sapien facilisis bibendum. Integer vehicula, lorem a hendrerit varius, risus elit ultrices neque, at dignissim libero sapien nec erat. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam.\n\nCurabitur non lorem vel orci pulvinar tincidunt. Nulla facilisi. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Donec vel mauris quam.",
-    attachment: { name: "CCS NIGHT - GEN.ASSEM.pdf", url: "#" },
-  },
-];
-
 const FILTER_OPTIONS = ["All Events", "Upcoming", "Ongoing", "Past"];
 
 export default function StudentEvents() {
   const [filter, setFilter] = useState("All Events");
   const [search, setSearch] = useState("");
+  const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const filtered = ALL_EVENTS.filter((ev) => {
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const res = await fetch("http://localhost:5000/api/events");
+        const data = await res.json();
+
+        // 🔥 map backend → frontend format
+        const mapped = (Array.isArray(data) ? data : []).map((e, i) => {
+          const eventDate = new Date(e.date);
+
+          const today = new Date();
+          const status = eventDate < today ? "Past" : "Upcoming";
+
+          return {
+            id: e._id || i,
+            title: e.title,
+            createdAt: new Date(e.createdAt).toLocaleString(),
+            date: eventDate.toDateString(),
+            month: e.month,
+            day: e.day,
+            status,
+            body: e.description || "",
+            attachment: null,
+            location: e.location,
+            time: e.time,
+            type: e.type,
+          };
+        });
+
+        setEvents(mapped);
+      } catch (err) {
+        console.error("Failed to fetch events:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchEvents();
+  }, []);
+
+  const filtered = events.filter((ev) => {
     const matchFilter = filter === "All Events" || ev.status === filter;
+
     const matchSearch =
       search.trim() === "" ||
       ev.title.toLowerCase().includes(search.toLowerCase());
+
     return matchFilter && matchSearch;
   });
 
-  const upcomingCount = ALL_EVENTS.filter((e) => e.status === "Upcoming").length;
-  const pastCount     = ALL_EVENTS.filter((e) => e.status === "Past").length;
+  const upcomingCount = events.filter((e) => e.status === "Upcoming").length;
+  const pastCount = events.filter((e) => e.status === "Past").length;
 
   return (
     <div className={styles.pageRoot}>
       <div className={styles.scrollArea}>
         <div className={styles.contentRow}>
-
           {/* ── Events column ── */}
           <main className={styles.eventsCol}>
-
             <div className={styles.pageHeader}>
               <div className={styles.pageTitleWrap}>
                 <div className={styles.pageTitleIcon}>
@@ -66,14 +83,18 @@ export default function StudentEvents() {
               </div>
 
               <div className={styles.statsStrip}>
-                <span className={`${styles.statPill} ${styles.statPillNeutral}`}>
-                  {ALL_EVENTS.length} Total
+                <span
+                  className={`${styles.statPill} ${styles.statPillNeutral}`}
+                >
+                  {events.length} Total
                 </span>
                 <span className={`${styles.statPill} ${styles.statPillOrange}`}>
                   {upcomingCount} Upcoming
                 </span>
                 {pastCount > 0 && (
-                  <span className={`${styles.statPill} ${styles.statPillNeutral}`}>
+                  <span
+                    className={`${styles.statPill} ${styles.statPillNeutral}`}
+                  >
                     {pastCount} Past
                   </span>
                 )}
@@ -81,11 +102,8 @@ export default function StudentEvents() {
             </div>
 
             <div className={styles.eventsCard}>
-
               <div className={styles.cardHeader}>
-                <div className={styles.cardHeaderLeft}>
-                  
-                </div>
+                <div className={styles.cardHeaderLeft}></div>
                 <div className={styles.cardControls}>
                   <FilterDropdown
                     value={filter}
@@ -110,7 +128,11 @@ export default function StudentEvents() {
                 </p>
               )}
 
-              <EventSection events={filtered} showMore={false} />
+              {loading ? (
+                <p>Loading events...</p>
+              ) : (
+                <EventSection events={filtered} showMore={false} />
+              )}
             </div>
           </main>
 
@@ -120,7 +142,6 @@ export default function StudentEvents() {
               <CcsLinks />
             </div>
           </aside>
-
         </div>
       </div>
     </div>
