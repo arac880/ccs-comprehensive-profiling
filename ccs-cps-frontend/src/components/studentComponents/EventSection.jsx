@@ -22,29 +22,34 @@ function getBadgeClass(status) {
   return styles.badgeUpcoming;
 }
 
-function getDriveFileId(link) {
-  if (!link) return null;
-
-  const match = link.match(/\/d\/([^/]+)/);
-  return match ? match[1] : null;
-}
-
-function getDrivePreviewLink(link) {
-  const id = getDriveFileId(link);
-  if (!id) return null;
-
-  return `https://drive.google.com/file/d/${id}/preview`;
-}
-
 function getDriveFileName(link) {
   if (!link) return "View PDF";
 
+  try {
+    // If filename exists in URL (rare)
+    const url = new URL(link);
+
+    // fallback: generic name with ID
+    const match = link.match(/\/d\/(.*?)\//);
+    if (match && match[1]) {
+      return `PDF File (${match[1].slice(0, 6)})`;
+    }
+
+    return "View PDF";
+  } catch {
+    return "View PDF";
+  }
+}
+
+function getDrivePreviewLink(link) {
+  if (!link) return "";
+
   const match = link.match(/\/d\/(.*?)\//);
   if (match && match[1]) {
-    return `PDF File (${match[1].slice(0, 6)})`;
+    return `https://drive.google.com/file/d/${match[1]}/preview`;
   }
 
-  return "View PDF";
+  return link; // fallback
 }
 
 function EventItem({ event, onPreview }) {
@@ -170,7 +175,7 @@ export default function EventsSection({
         ) : (
           <div className={styles.timelineList}>
             {events.map((event) => (
-              <EventItem key={event.id} event={event} />
+              <EventItem key={event.id} event={event} onPreview={onPreview} />
             ))}
           </div>
         )}
