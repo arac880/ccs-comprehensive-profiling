@@ -35,7 +35,7 @@ export default function ResearchCard({ title, uploadedAt, fileUrl = "#", index }
 
       {/* CTA */}
       <div className={styles.docAction}>
-        <span className={styles.actionText}>View PDF</span>
+        <span className={styles.actionText}>View Study</span>
         <BsArrowRightShort size={22} className={styles.actionIcon} />
       </div>
     </a>
