@@ -8,19 +8,18 @@ const MOBILE_BREAKPOINT = 992;
 
 const days = ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"];
 
-// Realistic IT Schedule Data
+// Schedule from COR — Section 4IT-D
 const scheduleData = [
-  { day: "MONDAY", startHour: 8, startMin: 0, duration: 2, course: "ITEW6", title: "Web Development Frameworks", room: "Room 402", instructor: "Prof. Eusebio", type: "LEC" },
-  { day: "MONDAY", startHour: 10, startMin: 0, duration: 3, course: "ITEW6", title: "Web Development Frameworks", room: "ComLab 1", instructor: "Prof. Eusebio", type: "LAB" },
-  
-  { day: "TUESDAY", startHour: 13, startMin: 0, duration: 2, course: "IT 312", title: "Networking 2", room: "Room 405", instructor: "Prof. Evangelista", type: "LEC" },
-  { day: "TUESDAY", startHour: 15, startMin: 0, duration: 3, course: "IT 312", title: "Networking 2", room: "ComLab 1", instructor: "Prof. Alforja", type: "LAB" },
-  
-  { day: "WEDNESDAY", startHour: 9, startMin: 0, duration: 3, course: "IT 303", title: "Database Management Systems", room: "ComLab 2", instructor: "Prof. Reyes", type: "LAB" },
-  
-  { day: "THURSDAY", startHour: 14, startMin: 0, duration: 2.5, course: "IT 303", title: "Database Management Systems", room: "Room 401", instructor: "Prof. Reyes", type: "LEC" },
-  
-  { day: "FRIDAY", startHour: 10, startMin: 0, duration: 3, course: "ITP113", title: "IT Practicum", room: "ComLab 3", instructor: "Prof. Cruz", type: "LAB" },
+  // ITP113 — LEC: M/W/Th 14:00–17:00
+  { day: "MONDAY",    startHour: 14, startMin: 0, duration: 3, course: "ITP113", title: "IT Practicum (500 hours)",    room: "VRCCS-1",        instructor: "Prof. Montecillo",    type: "LEC" },
+  { day: "WEDNESDAY", startHour: 14, startMin: 0, duration: 3, course: "ITP113", title: "IT Practicum (500 hours)",    room: "VRCCS-1",        instructor: "Prof. Montecillo",    type: "LEC" },
+  { day: "THURSDAY",  startHour: 14, startMin: 0, duration: 3, course: "ITP113", title: "IT Practicum (500 hours)",    room: "VRCCS-1",        instructor: "Prof. Montecillo",    type: "LEC" },
+
+  // ITP113 — LAB: Th 13:00–16:00
+  { day: "THURSDAY",  startHour: 13, startMin: 0, duration: 3, course: "ITP113", title: "IT Practicum (500 hours)",    room: "VRCCS-1/VRCCS-1", instructor: "Prof. Montecillo",   type: "LAB" },
+
+  // ITEW6 — LEC: M 10:00–13:00
+  { day: "MONDAY",    startHour: 10, startMin: 0, duration: 3, course: "ITEW6",  title: "Web Development Frameworks", room: "COMLAB 3",       instructor: "Prof. Eusebio", type: "LEC" },
 ];
 
 const PALETTE = ["#4A90E2", "#E65100", "#43A047", "#8E44AD", "#009688", "#D32F2F", "#F39C12"];
@@ -38,7 +37,6 @@ const hexToRgba = (hex, alpha) => {
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 };
 
-// Helper to format time (e.g., 14, 30 -> "2:30 PM")
 const formatTime = (hour, min) => {
   const ampm = hour >= 12 ? "PM" : "AM";
   const h12 = hour % 12 || 12;
@@ -56,7 +54,6 @@ const getEndTime = (startHour, startMin, durationHours) => {
 export default function StudentSchedule() {
   const [isMobile, setIsMobile] = useState(window.innerWidth < MOBILE_BREAKPOINT);
   
-  // Set default day to today (or Monday if Sunday)
   const TODAY_JS = new Date().getDay(); 
   const DAY_MAP = { 1: "MONDAY", 2: "TUESDAY", 3: "WEDNESDAY", 4: "THURSDAY", 5: "FRIDAY", 6: "SATURDAY", 0: "SUNDAY" };
   const initialDay = DAY_MAP[TODAY_JS] || "MONDAY";
@@ -68,7 +65,6 @@ export default function StudentSchedule() {
     return () => window.removeEventListener("resize", onResize);
   }, []);
 
-  // Get and sort classes for the currently selected day
   const todaysClasses = scheduleData
     .filter((c) => c.day === activeDay)
     .sort((a, b) => (a.startHour + a.startMin / 60) - (b.startHour + b.startMin / 60));
@@ -106,7 +102,6 @@ export default function StudentSchedule() {
               >
                 <span className={schedStyles.dayNameFull}>{day}</span>
                 <span className={schedStyles.dayNameShort}>{day.substring(0, 3)}</span>
-                {/* Show a small dot if there are classes on this day */}
                 {scheduleData.some(c => c.day === day) && <span className={schedStyles.classIndicatorDot}></span>}
               </button>
             ))}
@@ -125,19 +120,16 @@ export default function StudentSchedule() {
                 return (
                   <div key={idx} className={schedStyles.timelineRow}>
                     
-                    {/* Time Track (Left side) */}
                     <div className={schedStyles.timeTrack}>
                       <span className={schedStyles.timeStart}>{startTime}</span>
                       <span className={schedStyles.timeEnd}>{endTime}</span>
                     </div>
 
-                    {/* Timeline Line & Node */}
                     <div className={schedStyles.nodeTrack}>
                       <div className={schedStyles.nodeLine}></div>
                       <div className={schedStyles.nodeDot} style={{ borderColor: mainColor }}></div>
                     </div>
 
-                    {/* Class Card */}
                     <div className={schedStyles.cardTrack}>
                       <div 
                         className={schedStyles.agendaCard}
@@ -184,8 +176,6 @@ export default function StudentSchedule() {
               })}
             </div>
           ) : (
-            
-            // 3. Beautiful Empty State
             <div className={schedStyles.emptyState}>
               <div className={schedStyles.emptyIconWrap}>
                 <FaMugHot size={32} />
@@ -193,7 +183,6 @@ export default function StudentSchedule() {
               <h3 className={schedStyles.emptyTitle}>Free Day!</h3>
               <p className={schedStyles.emptyText}>You have no classes scheduled for {activeDay.toLowerCase()}. Enjoy your break or use this time to catch up on research.</p>
             </div>
-            
           )}
         </div>
       </div>
