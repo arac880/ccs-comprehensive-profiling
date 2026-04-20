@@ -12,20 +12,20 @@ const ALL_RESEARCH = [
     id: 1,
     title: "Web-Based Delivery Tracking System",
     uploadedAt: "March 2, 2026, 3:45 PM",
-    fileUrl: "#",
+    fileUrl: "https://drive.google.com/file/d/14KdLJ8vj4PPBxeebQfLzC5ZzaOuVQbI2/view?usp=sharing",
   },
   {
     id: 2,
-    title: "Comprehensive Student Profiling System",
+    title: "Student Affairs Management System with Real-time Audit trails and Event Scheduling",
     uploadedAt: "March 5, 2026, 10:15 AM",
-    fileUrl: "#",
+    fileUrl: "https://drive.google.com/file/d/1qsF8xL_nEwq0tKSldOul_43MDifpkwZS/view",
   },
   {
     id: 3,
-    title: "AI-Powered Grade Prediction Model",
+    title: "Study on the Impact of Artificial Intelligence on Student Learning Outcomes",
     uploadedAt: "April 1, 2026, 1:20 PM",
-    fileUrl: "#",
-  },
+    fileUrl: "https://www.researchgate.net/publication/383451820_Study_on_the_Impact_of_Artificial_Intelligence_on_Student_Learning_Outcomes",
+  }, 
 ];
 
 // Most recently uploaded (last in array by date)
