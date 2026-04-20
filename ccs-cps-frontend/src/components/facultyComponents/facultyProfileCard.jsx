@@ -76,7 +76,7 @@ export default function FacultyProfileCard() {
         setFaculty({
           fullName:
             `${data.firstName ?? ""} ${data.lastName ?? ""}`.trim() || "—",
-          facultyId: data.facultyIdid ?? "—", //
+          facultyId: data.facultyId ?? "—", //
           role: normalizeRole(data.role),
           department: data.department ?? "—",
           status: data.status ?? null,
