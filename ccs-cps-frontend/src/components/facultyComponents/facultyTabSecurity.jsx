@@ -48,7 +48,9 @@ export default function FacultyTabSecurity() {
         return;
       }
       try {
-        const res = await fetch(`http://localhost:5000/api/faculty/${id}`);
+        const res = await fetch(
+          `${import.meta.env.VITE_API_URL}/api/faculty/${id}`,
+        );
         if (!res.ok) throw new Error("Failed");
         const data = await res.json();
         setFaculty(data);
@@ -87,7 +89,7 @@ export default function FacultyTabSecurity() {
     try {
       const id = faculty?._id;
       const res = await fetch(
-        `http://localhost:5000/api/faculty/${id}/change-password`,
+        `${import.meta.env.VITE_API_URL}/api/faculty/${id}/change-password`,
         {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },

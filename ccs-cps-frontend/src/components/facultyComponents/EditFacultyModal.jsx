@@ -129,11 +129,14 @@ const EditFacultyModal = ({ isOpen, onClose, faculty, onSave }) => {
 
     setSaving(true);
     try {
-      const res = await fetch(`http://localhost:5000/api/faculty/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/faculty/${id}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData),
+        },
+      );
 
       if (!res.ok) {
         const err = await res.json();
