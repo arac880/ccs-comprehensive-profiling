@@ -94,17 +94,14 @@ function AddEventModal({ isOpen, onClose, onSuccess }) {
     setLoading(true);
     try {
       const token = localStorage.getItem("token");
-      const res = await fetchfetch(
-        `${import.meta.env.VITE_API_URL}/api/events`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(form),
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/events`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
-      );
+        body: JSON.stringify(form),
+      });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Failed to save event.");
       onSuccess?.();

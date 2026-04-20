@@ -241,9 +241,7 @@ const FacultyDashboard = () => {
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const res = await fetchfetch(
-          `${import.meta.env.VITE_API_URL}/api/events`,
-        );
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/events`);
         const data = await res.json();
 
         const now = new Date();
