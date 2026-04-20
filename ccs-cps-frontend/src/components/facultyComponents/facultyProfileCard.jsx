@@ -59,9 +59,35 @@ export default function FacultyProfileCard() {
   const fileInputRef = useRef(null);
 
   useEffect(() => {
-    const onStorage = () => setFaculty(getFacultyFromStorage());
-    window.addEventListener("storage", onStorage);
-    return () => window.removeEventListener("storage", onStorage);
+    const fetchFaculty = async () => {
+      const raw = localStorage.getItem("user");
+      if (!raw) return;
+      const u = JSON.parse(raw);
+      const id = u?._id || u?.id;
+      if (!id) return;
+
+      try {
+        const res = await fetch(
+          `${import.meta.env.VITE_API_URL}/api/faculty/${id}`,
+        );
+        if (!res.ok) return;
+        const data = await res.json();
+        setFaculty({
+          fullName:
+            `${data.firstName ?? ""} ${data.lastName ?? ""}`.trim() || "—",
+          facultyId: data.id ?? "—", // ← galing na sa DB
+          role: normalizeRole(data.role),
+          department: data.department ?? "—",
+          status: data.status ?? null,
+          email: data.email ?? "—", // ← galing na sa DB
+          avatarUrl: data.avatarUrl ?? null,
+        });
+      } catch (err) {
+        console.error("Failed to fetch faculty profile:", err);
+      }
+    };
+
+    fetchFaculty();
   }, []);
 
   if (!faculty) return null;
