@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 import styles from "../../pages/facultyPages/facultyStyles/events.module.css";
 
-const FILTERS = ["All", "Meeting", "Event", "Deadline", "Academic", "Assembly"];
-const TYPES = ["Meeting", "Event", "Deadline", "Academic", "Assembly"];
+const FILTERS = ["All", "Meeting", "Event",  "Academic", "Assembly"];
+const TYPES = ["Meeting", "Event",  "Academic", "Assembly"];
 
 const TYPE_BADGE = {
   Meeting: { bg: "#e65100", light: "#fff0e0", text: "#7a3800" },
   Event: { bg: "#2d7a3c", light: "#e6f4ea", text: "#1a4a24" },
-  Deadline: { bg: "#c0390a", light: "#fde8e8", text: "#7b1a00" },
+ 
   Academic: { bg: "#185fa5", light: "#e6f1fb", text: "#0c3a6b" },
   Assembly: { bg: "#666", light: "#f0f0f0", text: "#333" },
 };
@@ -15,7 +15,7 @@ const TYPE_BADGE = {
 const TYPE_ICON = {
   Meeting: "bi-people-fill",
   Event: "bi-stars",
-  Deadline: "bi-exclamation-circle-fill",
+ 
   Academic: "bi-mortarboard-fill",
   Assembly: "bi-megaphone-fill",
 };

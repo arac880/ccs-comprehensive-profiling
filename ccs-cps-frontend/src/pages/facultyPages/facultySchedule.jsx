@@ -1,5 +1,14 @@
 import React, { useState } from "react";
 import styles from "../../pages/facultyPages/facultyStyles/schedule.module.css";
+import {
+  FaBook,
+  FaChalkboardUser,
+  FaLaptopCode,
+  FaClock,
+  FaLocationDot,
+  FaUserGroup,
+  FaClipboardList,
+} from "react-icons/fa6";
 
 const TIMES = [
   "7:00 AM",
@@ -30,7 +39,6 @@ const CLASSES = [
     color: "blockRed",
     type: "Lecture",
   },
-
   {
     day: 1,
     start: 3,
@@ -41,7 +49,6 @@ const CLASSES = [
     color: "blockBlue",
     type: "Seminar",
   },
-
   {
     day: 2,
     start: 1,
@@ -92,9 +99,6 @@ const CLASSES = [
     color: "blockAmber",
     type: "Applied",
   },
- 
-
-
   {
     day: 4,
     start: 12,
@@ -117,18 +121,34 @@ const DAYS = [
 
 const LEGEND = [
   { label: "Lecture", color: "#c0390a" },
-  { label: "Applied", color: "#e65100" },
   { label: "Seminar", color: "#185fa5" },
   { label: "Lab / IT", color: "#2d7a3c" },
 ];
+
+const TYPE_META = {
+  Lecture: { icon: <FaBook size={18} />, bg: "#fde8e8", color: "#c0390a" },
+  Seminar: {
+    icon: <FaChalkboardUser size={18} />,
+    bg: "#e6f1fb",
+    color: "#185fa5",
+  },
+  Applied: {
+    icon: <FaLaptopCode size={18} />,
+    bg: "#fff0e0",
+    color: "#e65100",
+  },
+};
 
 const classesPerDay = DAYS.map(
   (_, i) => CLASSES.filter((c) => c.day === i).length,
 );
 
 const FacultySchedule = () => {
+  const [selected, setSelected] = useState(null);
+
   const totalClasses = CLASSES.length;
-  const totalHours = CLASSES.reduce((acc, c) => acc + (c.span || 1), 0);
+
+  const closeModal = () => setSelected(null);
 
   return (
     <div className={styles.pageContent}>
@@ -151,7 +171,6 @@ const FacultySchedule = () => {
             <span className={styles.headerStatLbl}>Classes</span>
           </div>
           <div className={styles.headerStatDiv} />
-    
           <div className={styles.headerStatDiv} />
           <div className={styles.headerStat}>
             <span className={styles.headerStatNum}>5</span>
@@ -160,7 +179,7 @@ const FacultySchedule = () => {
         </div>
       </div>
 
-      {/* ── Schedule Card (scrollable body) ── */}
+      {/* ── Schedule Card ── */}
       <div className={styles.scheduleCard}>
         {/* Sticky day-header row */}
         <div className={styles.stickyHeader}>
@@ -185,13 +204,11 @@ const FacultySchedule = () => {
           <div className={styles.scheduleGrid}>
             {TIMES.map((time, row) => (
               <React.Fragment key={time}>
-                {/* Time label */}
                 <div className={styles.schedTimeCell}>
                   <span className={styles.timeLabelText}>{time}</span>
                   <div className={styles.timeTickLine} />
                 </div>
 
-                {/* Day cells */}
                 {[0, 1, 2, 3, 4].map((col) => {
                   const cls = CLASSES.find(
                     (c) => c.day === col && c.start === row,
@@ -215,6 +232,7 @@ const FacultySchedule = () => {
                       {cls && (
                         <div
                           className={`${styles.schedBlock} ${styles[cls.color]}`}
+                          onClick={() => setSelected({ cls, rowIndex: row })}
                         >
                           <div className={styles.schedBlockInner}>
                             <div className={styles.schedBlockType}>
@@ -266,6 +284,114 @@ const FacultySchedule = () => {
           – 9:00 PM
         </span>
       </div>
+
+      {/* ── Class Detail Modal ── */}
+      {selected && (
+        <div className={styles.modalOverlay} onClick={closeModal}>
+          <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+            {/* Modal Header */}
+            <div className={styles.modalHead}>
+              <div
+                className={styles.modalIcon}
+                style={{
+                  background: TYPE_META[selected.cls.type]?.bg,
+                  color: TYPE_META[selected.cls.type]?.color,
+                }}
+              >
+                {TYPE_META[selected.cls.type]?.icon}
+              </div>
+              <div className={styles.modalInfo}>
+                <div
+                  className={styles.modalTypeTag}
+                  style={{ color: TYPE_META[selected.cls.type]?.color }}
+                >
+                  {selected.cls.type}
+                </div>
+                <div className={styles.modalTitle}>{selected.cls.title}</div>
+                <div className={styles.modalSub}>{selected.cls.sub}</div>
+              </div>
+              <button className={styles.modalClose} onClick={closeModal}>
+                ✕
+              </button>
+            </div>
+
+            <div className={styles.modalDivider} />
+
+            {/* Modal Rows */}
+            <div className={styles.modalRows}>
+              <div className={styles.modalRow}>
+                <div
+                  className={styles.modalRowIcon}
+                  style={{ background: "#fff0e0", color: "#e65100" }}
+                >
+                  <FaClock size={15} />
+                </div>
+                <div>
+                  <div className={styles.modalRowLabel}>Time</div>
+                  <div className={styles.modalRowVal}>
+                    {TIMES[selected.rowIndex]} –{" "}
+                    {TIMES[selected.rowIndex + selected.cls.span] ?? "End"}
+                  </div>
+                </div>
+              </div>
+
+              <div className={styles.modalRow}>
+                <div
+                  className={styles.modalRowIcon}
+                  style={{ background: "#e6f1fb", color: "#185fa5" }}
+                >
+                  <FaLocationDot size={15} />
+                </div>
+                <div>
+                  <div className={styles.modalRowLabel}>Room</div>
+                  <div className={styles.modalRowVal}>{selected.cls.room}</div>
+                </div>
+              </div>
+
+              <div className={styles.modalRow}>
+                <div
+                  className={styles.modalRowIcon}
+                  style={{ background: "#e6f4ea", color: "#2d7a3c" }}
+                >
+                  <FaUserGroup size={15} />
+                </div>
+                <div>
+                  <div className={styles.modalRowLabel}>Section</div>
+                  <div className={styles.modalRowVal}>{selected.cls.sub}</div>
+                </div>
+              </div>
+
+              <div className={styles.modalRow}>
+                <div
+                  className={styles.modalRowIcon}
+                  style={{ background: "#fde8e8", color: "#c0390a" }}
+                >
+                  <FaClipboardList size={15} />
+                </div>
+                <div>
+                  <div className={styles.modalRowLabel}>Duration</div>
+                  <div className={styles.modalRowVal}>
+                    {selected.cls.span} hour{selected.cls.span > 1 ? "s" : ""}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.modalDivider} />
+
+            {/* Modal Footer */}
+            <div className={styles.modalFooter}>
+              <button
+                className={`${styles.modalBtn} ${styles.modalBtnSec}`}
+                onClick={closeModal}
+              >
+                Close
+              </button>
+             
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
