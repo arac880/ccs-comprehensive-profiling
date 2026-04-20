@@ -145,12 +145,12 @@ export default function StudentDashboard() {
         >
           <div className={styles.scheduleWidget}>
             <div className={styles.timeBlock}>
-              <span className={styles.timeHighlight}>01:30 PM</span>
-              <span className={styles.timeEnd}>to 03:00 PM</span>
+              <span className={styles.timeHighlight}>02:00 PM</span>
+              <span className={styles.timeEnd}>to 05:00 PM</span>
             </div>
             <div className={styles.classBlock}>
-              <span className={styles.subject}>IT312 - ComLab 2</span>
-              <span className={styles.instructor}>Prof. Santos</span>
+              <span className={styles.subject}>ITP113 - ComLab 2</span>
+              <span className={styles.instructor}>Prof. Montecillo</span>
             </div>
           </div>
         </DashWidget>
