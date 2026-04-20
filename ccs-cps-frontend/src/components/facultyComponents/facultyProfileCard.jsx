@@ -76,11 +76,11 @@ export default function FacultyProfileCard() {
         setFaculty({
           fullName:
             `${data.firstName ?? ""} ${data.lastName ?? ""}`.trim() || "—",
-          facultyId: data.id ?? "—", // ← galing na sa DB
+          facultyId: data.facultyIdid ?? "—", //
           role: normalizeRole(data.role),
           department: data.department ?? "—",
           status: data.status ?? null,
-          email: data.email ?? "—", // ← galing na sa DB
+          email: data.email ?? "—", //
           avatarUrl: data.avatarUrl ?? null,
         });
       } catch (err) {
