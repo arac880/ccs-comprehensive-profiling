@@ -41,7 +41,7 @@ const getEvents = async (req, res) => {
   }
 };
 
-// 🔥 CREATE EVENT
+// CREATE EVENT
 const createEvent = async (req, res) => {
   try {
     const token = req.headers.authorization?.split(" ")[1];
@@ -56,7 +56,10 @@ const createEvent = async (req, res) => {
       return res.status(403).json({ message: "Access denied." });
     }
 
-    const { title, description, date, time, location, type } = req.body;
+    // 1. ADD driveLink TO THIS LIST ⬇️
+    const { title, description, date, time, location, type, driveLink } =
+      req.body;
+
     if (!title || !date || !type) {
       return res.status(400).json({ message: "Missing fields." });
     }
@@ -74,6 +77,7 @@ const createEvent = async (req, res) => {
       location: location || "TBA",
       type,
       icon: TYPE_ICONS[type] || "bi-calendar-event-fill",
+      // 2. NOW driveLink IS DEFINED AND CAN BE USED ⬇️
       driveLink: driveLink || "",
       createdBy: decoded.id,
       createdAt: new Date(),
