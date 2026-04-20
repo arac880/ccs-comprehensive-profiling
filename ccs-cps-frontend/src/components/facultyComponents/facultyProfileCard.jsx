@@ -22,6 +22,18 @@ function getInitials(fullName = "") {
   return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
 }
 
+function normalizeRole(role) {
+  if (!role) return "Faculty";
+  const map = {
+    dean: "Dean",
+    faculty: "Faculty",
+    chair: "Department Chair",
+    "department chair": "Department Chair",
+    secretary: "Secretary",
+  };
+  return map[role.toLowerCase()] ?? role;
+}
+
 function getFacultyFromStorage() {
   try {
     const raw = localStorage.getItem("user");
@@ -30,7 +42,7 @@ function getFacultyFromStorage() {
     return {
       fullName: `${u.firstName ?? ""} ${u.lastName ?? ""}`.trim() || "—",
       facultyId: u.id ?? "—",
-      role: u.role ?? "Faculty",
+      role: normalizeRole(u.role),
       department: u.department ?? "—",
       status: u.status ?? null,
       email: u.email ?? "—",
