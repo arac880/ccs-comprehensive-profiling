@@ -56,6 +56,7 @@ function getFacultyFromStorage() {
 export default function FacultyProfileCard() {
   const [faculty, setFaculty] = useState(getFacultyFromStorage);
   const [previewUrl, setPreviewUrl] = useState(null);
+
   const fileInputRef = useRef(null);
 
   useEffect(() => {
