@@ -171,32 +171,34 @@ const AccordionBlock = ({ group, defaultOpen }) => {
       </div>
 
       {open && (
-        <table className={styles.gradesTable}>
-          <thead>
-            <tr>
-              <th>Course Code</th>
-              <th>Course Name</th>
-              <th className={styles.centered}>Units</th>
-              <th className={styles.centered}>Grade</th>
-              <th className={styles.centered}>Remarks</th>
-            </tr>
-          </thead>
-          <tbody>
-            {group.courses.map((course, i) => (
-              <tr key={i}>
-                <td className={styles.courseCode}>{course.courseCode}</td>
-                <td>{course.courseName}</td>
-                <td className={styles.centered}>{course.units}</td>
-                <td className={`${styles.centered} ${gradeColor(course.grade)}`}>{course.grade}</td>
-                <td className={styles.centered}>
-                  <span className={`${styles.remarkBadge} ${remarkClass(course.remarks)}`}>
-                    {course.remarks || "—"}
-                  </span>
-                </td>
+        <div style={{ overflowX: "auto" }}>
+          <table className={styles.gradesTable}>
+            <thead>
+              <tr>
+                <th>Course Code</th>
+                <th>Course Name</th>
+                <th className={styles.centered}>Units</th>
+                <th className={styles.centered}>Grade</th>
+                <th className={styles.centered}>Remarks</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {group.courses.map((course, i) => (
+                <tr key={i}>
+                  <td className={styles.courseCode}>{course.courseCode}</td>
+                  <td>{course.courseName}</td>
+                  <td className={styles.centered}>{course.units}</td>
+                  <td className={`${styles.centered} ${gradeColor(course.grade)}`}>{course.grade}</td>
+                  <td className={styles.centered}>
+                    <span className={`${styles.remarkBadge} ${remarkClass(course.remarks)}`}>
+                      {course.remarks || "—"}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   );

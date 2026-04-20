@@ -15,7 +15,10 @@
   flex-grow: 1;
   padding: 16px;
   overflow-y: auto;
+  overflow-x: hidden;
   background-color: #fffaf6;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 /* ── Header row ── */
@@ -1090,4 +1093,240 @@
   margin: 0;
   padding-top: 4px;
   border-top: 1px solid #f0eae3;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   RESPONSIVE — MOBILE & TABLET
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── Tablet (max 900px) ── */
+@media (max-width: 900px) {
+
+  .profileBody {
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+  }
+
+  /* Tab sidebar: horizontal scrollable pill row */
+  .tabSidebar {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    overflow-x: auto;
+    border-radius: 10px;
+    scrollbar-width: none;
+  }
+  .tabSidebar::-webkit-scrollbar { display: none; }
+
+  .tabSidebarHeader { display: none; }
+
+  .tabItem {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    padding: 10px 16px;
+    font-size: 11px;
+    white-space: nowrap;
+    border-left: none;
+    border-bottom: 3px solid transparent;
+    flex-shrink: 0;
+    min-width: 72px;
+    text-align: center;
+  }
+
+  .tabItem i {
+    font-size: 16px;
+    width: auto;
+  }
+
+  .tabItemActive {
+    border-left: none;
+    border-bottom: 3px solid #e65100;
+    background: #fdf0e8;
+  }
+
+  .violationBadge {
+    margin-left: 0;
+    margin-top: 2px;
+  }
+
+  .gradingLegendGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ── Mobile (max 600px) ── */
+@media (max-width: 600px) {
+
+  .pageContent {
+    padding: 10px;
+  }
+
+  /* Page header: keep back + edit on same row, wrap if needed */
+  .pageHeader {
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .headerActions {
+    margin-left: auto;
+  }
+
+  /* Hero card: avatar + name row, then meta below */
+  .heroCard {
+    flex-wrap: wrap;
+    padding: 14px;
+    gap: 10px;
+    align-items: flex-start;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .heroAvatar {
+    width: 52px;
+    height: 52px;
+    font-size: 18px;
+  }
+
+  .heroInfo {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .heroName {
+    font-size: 16px;
+    margin-bottom: 6px;
+  }
+
+  .heroMeta {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  /* Badges: move to their own full row */
+  .heroCard > div:last-child {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  /* Info/Form grids: single column */
+  .infoGrid {
+    grid-template-columns: 1fr;
+  }
+  .infoItem.fullWidth {
+    grid-column: 1;
+  }
+  .formGrid {
+    grid-template-columns: 1fr;
+  }
+  .formGroup.fullWidth {
+    grid-column: 1;
+  }
+
+  .detailCardBody {
+    padding: 14px;
+  }
+
+  /* Force full width on both sidebar and detail card */
+  .tabSidebar,
+  .detailCard {
+    width: 100%;
+    min-width: 0;
+    flex-shrink: 0;
+  }
+
+  /* Violation cards */
+  .violationCard {
+    flex-direction: column;
+    gap: 10px;
+    padding: 12px;
+  }
+  .violationCardLeft {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .violationDeleteBtn {
+    align-self: flex-end;
+  }
+
+  /* Semester accordion */
+  .semesterHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 10px 12px;
+  }
+  .semesterStats {
+    width: 100%;
+    justify-content: flex-start;
+    gap: 20px;
+  }
+  .semesterStat {
+    align-items: flex-start;
+  }
+
+  /* Grades table: horizontal scroll */
+  .semesterBlock {
+    overflow-x: auto;
+  }
+  .gradesTable {
+    min-width: 440px;
+    font-size: 12px;
+  }
+  .gradesTable th,
+  .gradesTable td {
+    padding: 8px 10px;
+  }
+
+  /* Grading legend */
+  .gradingLegendGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* Skills */
+  .skillsGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  /* Affiliation */
+  .affiliationCard {
+    padding: 10px 12px;
+  }
+
+  /* Activity card header: stack */
+  .activityCardHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  /* Violation form */
+  .violationForm {
+    padding: 12px;
+  }
+
+  /* Edit footer: full-width stacked buttons */
+  .editFooter {
+    flex-direction: column-reverse;
+    gap: 8px;
+    padding: 12px 14px;
+  }
+  .editFooter > * {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Tab strip: smaller */
+  .tabItem {
+    padding: 8px 10px;
+    min-width: 58px;
+    font-size: 10px;
+  }
+  .tabItem i {
+    font-size: 15px;
+  }
 }
