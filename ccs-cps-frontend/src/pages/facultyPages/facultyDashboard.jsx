@@ -135,13 +135,13 @@ const QUICK_ACTIONS = [
     label: "Add Student",
     path: "/faculty/student-list",
   },
-  { icon: "bi-clipboard2-check-fill", label: "Clearance", path: null },
+ 
   {
     icon: "bi-calendar-plus-fill",
     label: "Add Event",
     path: "/faculty/events",
   },
-  { icon: "bi-file-earmark-text-fill", label: "Reports", path: null },
+
 ];
 
 function getInitials(name) {
