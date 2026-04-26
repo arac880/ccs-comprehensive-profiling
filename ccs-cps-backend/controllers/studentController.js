@@ -1,14 +1,35 @@
 const { getDB } = require("../config/db");
 const { ObjectId } = require("mongodb");
 const bcrypt = require("bcryptjs");
-
 const getStudents = async (req, res) => {
   try {
     const db = getDB();
-    const students = await db
-      .collection("students")
-      .find({ isDeleted: { $ne: true } })
-      .toArray();
+    const { section, program, year } = req.query;
+
+    const PROGRAM_MAP = {
+      BSIT: "BS Information Technology",
+      BSCS: "BS Computer Science",
+      
+    };
+
+    const filter = { isDeleted: { $ne: true } };
+
+    if (section) filter.section = section;
+
+    // year — decode spaces ("+Year" → " Year")
+    if (year) filter.year = decodeURIComponent(year.replace(/\+/g, " "));
+
+    // program — map short code to full name
+    if (program) {
+      const fullName = PROGRAM_MAP[program.toUpperCase()] ?? program;
+      filter.program = fullName;
+    }
+
+    console.log("FINAL FILTER:", JSON.stringify(filter));
+
+    const students = await db.collection("students").find(filter).toArray();
+
+    console.log(`RESULT: ${students.length} students`);
     res.status(200).json(students);
   } catch (error) {
     res
@@ -16,7 +37,6 @@ const getStudents = async (req, res) => {
       .json({ message: "Failed to fetch students", error: error.message });
   }
 };
-
 const generateDefaultClearance = () => {
   const isGradesCleared = Math.random() > 0.5; 
   const isAccountCleared = Math.random() > 0.5;

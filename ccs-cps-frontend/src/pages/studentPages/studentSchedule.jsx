@@ -9,6 +9,7 @@ import {
 
 import schedStyles from "./studentStyles/schedule.module.css";
 import layoutStyles from "./studentStyles/dashboard.module.css";
+import SubjectDetailPage from "../../pages/facultyPages/SubjectDetailPage"; // ← import
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 const MOBILE_BREAKPOINT = 992;
@@ -23,7 +24,6 @@ const DAYS = [
   "SUNDAY",
 ];
 
-// DB stores day as 0=Monday, 1=Tuesday, etc.
 const DAY_NUM_TO_STR = {
   0: "MONDAY",
   1: "TUESDAY",
@@ -34,7 +34,6 @@ const DAY_NUM_TO_STR = {
   6: "SUNDAY",
 };
 
-// DB stores start as slot index: 0=7AM, 1=8AM, 2=9AM ...
 const SLOT_TO_HOUR = (slot) => 7 + Number(slot);
 
 const DAY_MAP_JS = {
@@ -46,6 +45,23 @@ const DAY_MAP_JS = {
   5: "FRIDAY",
   6: "SATURDAY",
 };
+
+const TIMES = [
+  "7:00 AM",
+  "8:00 AM",
+  "9:00 AM",
+  "10:00 AM",
+  "11:00 AM",
+  "12:00 PM",
+  "1:00 PM",
+  "2:00 PM",
+  "3:00 PM",
+  "4:00 PM",
+  "5:00 PM",
+  "6:00 PM",
+  "7:00 PM",
+  "8:00 PM",
+];
 
 const PALETTE = [
   "#4A90E2",
@@ -61,8 +77,7 @@ const PALETTE = [
 const getStudentFromStorage = () => {
   try {
     const raw = localStorage.getItem("user");
-    if (!raw) return null;
-    return JSON.parse(raw);
+    return raw ? JSON.parse(raw) : null;
   } catch {
     return null;
   }
@@ -83,14 +98,15 @@ const formatTime = (hour, min = 0) => {
 };
 
 const getEndTime = (startHour, durationHours) => {
-  const endH = startHour + Number(durationHours);
-  return formatTime(endH, 0);
+  return formatTime(startHour + Number(durationHours), 0);
 };
 
 // Map raw MongoDB Schedule doc → shape this component uses
 const normalizeSchedule = (s) => ({
+  ...s, // keep all original fields (section, program, year, etc.)
   day: DAY_NUM_TO_STR[Number(s.day)] ?? "MONDAY",
-  startHour: SLOT_TO_HOUR(s.start), // 0 → 7, 1 → 8, 2 → 9 ...
+  dayNum: Number(s.day),
+  startHour: SLOT_TO_HOUR(s.start),
   duration: Number(s.span) ?? 1,
   course: s.subjectCode ?? "",
   title: s.title ?? "",
@@ -98,7 +114,64 @@ const normalizeSchedule = (s) => ({
   instructor: s.facultyName ?? "",
   type: s.type ?? "Lecture",
   sub: s.sub ?? "",
+  // timeLabel needed by SubjectDetailPage
+  timeLabel: `${TIMES[s.start]} – ${TIMES[s.start + Number(s.span)] ?? "End"}`,
 });
+
+// getInitialDay — jump to nearest day with class
+const getInitialDay = (data) => {
+  const JS_TO_DB = { 0: 6, 1: 0, 2: 1, 3: 2, 4: 3, 5: 4, 6: 5 };
+  const DB_TO_DAYSTR = DAY_NUM_TO_STR;
+  const todayDb = JS_TO_DB[new Date().getDay()];
+  const daysWithClass = [
+    ...new Set(
+      data.map((s) => {
+        const raw = localStorage.getItem("user");
+        const parsed = raw ? JSON.parse(raw) : null;
+        return Number(parsed ? (s.dayNum ?? 0) : 0);
+      }),
+    ),
+  ];
+
+  // simpler — just use the already-normalized day string
+  const dayStrings = [...new Set(data.map((s) => s.day))];
+  const DB_TO_IDX = {
+    MONDAY: 0,
+    TUESDAY: 1,
+    WEDNESDAY: 2,
+    THURSDAY: 3,
+    FRIDAY: 4,
+    SATURDAY: 5,
+    SUNDAY: 6,
+  };
+  const JS_DAY_TO_DB_STR = {
+    0: "SUNDAY",
+    1: "MONDAY",
+    2: "TUESDAY",
+    3: "WEDNESDAY",
+    4: "THURSDAY",
+    5: "FRIDAY",
+    6: "SATURDAY",
+  };
+  const todayStr = JS_DAY_TO_DB_STR[new Date().getDay()];
+
+  // Find closest day starting from today
+  const ordered = [
+    "MONDAY",
+    "TUESDAY",
+    "WEDNESDAY",
+    "THURSDAY",
+    "FRIDAY",
+    "SATURDAY",
+    "SUNDAY",
+  ];
+  const todayIdx = ordered.indexOf(todayStr);
+  for (let i = 0; i < 7; i++) {
+    const check = ordered[(todayIdx + i) % 7];
+    if (dayStrings.includes(check)) return check;
+  }
+  return "MONDAY";
+};
 
 // ─── Component ────────────────────────────────────────────────────────────────
 export default function StudentSchedule() {
@@ -111,6 +184,7 @@ export default function StudentSchedule() {
   const [activeDay, setActiveDay] = useState(
     DAY_MAP_JS[new Date().getDay()] || "MONDAY",
   );
+  const [selectedSubject, setSelectedSubject] = useState(null); // ← new
 
   const student = getStudentFromStorage();
   const section = student?.section ?? null;
@@ -129,18 +203,17 @@ export default function StudentSchedule() {
       return;
     }
 
-    const url = `http://localhost:5000/api/schedules/section/${encodeURIComponent(section)}`;
-    console.log("[StudentSchedule] Fetching:", url);
-
-    fetch(url)
+    fetch(
+      `http://localhost:5000/api/schedules/section/${encodeURIComponent(section)}`,
+    )
       .then((res) => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return res.json();
       })
       .then((data) => {
-        console.log("[StudentSchedule] Raw data:", data);
         const mapped = Array.isArray(data) ? data.map(normalizeSchedule) : [];
         setScheduleData(mapped);
+        setActiveDay(getInitialDay(mapped));
       })
       .catch((err) => {
         console.error("[StudentSchedule] Error:", err);
@@ -149,13 +222,22 @@ export default function StudentSchedule() {
       .finally(() => setLoading(false));
   }, [section]);
 
-  // ── Derived: course colours ─────────────────────────────────────────────────
+  // ── If subject selected, show detail page ──────────────────────────────────
+  if (selectedSubject) {
+    return (
+      <SubjectDetailPage
+        cls={selectedSubject}
+        onBack={() => setSelectedSubject(null)}
+      />
+    );
+  }
+
+  // ── Derived ─────────────────────────────────────────────────────────────────
   const uniqueCourses = [...new Set(scheduleData.map((c) => c.course))];
   const courseColors = Object.fromEntries(
     uniqueCourses.map((course, i) => [course, PALETTE[i % PALETTE.length]]),
   );
 
-  // ── Derived: classes for active day sorted by time ──────────────────────────
   const todaysClasses = scheduleData
     .filter((c) => c.day === activeDay)
     .sort((a, b) => a.startHour - b.startHour);
@@ -166,7 +248,7 @@ export default function StudentSchedule() {
       className={isMobile ? layoutStyles.mobileMain : layoutStyles.mainContent}
     >
       <div className={schedStyles.scheduleContainer}>
-        {/* ── Header ── */}
+        {/* Header */}
         <div className={schedStyles.pageHeader}>
           <div className={schedStyles.titleWrapper}>
             <div className={schedStyles.iconBox}>
@@ -181,7 +263,7 @@ export default function StudentSchedule() {
           </div>
         </div>
 
-        {/* ── No section ── */}
+        {/* No section */}
         {!loading && !section && (
           <div
             style={{
@@ -197,7 +279,7 @@ export default function StudentSchedule() {
           </div>
         )}
 
-        {/* ── Loading ── */}
+        {/* Loading */}
         {loading && (
           <div
             style={{
@@ -225,7 +307,7 @@ export default function StudentSchedule() {
           </div>
         )}
 
-        {/* ── Error ── */}
+        {/* Error */}
         {!loading && error && (
           <div
             style={{
@@ -238,7 +320,7 @@ export default function StudentSchedule() {
           </div>
         )}
 
-        {/* ── Agenda widget ── */}
+        {/* Agenda widget */}
         {!loading && section && !error && (
           <div className={schedStyles.agendaWidget}>
             {/* Day picker */}
@@ -248,9 +330,7 @@ export default function StudentSchedule() {
                   <button
                     key={day}
                     onClick={() => setActiveDay(day)}
-                    className={`${schedStyles.dayBtn} ${
-                      activeDay === day ? schedStyles.activeDayBtn : ""
-                    }`}
+                    className={`${schedStyles.dayBtn} ${activeDay === day ? schedStyles.activeDayBtn : ""}`}
                   >
                     <span className={schedStyles.dayNameFull}>{day}</span>
                     <span className={schedStyles.dayNameShort}>
@@ -274,7 +354,12 @@ export default function StudentSchedule() {
                     const endTime = getEndTime(cls.startHour, cls.duration);
 
                     return (
-                      <div key={idx} className={schedStyles.timelineRow}>
+                      <div
+                        key={idx}
+                        className={schedStyles.timelineRow}
+                        onClick={() => setSelectedSubject(cls)} // ← click to open detail
+                        style={{ cursor: "pointer" }}
+                      >
                         {/* Time */}
                         <div className={schedStyles.timeTrack}>
                           <span className={schedStyles.timeStart}>
@@ -297,10 +382,7 @@ export default function StudentSchedule() {
                           <div
                             className={schedStyles.agendaCard}
                             style={{
-                              background: `linear-gradient(${hexToRgba(
-                                mainColor,
-                                0.08,
-                              )}, ${hexToRgba(mainColor, 0.08)}), #ffffff`,
+                              background: `linear-gradient(${hexToRgba(mainColor, 0.08)}, ${hexToRgba(mainColor, 0.08)}), #ffffff`,
                               borderLeft: `4px solid ${mainColor}`,
                               borderTop: `1px solid ${hexToRgba(mainColor, 0.2)}`,
                               borderRight: `1px solid ${hexToRgba(mainColor, 0.2)}`,
@@ -348,6 +430,18 @@ export default function StudentSchedule() {
                               <div className={schedStyles.metaItem}>
                                 <FaUserTie color={mainColor} /> {cls.instructor}
                               </div>
+                            </div>
+
+                            {/* View detail hint */}
+                            <div
+                              style={{
+                                fontSize: 11,
+                                color: mainColor,
+                                marginTop: 6,
+                                opacity: 0.7,
+                              }}
+                            >
+                              Tap to view subject details →
                             </div>
                           </div>
                         </div>

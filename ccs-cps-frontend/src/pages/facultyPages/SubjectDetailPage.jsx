@@ -1,4 +1,5 @@
-import React, { useState, useRef } from "react";
+// pages/facultyPages/SubjectDetailPage.jsx
+import React, { useState, useRef, useEffect } from "react";
 import styles from "../../pages/facultyPages/facultyStyles/SubjectDetail.module.css";
 import {
   FiArrowLeft,
@@ -10,7 +11,7 @@ import {
   FiBook,
   FiCheckSquare,
   FiPaperclip,
-  FiThumbsUp,
+  FiHeart,
   FiMessageSquare,
   FiShare2,
   FiTrash2,
@@ -22,12 +23,13 @@ import {
   FiBookOpen,
   FiFolder,
   FiCalendar,
-  FiZap,
   FiLayers,
+  FiEdit2,
 } from "react-icons/fi";
-import { useEffect } from "react";
+import AppToast from "../../components/ui/AppToast";
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+const API = "http://localhost:5000";
+
 const getUserRole = () => {
   try {
     return localStorage.getItem("role");
@@ -38,8 +40,8 @@ const getUserRole = () => {
 
 const getUser = () => {
   try {
-    const raw = localStorage.getItem("user");
-    return raw ? JSON.parse(raw) : null;
+    const r = localStorage.getItem("user");
+    return r ? JSON.parse(r) : null;
   } catch {
     return null;
   }
@@ -66,7 +68,6 @@ const formatTime = (date) => {
   });
 };
 
-// icon is a render function so JSX can be used outside component scope
 const POST_TYPES = [
   {
     key: "announcement",
@@ -86,31 +87,15 @@ const POST_TYPES = [
     icon: () => <FiBookOpen size={13} />,
     badge: "badgeLesson",
   },
-  {
-    key: "material",
-    label: "Material",
-    icon: () => <FiFolder size={13} />,
-    badge: "badgeMaterial",
-  },
+
 ];
 
-const SAMPLE_STUDENTS = [
-  { id: "2201001", name: "Anna Reyes" },
-  { id: "2201002", name: "Ben Santos" },
-  { id: "2201003", name: "Cara Lim" },
-  { id: "2201004", name: "Dan Cruz" },
-  { id: "2201005", name: "Eva Gomez" },
-];
-
-// ─── Component ────────────────────────────────────────────────────────────────
 const SubjectDetailPage = ({ cls, onBack }) => {
- 
   const userRole = getUserRole();
   const user = getUser();
   const canPost = ["dean", "chair", "faculty"].includes(userRole);
-
   const authorName = user ? `${user.firstName} ${user.lastName}` : "Instructor";
-  const initials = (name) =>
+  const initials = (name = "") =>
     name
       .split(" ")
       .map((n) => n[0])
@@ -118,110 +103,177 @@ const SubjectDetailPage = ({ cls, onBack }) => {
       .slice(0, 2)
       .toUpperCase();
 
-  // ── State ────────────────────────────────────────────────────────────────
-  const [posts, setPosts] = useState([
-    {
-      id: 1,
-      type: "announcement",
-      title: "Welcome to the Class!",
-      content:
-        "Hello everyone! This is your class board for this subject. Please check here regularly for updates, activities, and learning materials. Looking forward to a great semester with all of you.",
-      author: authorName,
-      createdAt: new Date(Date.now() - 3600000 * 2),
-      attachments: [],
-    },
-    {
-      id: 2,
-      type: "lesson",
-      title: "Week 1 — Introduction to the Subject",
-      content:
-        "Please review the attached slides and reading materials before our next session. We will be covering the foundational concepts, historical background, and core principles that will frame the entire course.",
-      author: authorName,
-      createdAt: new Date(Date.now() - 86400000),
-      attachments: [
-        { name: "Week1_Slides.pdf", size: "2.4 MB" },
-        { name: "Intro_Reading.docx", size: "540 KB" },
-      ],
-    },
-  ]);
-
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");
   const [showModal, setShowModal] = useState(false);
   const [activeTab, setActiveTab] = useState("announcement");
   const [form, setForm] = useState({ title: "", content: "" });
   const [attachments, setAttachments] = useState([]);
   const [submitting, setSubmitting] = useState(false);
+  const [editingPost, setEditingPost] = useState(null);
+  const [deletingId, setDeletingId] = useState(null);
+  const [toast, setToast] = useState({
+    isVisible: false,
+    message: "",
+    type: "success",
+  });
+  const [students, setStudents] = useState([]);
+  const [loadingStudents, setLoadingStudents] = useState(true);
+
   const fileRef = useRef();
 
-  // ── Handlers ─────────────────────────────────────────────────────────────
-  const openModal = (tab = "announcement") => {
+  const showToast = (message, type = "success") =>
+    setToast({ isVisible: true, message, type });
+  const closeToast = () => setToast((t) => ({ ...t, isVisible: false }));
+
+  // ── Fetch posts ─────────────────────────────────────────────────────────────
+  useEffect(() => {
+    if (!cls?._id) {
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
+    fetch(`${API}/api/posts/${cls._id}`)
+      .then((r) => {
+        if (!r.ok) throw new Error();
+        return r.json();
+      })
+      .then((d) => setPosts(Array.isArray(d) ? d : []))
+      .catch(() => showToast("Failed to load posts.", "error"))
+      .finally(() => setLoading(false));
+  }, [cls?._id]);
+
+  // ── Fetch students (only for non-student roles) ─────────────────────────────
+  useEffect(() => {
+    if (userRole === "student") {
+      setLoadingStudents(false);
+      return;
+    }
+    if (!cls?.section || !cls?.program || !cls?.year) {
+      setLoadingStudents(false);
+      return;
+    }
+
+    setLoadingStudents(true);
+    const params = new URLSearchParams({
+      section: cls.section,
+      program: cls.program,
+      year: cls.year,
+    });
+
+    fetch(`${API}/api/students?${params.toString()}`)
+      .then((r) => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.json();
+      })
+      .then((data) =>
+        setStudents(Array.isArray(data) ? data : (data.students ?? [])),
+      )
+      .catch(() => setStudents([]))
+      .finally(() => setLoadingStudents(false));
+  }, [cls?.section, cls?.program, cls?.year, userRole]);
+
+  // ── Modal helpers ───────────────────────────────────────────────────────────
+  const openModal = (tab = "announcement", postToEdit = null) => {
     setActiveTab(tab);
-    setForm({ title: "", content: "" });
-    setAttachments([]);
+    if (postToEdit) {
+      setEditingPost(postToEdit);
+      setForm({ title: postToEdit.title, content: postToEdit.content });
+      setAttachments(postToEdit.attachments ?? []);
+    } else {
+      setEditingPost(null);
+      setForm({ title: "", content: "" });
+      setAttachments([]);
+    }
     setShowModal(true);
   };
 
-  
+  const closeModal = () => {
+    setShowModal(false);
+    setEditingPost(null);
+    setForm({ title: "", content: "" });
+    setAttachments([]);
+  };
 
   const handleFileChange = (e) => {
-    const files = Array.from(e.target.files);
-    const mapped = files.map((f) => ({
-      name: f.name,
-      size: `${(f.size / 1024).toFixed(0)} KB`,
-      file: f,
-    }));
-    setAttachments((prev) => [...prev, ...mapped]);
+    setAttachments((prev) => [
+      ...prev,
+      ...Array.from(e.target.files).map((f) => ({
+        name: f.name,
+        size: `${(f.size / 1024).toFixed(0)} KB`,
+        file: f,
+      })),
+    ]);
     e.target.value = "";
   };
 
-const handleSubmit = async () => {
-  if (!form.title.trim() || !form.content.trim()) return;
+  // ── Submit ──────────────────────────────────────────────────────────────────
+  const handleSubmit = async () => {
+    if (!form.title.trim() || !form.content.trim()) return;
+    setSubmitting(true);
+    const payload = {
+      title: form.title.trim(),
+      content: form.content.trim(),
+      type: activeTab,
+      subjectId: cls?._id,
+      author: authorName,
+      attachments: attachments.map(({ name, size }) => ({ name, size })),
+    };
+    try {
+      if (editingPost) {
+        const res = await fetch(`${API}/api/posts/${editingPost._id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        if (!res.ok) throw new Error();
+        const updated = await res.json();
+        setPosts((prev) =>
+          prev.map((p) => (p._id === updated._id ? updated : p)),
+        );
+        showToast("Post updated successfully!", "success");
+      } else {
+        const res = await fetch(`${API}/api/posts`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        if (!res.ok) throw new Error();
+        const newPost = await res.json();
+        setPosts((prev) => [newPost, ...prev]);
+        showToast("Post published!", "success");
+      }
+      closeModal();
+    } catch {
+      showToast("Failed to save post.", "error");
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
-  setSubmitting(true);
+  // ── Delete ──────────────────────────────────────────────────────────────────
+  const handleDelete = async () => {
+    if (!deletingId) return;
+    try {
+      const res = await fetch(`${API}/api/posts/${deletingId}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) throw new Error();
+      setPosts((prev) => prev.filter((p) => p._id !== deletingId));
+      showToast("Post deleted.", "info");
+    } catch {
+      showToast("Failed to delete post.", "error");
+    } finally {
+      setDeletingId(null);
+    }
+  };
 
-  try {
-    const res = await fetch("http://localhost:5000/api/posts", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        title: form.title,
-        content: form.content,
-        type: activeTab,
-        subjectId: cls?._id,
-        author: authorName,
-        attachments: attachments.map(({ name, size }) => ({ name, size })),
-      }),
-    });
 
-    const newPost = await res.json();
-
-    setPosts((prev) => [newPost, ...prev]);
-    setShowModal(false);
-  } catch (err) {
-    console.error(err);
-  }
-
-  setSubmitting(false);
-};
-
- const deletePost = async (id) => {
-   try {
-     await fetch(`http://localhost:5000/api/posts/${id}`, {
-       method: "DELETE",
-     });
-
-     setPosts((prev) => prev.filter((p) => p._id !== id));
-   } catch (err) {
-     console.error(err);
-   }
- };
 
   const filtered =
     filter === "all" ? posts : posts.filter((p) => p.type === filter);
 
-  // ── Type Badge ────────────────────────────────────────────────────────────
   const TypeBadge = ({ type }) => {
     const t = POST_TYPES.find((x) => x.key === type) || POST_TYPES[0];
     return (
@@ -231,95 +283,79 @@ const handleSubmit = async () => {
     );
   };
 
- 
-
-  useEffect(() => {
-    if (!cls?._id) return;
-
-    fetch(`http://localhost:5000/api/posts/${cls._id}`)
-      .then((res) => res.json())
-      .then((data) => setPosts(data))
-      .catch((err) => console.error(err));
-  }, [cls]);
-  // ── Render ────────────────────────────────────────────────────────────────
+  // ─── Render ──────────────────────────────────────────────────────────────────
   return (
     <div className={styles.page}>
-      {/* ── Hero ── */}
+      {/* Hero */}
       <div className={styles.hero}>
         <button className={styles.heroBack} onClick={onBack}>
-          <FiArrowLeft size={13} /> Back to Schedule
+          <FiArrowLeft size={12} /> Back to Schedule
         </button>
         <div className={styles.heroBadge}>
-          <FiLayers size={11} /> {cls?.type ?? "Subject"}
+          <FiLayers size={10} /> {cls?.type ?? "Subject"}
         </div>
         <h1 className={styles.heroTitle}>{cls?.title ?? "Subject Title"}</h1>
         <p className={styles.heroSub}>{cls?.sub ?? "Section"}</p>
         <div className={styles.heroMeta}>
           <span className={styles.heroMetaItem}>
-            <FiClock size={14} /> {cls?.timeLabel ?? "TBA"}
+            <FiClock size={13} /> {cls?.timeLabel ?? "TBA"}
           </span>
           <span className={styles.heroMetaItem}>
-            <FiMapPin size={14} /> {cls?.room ?? "TBA"}
+            <FiMapPin size={13} /> {cls?.room ?? "TBA"}
           </span>
-          <span className={styles.heroMetaItem}>
-            <FiUsers size={14} /> {SAMPLE_STUDENTS.length} Students
-          </span>
+          {userRole !== "student" && (
+            <span className={styles.heroMetaItem}>
+              <FiUsers size={13} /> {loadingStudents ? "..." : students.length}{" "}
+              Students
+            </span>
+          )}
         </div>
       </div>
 
-      {/* ── Stats Row ── */}
+      {/* Stats */}
       <div className={styles.statsRow}>
-        <div className={styles.statCard}>
-          <div className={`${styles.statIcon} ${styles.statIconOrange}`}>
-            <FiAlertCircle />
-          </div>
-          <div>
-            <div className={styles.statNum}>
-              {posts.filter((p) => p.type === "announcement").length}
+        {[
+          {
+            icon: <FiAlertCircle />,
+            cls: "statIconOrange",
+            num: posts.filter((p) => p.type === "announcement").length,
+            lbl: "Announcements",
+          },
+          {
+            icon: <FiBook />,
+            cls: "statIconBlue",
+            num: posts.filter((p) => p.type === "lesson").length,
+            lbl: "Lessons",
+          },
+          {
+            icon: <FiCheckSquare />,
+            cls: "statIconGreen",
+            num: posts.filter((p) => p.type === "activity").length,
+            lbl: "Activities",
+          },
+          {
+            icon: <FiPaperclip />,
+            cls: "statIconAmber",
+            num: posts.reduce((a, p) => a + (p.attachments?.length ?? 0), 0),
+            lbl: "Files",
+          },
+        ].map((s) => (
+          <div key={s.lbl} className={styles.statCard}>
+            <div className={`${styles.statIcon} ${styles[s.cls]}`}>
+              {s.icon}
             </div>
-            <div className={styles.statLbl}>Announcements</div>
-          </div>
-        </div>
-        <div className={styles.statCard}>
-          <div className={`${styles.statIcon} ${styles.statIconBlue}`}>
-            <FiBook />
-          </div>
-          <div>
-            <div className={styles.statNum}>
-              {posts.filter((p) => p.type === "lesson").length}
+            <div>
+              <div className={styles.statNum}>{s.num}</div>
+              <div className={styles.statLbl}>{s.lbl}</div>
             </div>
-            <div className={styles.statLbl}>Lessons</div>
           </div>
-        </div>
-        <div className={styles.statCard}>
-          <div className={`${styles.statIcon} ${styles.statIconGreen}`}>
-            <FiCheckSquare />
-          </div>
-          <div>
-            <div className={styles.statNum}>
-              {posts.filter((p) => p.type === "activity").length}
-            </div>
-            <div className={styles.statLbl}>Activities</div>
-          </div>
-        </div>
-        <div className={styles.statCard}>
-          <div className={`${styles.statIcon} ${styles.statIconAmber}`}>
-            <FiPaperclip />
-          </div>
-          <div>
-            <div className={styles.statNum}>
-              {posts.reduce((a, p) => a + p.attachments.length, 0)}
-            </div>
-            <div className={styles.statLbl}>Files</div>
-          </div>
-        </div>
+        ))}
       </div>
 
-      {/* ── Main ── */}
+      {/* Main */}
       <div className={styles.main}>
-        {/* Feed */}
         <div>
-          {/* Create Post Box */}
+          {/* Create box — faculty/dean/chair only */}
           {canPost && (
             <div className={styles.createBox}>
               <div className={styles.createBoxTop}>
@@ -349,7 +385,7 @@ const handleSubmit = async () => {
             </div>
           )}
 
-          {/* Filter Bar */}
+          {/* Filters */}
           <div className={styles.filterBar}>
             {["all", ...POST_TYPES.map((t) => t.key)].map((f) => (
               <button
@@ -364,33 +400,65 @@ const handleSubmit = async () => {
             ))}
           </div>
 
-          {/* Posts */}
-          {filtered.length === 0 ? (
+          {/* Loading */}
+          {loading && (
+            <div
+              style={{
+                textAlign: "center",
+                padding: "48px 0",
+                color: "#b0a099",
+              }}
+            >
+              <div
+                style={{
+                  width: 22,
+                  height: 22,
+                  border: "2.5px solid #fde0cc",
+                  borderTop: "2.5px solid #e8641a",
+                  borderRadius: "50%",
+                  animation: "sdSpin .75s linear infinite",
+                  margin: "0 auto 12px",
+                }}
+              />
+              <style>{`@keyframes sdSpin{to{transform:rotate(360deg)}}`}</style>
+              <div style={{ fontSize: 13 }}>Loading posts…</div>
+            </div>
+          )}
+
+          {/* Empty */}
+          {!loading && filtered.length === 0 && (
             <div className={styles.emptyState}>
               <div className={styles.emptyIcon}>
                 <svg
                   viewBox="0 0 64 64"
-                  width="52"
-                  height="52"
+                  width="56"
+                  height="56"
                   fill="none"
                   stroke="currentColor"
                   strokeWidth="1.5"
                 >
-                  <rect x="8" y="12" width="48" height="40" rx="4" />
+                  <rect x="8" y="12" width="48" height="40" rx="6" />
                   <line x1="20" y1="26" x2="44" y2="26" />
                   <line x1="20" y1="34" x2="36" y2="34" />
                 </svg>
               </div>
-              <div className={styles.emptyText}>No posts yet</div>
+              <div className={styles.emptyText}>Nothing here yet</div>
               <div className={styles.emptyHint}>
                 {canPost
                   ? 'Click "Share something" to create the first post.'
                   : "Check back later for updates."}
               </div>
             </div>
-          ) : (
+          )}
+
+          {/* Posts */}
+          {!loading &&
             filtered.map((post) => (
-              <div key={post._id} className={styles.postCard}>
+              <div
+                key={post._id}
+                className={styles.postCard}
+                data-type={post.type}
+              >
                 <div className={styles.postCardHeader}>
                   <div
                     className={styles.avatar}
@@ -406,27 +474,42 @@ const handleSubmit = async () => {
                   </div>
                   <TypeBadge type={post.type} />
                   {canPost && (
-                    <button
-                      className={styles.deleteBtn}
-                      onClick={() => deletePost(post._id)}
-                      title="Delete post"
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: 4,
+                        marginLeft: "auto",
+                        paddingLeft: 8,
+                      }}
                     >
-                      <FiTrash2 size={13} />
-                    </button>
+                      <button
+                        className={styles.editBtn}
+                        onClick={() => openModal(post.type, post)}
+                        title="Edit"
+                      >
+                        <FiEdit2 size={13} />
+                      </button>
+                      <button
+                        className={styles.deleteBtn}
+                        onClick={() => setDeletingId(post._id)}
+                        title="Delete"
+                      >
+                        <FiTrash2 size={13} />
+                      </button>
+                    </div>
                   )}
                 </div>
-
                 <div className={styles.postBody}>
                   <p className={styles.postTitle}>{post.title}</p>
                   <p className={styles.postContent}>{post.content}</p>
                 </div>
-
-                {post.attachments.length > 0 && (
+                {post.attachments?.length > 0 && (
                   <>
                     <div className={styles.postDivider} />
                     <div className={styles.postAttachments}>
                       <div className={styles.postAttachmentsLabel}>
-                        Attachments
+                        {post.attachments.length} Attachment
+                        {post.attachments.length > 1 ? "s" : ""}
                       </div>
                       {post.attachments.map((a, i) => (
                         <span key={i} className={styles.attachmentChip}>
@@ -436,8 +519,8 @@ const handleSubmit = async () => {
                           {a.name}
                           <span
                             style={{
-                              color: "#a89388",
-                              marginLeft: 2,
+                              color: "#b0a099",
+                              marginLeft: 4,
                               fontSize: 11,
                             }}
                           >
@@ -448,31 +531,18 @@ const handleSubmit = async () => {
                     </div>
                   </>
                 )}
-
-                <div className={styles.postFooter}>
-                  <button className={styles.postAction}>
-                    <FiThumbsUp size={13} /> Like
-                  </button>
-                  <button className={styles.postAction}>
-                    <FiMessageSquare size={13} /> Comment
-                  </button>
-                  <button className={styles.postAction}>
-                    <FiShare2 size={13} /> Share
-                  </button>
-                </div>
-              </div>
-            ))
-          )}
+           
+    </div>         ))}
         </div>
 
         {/* Sidebar */}
         <div className={styles.sidebar}>
-          {/* Schedule Info */}
+          {/* Class Schedule */}
           <div className={styles.sideCard}>
             <div className={styles.sideCardHead}>
               <span className={styles.sideCardTitle}>
                 <FiCalendar
-                  size={13}
+                  size={12}
                   style={{ marginRight: 6, verticalAlign: "middle" }}
                 />
                 Class Schedule
@@ -495,86 +565,91 @@ const handleSubmit = async () => {
             </div>
           </div>
 
-          {/* Students */}
-          <div className={styles.sideCard}>
-            <div className={styles.sideCardHead}>
-              <span className={styles.sideCardTitle}>
-                <FiUsers
-                  size={13}
-                  style={{ marginRight: 6, verticalAlign: "middle" }}
-                />
-                Students ({SAMPLE_STUDENTS.length})
-              </span>
-              <span className={styles.sideCardMore}>View all</span>
-            </div>
-            <div className={styles.sideCardBody}>
-              {SAMPLE_STUDENTS.map((s) => (
-                <div key={s.id} className={styles.studentItem}>
-                  <div className={styles.studentAvatar}>{initials(s.name)}</div>
-                  <div>
-                    <div className={styles.studentName}>{s.name}</div>
-                    <div className={styles.studentId}>{s.id}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Quick Actions */}
-          {canPost && (
+          {/* Students — hidden for student role */}
+          {userRole !== "student" && (
             <div className={styles.sideCard}>
               <div className={styles.sideCardHead}>
                 <span className={styles.sideCardTitle}>
-                  <FiZap
-                    size={13}
+                  <FiUsers
+                    size={12}
                     style={{ marginRight: 6, verticalAlign: "middle" }}
                   />
-                  Quick Post
+                  Students ({loadingStudents ? "…" : students.length})
                 </span>
               </div>
-              <div
-                className={styles.sideCardBody}
-                style={{ display: "flex", flexDirection: "column", gap: 8 }}
-              >
-                {POST_TYPES.map((t) => (
-                  <button
-                    key={t.key}
-                    className={styles.createAction}
+              <div className={styles.sideCardBody}>
+                {loadingStudents && (
+                  <div
                     style={{
-                      justifyContent: "flex-start",
-                      width: "100%",
-                      borderRadius: 10,
+                      textAlign: "center",
+                      padding: "16px 0",
+                      color: "#b0a099",
+                      fontSize: 13,
                     }}
-                    onClick={() => openModal(t.key)}
                   >
-                    {t.icon()} {t.label}
-                  </button>
-                ))}
+                    <div
+                      style={{
+                        width: 16,
+                        height: 16,
+                        border: "2px solid #fde0cc",
+                        borderTop: "2px solid #e8641a",
+                        borderRadius: "50%",
+                        animation: "sdSpin .75s linear infinite",
+                        margin: "0 auto 8px",
+                      }}
+                    />
+                    Loading students…
+                  </div>
+                )}
+                {!loadingStudents && students.length === 0 && (
+                  <div
+                    style={{
+                      textAlign: "center",
+                      padding: "16px 0",
+                      color: "#b0a099",
+                      fontSize: 13,
+                    }}
+                  >
+                    No students found for this section.
+                  </div>
+                )}
+                {!loadingStudents &&
+                  students.map((s) => {
+                    const fullName = `${s.firstName} ${s.lastName}`;
+                    return (
+                      <div
+                        key={s._id ?? s.studentId}
+                        className={styles.studentItem}
+                      >
+                        <div className={styles.studentAvatar}>
+                          {initials(fullName)}
+                        </div>
+                        <div>
+                          <div className={styles.studentName}>{fullName}</div>
+                          <div className={styles.studentId}>{s.studentId}</div>
+                        </div>
+                      </div>
+                    );
+                  })}
               </div>
             </div>
           )}
         </div>
       </div>
 
-      {/* ── Create Post Modal ── */}
+      {/* Create/Edit Modal */}
       {showModal && (
-        <div
-          className={styles.modalOverlay}
-          onClick={() => setShowModal(false)}
-        >
+        <div className={styles.modalOverlay} onClick={closeModal}>
           <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
             <div className={styles.modalHeader}>
-              <span className={styles.modalTitle}>Create Post</span>
-              <button
-                className={styles.modalClose}
-                onClick={() => setShowModal(false)}
-              >
+              <span className={styles.modalTitle}>
+                {editingPost ? "Edit Post" : "Create Post"}
+              </span>
+              <button className={styles.modalClose} onClick={closeModal}>
                 ✕
               </button>
             </div>
-
             <div className={styles.modalBody}>
-              {/* Type tabs */}
               <div className={styles.modalTabs}>
                 {POST_TYPES.map((t) => (
                   <button
@@ -586,8 +661,6 @@ const handleSubmit = async () => {
                   </button>
                 ))}
               </div>
-
-              {/* Title */}
               <div className={styles.formGroup}>
                 <label className={styles.formLabel}>Title *</label>
                 <input
@@ -599,8 +672,6 @@ const handleSubmit = async () => {
                   }
                 />
               </div>
-
-              {/* Content */}
               <div className={styles.formGroup}>
                 <label className={styles.formLabel}>Content *</label>
                 <textarea
@@ -612,8 +683,6 @@ const handleSubmit = async () => {
                   }
                 />
               </div>
-
-              {/* File Upload */}
               <div className={styles.formGroup}>
                 <label className={styles.formLabel}>
                   Attachments (optional)
@@ -623,7 +692,7 @@ const handleSubmit = async () => {
                   onClick={() => fileRef.current?.click()}
                 >
                   <div className={styles.fileUploadIcon}>
-                    <FiUpload size={28} />
+                    <FiUpload size={26} />
                   </div>
                   <div className={styles.fileUploadText}>
                     <span>Click to upload</span> or drag and drop
@@ -644,7 +713,7 @@ const handleSubmit = async () => {
                       {getFileIcon(a.name)}
                     </span>
                     <span style={{ flex: 1 }}>{a.name}</span>
-                    <span style={{ color: "#a89388", fontSize: 12 }}>
+                    <span style={{ color: "#b0a099", fontSize: 12 }}>
                       {a.size}
                     </span>
                     <button
@@ -659,12 +728,8 @@ const handleSubmit = async () => {
                 ))}
               </div>
             </div>
-
             <div className={styles.modalFooter}>
-              <button
-                className={styles.btnSecondary}
-                onClick={() => setShowModal(false)}
-              >
+              <button className={styles.btnSecondary} onClick={closeModal}>
                 Cancel
               </button>
               <button
@@ -674,12 +739,97 @@ const handleSubmit = async () => {
                   submitting || !form.title.trim() || !form.content.trim()
                 }
               >
-                {submitting ? "Posting..." : "Post"}
+                {submitting ? (
+                  <>
+                    <div
+                      style={{
+                        width: 13,
+                        height: 13,
+                        border: "2px solid rgba(255,255,255,.4)",
+                        borderTop: "2px solid #fff",
+                        borderRadius: "50%",
+                        animation: "sdSpin .7s linear infinite",
+                        flexShrink: 0,
+                      }}
+                    />
+                    {editingPost ? "Saving…" : "Posting…"}
+                  </>
+                ) : editingPost ? (
+                  "Save Changes"
+                ) : (
+                  "Publish Post"
+                )}
               </button>
             </div>
           </div>
         </div>
       )}
+
+      {/* Delete Confirm */}
+      {deletingId && (
+        <div
+          className={styles.modalOverlay}
+          onClick={() => setDeletingId(null)}
+        >
+          <div
+            className={styles.modal}
+            style={{ maxWidth: 400 }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className={styles.modalHeader}>
+              <span className={styles.modalTitle}>Delete Post</span>
+              <button
+                className={styles.modalClose}
+                onClick={() => setDeletingId(null)}
+              >
+                ✕
+              </button>
+            </div>
+            <div className={styles.modalBody}>
+              <div
+                style={{
+                  background: "#fff5f0",
+                  border: "1.5px solid #fde0cc",
+                  borderRadius: 12,
+                  padding: "16px 18px",
+                  fontSize: 14,
+                  color: "#5a2a1a",
+                  lineHeight: 1.7,
+                }}
+              >
+                ⚠️ This post will be <strong>permanently deleted</strong> and
+                cannot be recovered.
+              </div>
+            </div>
+            <div className={styles.modalFooter}>
+              <button
+                className={styles.btnSecondary}
+                onClick={() => setDeletingId(null)}
+              >
+                Cancel
+              </button>
+              <button
+                className={styles.btnPrimary}
+                style={{
+                  background: "linear-gradient(135deg,#b91c1c,#dc2626)",
+                  boxShadow: "0 3px 12px rgba(185,28,28,.35)",
+                }}
+                onClick={handleDelete}
+              >
+                Yes, Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <AppToast
+        isVisible={toast.isVisible}
+        message={toast.message}
+        type={toast.type}
+        onClose={closeToast}
+        duration={3500}
+      />
     </div>
   );
 };

@@ -29,7 +29,7 @@ app.use("/api/events", eventRoutes);
 app.use("/api/faculty", facultyRoutes);
 
 app.use("/api/schedules", require("./routes/schedule"));
-
+app.use("/api/posts",     postRoutes);   
 
 app.get("/", (req, res) => {
   res.send("Student Profiling API is running...");
