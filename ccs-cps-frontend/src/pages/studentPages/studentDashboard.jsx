@@ -43,43 +43,61 @@ export default function StudentDashboard() {
   const [bannerData, setBannerData] = useState({
     name: "Student",
     programLabel: "Loading...",
-    semesterLabel: "2nd Semester • A.Y. 2025–2026",
+    semesterLabel: "1st Semester • A.Y. 2025–2026",
   });
 
-  const isCleared = false;
+  // Dynamic Clearance States
+  const [isCleared, setIsCleared] = useState(false);
+  const [loadingClearance, setLoadingClearance] = useState(true);
 
+  // Handle Resize
   useEffect(() => {
     const onResize = () => setIsMobile(window.innerWidth < 992);
     window.addEventListener("resize", onResize);
-
-    try {
-      const storedUser = localStorage.getItem("user");
-      if (storedUser) {
-        const parsedUser = JSON.parse(storedUser);
-
-        let programAbbr = "CCS";
-        if (parsedUser.program) {
-          if (parsedUser.program.includes("Information Technology"))
-            programAbbr = "BSIT";
-          if (parsedUser.program.includes("Computer Science"))
-            programAbbr = "BSCS";
-        }
-
-        const formattedProgram = `${programAbbr} — ${parsedUser.year || ""}`;
-
-        setBannerData({
-          name: parsedUser.firstName + " " + parsedUser.lastName || "Student",
-          programLabel: formattedProgram,
-          semesterLabel: "2nd Semester • A.Y. 2025–2026",
-        });
-      }
-    } catch (error) {
-      console.error("Failed to parse user data", error);
-    }
-
     return () => window.removeEventListener("resize", onResize);
   }, []);
 
+  // Fetch Student Profile & Clearance Data
+  useEffect(() => {
+    const fetchStudentData = async () => {
+      try {
+        const storedUser = localStorage.getItem("user");
+        if (!storedUser) return;
+
+        const parsedUser = JSON.parse(storedUser);
+
+        // Set banner data from localStorage
+        let programAbbr = "CCS";
+        if (parsedUser.program) {
+          if (parsedUser.program.includes("Information Technology")) programAbbr = "BSIT";
+          if (parsedUser.program.includes("Computer Science")) programAbbr = "BSCS";
+        }
+        setBannerData({
+          name: parsedUser.firstName + " " + parsedUser.lastName || "Student",
+          programLabel: `${programAbbr} — ${parsedUser.year || ""}`,
+          semesterLabel: "1st Semester • A.Y. 2025–2026", 
+        });
+
+        // Fetch deep clearance data from backend using the logged-in student's ID
+        const res = await fetch(`http://localhost:5000/api/students/${parsedUser._id}`);
+        const data = await res.json();
+
+        // Calculate overall clearance status
+        if (data && data.clearance && data.clearance.summaryItems) {
+          const overallCleared = data.clearance.summaryItems.every(item => item.isCleared);
+          setIsCleared(overallCleared);
+        }
+      } catch (error) {
+        console.error("Failed to fetch student data:", error);
+      } finally {
+        setLoadingClearance(false);
+      }
+    };
+
+    fetchStudentData();
+  }, []);
+
+  // Fetch Events
   useEffect(() => {
     const fetchUpcomingEvent = async () => {
       try {
@@ -89,20 +107,13 @@ export default function StudentDashboard() {
         if (!Array.isArray(data)) return;
 
         const today = new Date();
-
-        // 🔥 filter only upcoming
         const upcoming = data
-          .map((e) => ({
-            ...e,
-            dateObj: new Date(e.date),
-          }))
+          .map((e) => ({ ...e, dateObj: new Date(e.date) }))
           .filter((e) => e.dateObj >= today)
-          .sort((a, b) => a.dateObj - b.dateObj); // nearest first
+          .sort((a, b) => a.dateObj - b.dateObj);
 
         if (upcoming.length > 0) {
           const e = upcoming[0];
-
-          // map to your EventSection format
           setUpcomingEvent({
             id: e._id,
             title: e.title,
@@ -137,6 +148,7 @@ export default function StudentDashboard() {
       </div>
 
       <div className={styles.widgetsRow}>
+        {/* Next Class - Reverted to your original static layout */}
         <DashWidget
           title="Next Class"
           icon={<FaClock />}
@@ -155,31 +167,36 @@ export default function StudentDashboard() {
           </div>
         </DashWidget>
 
+        {/* Dynamic Clearance Widget */}
         <DashWidget
           title="Clearance Status"
           icon={<FaCheckCircle />}
           actionText="Overall Clearance"
           actionTo="/student/clearance"
         >
-          <div
-            className={`${styles.clearanceDisplay} ${isCleared ? styles.cleared : styles.notCleared}`}
-          >
-            <div className={styles.statusMain}>
-              {isCleared ? (
-                <FaCheckCircle size={28} />
-              ) : (
-                <FaTimesCircle size={28} />
-              )}
-              <span className={styles.statusTitle}>
-                {isCleared ? "CLEARED" : "NOT YET CLEARED"}
-              </span>
+          {loadingClearance ? (
+            <div style={{ padding: "10px 0", color: "#666", textAlign: "center" }}>
+              Checking status...
             </div>
-            <p className={styles.statusDesc}>
-              {isCleared
-                ? "You have fully settled all requirements."
-                : "You have pending requirements to settle."}
-            </p>
-          </div>
+          ) : (
+            <div className={`${styles.clearanceDisplay} ${isCleared ? styles.cleared : styles.notCleared}`}>
+              <div className={styles.statusMain}>
+                {isCleared ? (
+                  <FaCheckCircle size={28} />
+                ) : (
+                  <FaTimesCircle size={28} />
+                )}
+                <span className={styles.statusTitle}>
+                  {isCleared ? "CLEARED" : "NOT YET CLEARED"}
+                </span>
+              </div>
+              <p className={styles.statusDesc}>
+                {isCleared
+                  ? "You have fully settled all requirements."
+                  : "You have pending requirements to settle."}
+              </p>
+            </div>
+          )}
         </DashWidget>
       </div>
 
@@ -206,12 +223,7 @@ export default function StudentDashboard() {
           <CalendarWidget />
           <div style={{ marginTop: "24px" }}>
             <TitlePages
-              icon={
-                <i
-                  className="bi bi-link-45deg"
-                  style={{ fontSize: 16, color: "#fff" }}
-                />
-              }
+              icon={<i className="bi bi-link-45deg" style={{ fontSize: 16, color: "#fff" }} />}
               title="CCS Links"
               iconBg="#E65100"
               textColor="#7A4F35"

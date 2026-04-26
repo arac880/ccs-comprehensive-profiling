@@ -85,6 +85,11 @@ const studentSchema = new mongoose.Schema({
   organizations:      { type: [organizationSchema],  default: [] },
   sports:             { type: [sportSchema],         default: [] },
 
+  clearance: { 
+    type: Object, 
+    default: {} 
+  },
+
   password: { type: String, default: null },
   role:     { type: String, default: "student" },
 });
