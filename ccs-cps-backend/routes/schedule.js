@@ -124,7 +124,7 @@ router.post("/", async (req, res) => {
       facultyId: facultyObjId.toString(), // send back as string
     });
   } catch (err) {
-    console.error("❌ POST / error:", err);
+    console.error("POST / error:", err);
     res.status(500).json({ message: "Server error.", error: err.message });
   }
 });
