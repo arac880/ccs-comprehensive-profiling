@@ -5,6 +5,7 @@ import AppToast from "../ui/AppToast";
 import ConfirmModal from "../ui/ConfirmModal";
 import ErrorModal from "../ui/ErrorModal";
 import styles from "../../pages/facultyPages/facultyStyles/studentList.module.css";
+import PROGRAM_DATA from "../../data/programData";
 
 const initialFormState = {
   studentId: "",
@@ -32,6 +33,8 @@ const AddStudentModal = ({ isOpen, onClose }) => {
   const [isErrorOpen, setIsErrorOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const [availableSections, setAvailableSections] = useState([]);
 
   const [toast, setToast] = useState({
     isVisible: false,
@@ -103,6 +106,20 @@ const AddStudentModal = ({ isOpen, onClose }) => {
       if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
     }
   };
+
+  // After existing handleChange logic, add useEffect:
+  useEffect(() => {
+    if (!formData.program || !formData.year) {
+      setAvailableSections([]);
+      return;
+    }
+    const found = PROGRAM_DATA.find((p) => p.program === formData.program);
+    const yearObj = found?.years.find((y) => y.year === formData.year);
+    setAvailableSections(yearObj ? yearObj.sections : []);
+
+    // Reset section if current section is no longer valid
+    setFormData((prev) => ({ ...prev, section: "" }));
+  }, [formData.program, formData.year]);
 
   const validateForm = () => {
     const newErrors = {};
@@ -495,12 +512,11 @@ const AddStudentModal = ({ isOpen, onClose }) => {
                   style={{ borderColor: errors.program ? "#dc3545" : "" }}
                 >
                   <option value="">Select Program</option>
-                  <option value="BS Computer Science">
-                    BS Computer Science
-                  </option>
-                  <option value="BS Information Technology">
-                    BS Information Technology
-                  </option>
+                  {PROGRAM_DATA.map((p) => (
+                    <option key={p.code} value={p.program}>
+                      {p.program}
+                    </option>
+                  ))}
                 </select>
                 <ErrorText message={errors.program} />
               </div>
@@ -520,10 +536,19 @@ const AddStudentModal = ({ isOpen, onClose }) => {
                   style={{ borderColor: errors.year ? "#dc3545" : "" }}
                 >
                   <option value="">Select Year</option>
-                  <option value="1st Year">1st Year</option>
-                  <option value="2nd Year">2nd Year</option>
-                  <option value="3rd Year">3rd Year</option>
-                  <option value="4th Year">4th Year</option>
+                  {(() => {
+                    const found = PROGRAM_DATA.find(
+                      (p) => p.program === formData.program,
+                    );
+                    const years = found
+                      ? found.years.map((y) => y.year)
+                      : ["1st Year", "2nd Year", "3rd Year", "4th Year"];
+                    return years.map((y) => (
+                      <option key={y} value={y}>
+                        {y}
+                      </option>
+                    ));
+                  })()}
                 </select>
                 <ErrorText message={errors.year} />
               </div>
@@ -553,11 +578,14 @@ const AddStudentModal = ({ isOpen, onClose }) => {
                     style={{ borderColor: errors.section ? "#dc3545" : "" }}
                   >
                     <option value="">Select Section</option>
-                    <option value="A">A</option>
-                    <option value="B">B</option>
-                    <option value="C">C</option>
-                    <option value="D">D</option>
-                    <option value="E">E</option>
+                    {(availableSections.length > 0
+                      ? availableSections
+                      : ["A", "B", "C", "D"]
+                    ).map((sec) => (
+                      <option key={sec} value={sec}>
+                        {sec}
+                      </option>
+                    ))}
                   </select>
                 )}
                 <ErrorText message={errors.section} />
@@ -679,6 +707,6 @@ const AddStudentModal = ({ isOpen, onClose }) => {
       />
     </>
   );
-};
+};;
 
 export default AddStudentModal;
