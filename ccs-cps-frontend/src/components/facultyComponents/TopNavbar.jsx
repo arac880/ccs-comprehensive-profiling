@@ -197,7 +197,7 @@ export default function TopBar({ onMenuClick, mobileOpen }) {
                   className={styles.notifFooter}
                   onClick={() => {
                     setShowNotif(false);
-                    navigate("/faculty/");
+                    navigate("/faculty/notifications");
                   }}
                 >
                   View All Notifications

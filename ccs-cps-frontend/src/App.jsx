@@ -5,10 +5,9 @@ import {
   Navigate,
 } from "react-router-dom";
 
-
-
 import Login from "./pages/Login";
 import ProtectedRoute from "./components/ProtectedRoute";
+import NotificationPage from "./components/NotifcationPage";
 
 // Layouts
 import FacultyLayout from "./components/facultyComponents/FacultyLayout";
@@ -28,7 +27,7 @@ import StudentSchedule from "./pages/studentPages/studentSchedule";
 import StudentEvents from "./pages/studentPages/studentEvents";
 import StudentClearance from "./pages/studentPages/studentClearance";
 import CollegeResearch from "./pages/studentPages/collegeResearch";
-import StudentProfile from "./pages/studentPages/studentProfile";
+import StudentProfile from "./pages/studentPages/StudentProfile";
 
 function App() {
   return (
@@ -56,6 +55,7 @@ function App() {
           <Route path="schedule" element={<FacultySchedule />} />
           <Route path="events" element={<FacultyEvents />} />
           <Route path="profile" element={<FacultyProfile />} />
+          <Route path="/faculty/notifications" element={<NotificationPage />} />
           <Route path="student/:id" element={<FacultyStudentProfile />} />
         </Route>
 
@@ -79,6 +79,7 @@ function App() {
           <Route path="clearance" element={<StudentClearance />} />
           <Route path="research" element={<CollegeResearch />} />
           <Route path="profile" element={<StudentProfile />} />
+          <Route path="/student/notifications" element={<NotificationPage />} />
         </Route>
 
         {/* Fallback for undefined URLs */}

@@ -230,7 +230,7 @@ export default function TopNavBar({ onSignOut, onMenuClick }) {
                   className={styles.notifFooter}
                   onClick={() => {
                     setShowNotif(false);
-                    navigate("/student/");
+                    navigate("/student/notifications");
                   }}
                 >
                   View All Notifications
