@@ -24,8 +24,19 @@ export default function TopBar({ onMenuClick, mobileOpen }) {
   const [showLogout, setShowLogout] = useState(false);
 
   const [showNotif, setShowNotif] = useState(false);
-  const [notifs, setNotifs] = useState([]);
+  const [notifs, setNotifs] = useState(() => {
+    try {
+      const saved = localStorage.getItem("faculty_notifs");
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
   const notifRef = useRef(null);
+
+  useEffect(() => {
+    localStorage.setItem("faculty_notifs", JSON.stringify(notifs));
+  }, [notifs]);
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"));

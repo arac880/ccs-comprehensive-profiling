@@ -2,8 +2,7 @@
 import { useState, useEffect } from "react";
 import { io } from "socket.io-client";
 
-const socket = io("http://localhost:5000"); // ← port ng backend mo
-
+const socket = io("http://localhost:5000");
 export const useNotifications = (userId) => {
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);

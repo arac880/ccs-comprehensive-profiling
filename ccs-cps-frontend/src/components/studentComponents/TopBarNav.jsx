@@ -6,6 +6,7 @@ import {
   FaBell,
   FaCircleUser,
   FaArrowRightFromBracket,
+  FaTriangleExclamation,
   FaBars,
   FaCircle,
   FaClipboardCheck,
@@ -17,24 +18,46 @@ import {
 
 import LogoutModal from "../LogoutModal";
 
-const socket = io("http://localhost:5000");
+let socket;
+
+const getSocket = () => {
+  if (!socket) {
+    socket = io("http://localhost:5000");
+  }
+  return socket;
+};
 
 export default function TopNavBar({ onSignOut, onMenuClick }) {
   const navigate = useNavigate();
   const [showLogout, setShowLogout] = useState(false);
 
   const [showNotif, setShowNotif] = useState(false);
-  const [notifs, setNotifs] = useState([]);
+  const [notifs, setNotifs] = useState(() => {
+    try {
+      const saved = localStorage.getItem("student_notifs");
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
   const notifRef = useRef(null);
+
+  useEffect(() => {
+    localStorage.setItem("student_notifs", JSON.stringify(notifs));
+  }, [notifs]);
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"));
     const userId = user?._id;
+    console.log("👤 Student joining room:", userId); // ← add
     if (!userId) return;
+
+    const sock = getSocket();
 
     socket.emit("join", userId);
 
     socket.on("notification", (notif) => {
+      console.log("🔔 Notification received:", notif); // ← add
       setNotifs((prev) => [notif, ...prev]);
     });
 
@@ -61,6 +84,8 @@ export default function TopNavBar({ onSignOut, onMenuClick }) {
         return <FaCalendarDay size={16} />;
       case "announcement":
         return <FaScrewdriverWrench size={16} />;
+      case "violation":
+        return <FaTriangleExclamation size={16} color="#E65100" />; // ← add
       default:
         return <FaBell size={16} />;
     }
@@ -72,6 +97,12 @@ export default function TopNavBar({ onSignOut, onMenuClick }) {
     setNotifs(notifs.map((n) => ({ ...n, read: true })));
   };
 
+  const markOneRead = (id) => {
+    setNotifs((prev) =>
+      prev.map((n) => (n.id === id ? { ...n, read: true } : n)),
+    );
+  };
+
   const handleMenuClick = (e) => {
     console.log("TopNav hamburger clicked!");
     onMenuClick?.(e);
@@ -80,6 +111,7 @@ export default function TopNavBar({ onSignOut, onMenuClick }) {
   const handleLogout = () => {
     localStorage.removeItem("user");
     localStorage.removeItem("token");
+    // localStorage.removeItem("student_notifs");
     navigate("/login");
   };
 
@@ -138,6 +170,18 @@ export default function TopNavBar({ onSignOut, onMenuClick }) {
                     notifs.map((notif) => (
                       <div
                         key={notif.id}
+                        onClick={() => {
+                          markOneRead(notif.id);
+                          if (notif.type === "violation") {
+                            navigate("/student/profile", {
+                              state: { tab: "violations" },
+                            });
+                          } else if (notif.link) {
+                            navigate(notif.link);
+                          }
+                          setShowNotif(false);
+                        }}
+                        style={{ cursor: "pointer" }}
                         className={`${styles.notifItem} ${!notif.read ? styles.unreadBg : ""}`}
                       >
                         <div className={styles.notifIconWrap}>
