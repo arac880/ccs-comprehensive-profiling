@@ -17,12 +17,32 @@ import {
 import styles from "../../pages/facultyPages/facultyStyles/TopNavbar.module.css";
 import LogoutModal from "../LogoutModal";
 
-const socket = io("http://localhost:5000");
+let socket;
+const getSocket = () => {
+  if (!socket) {
+    socket = io("http://localhost:5000", {
+      transports: ["websocket", "polling"],
+    });
+  }
+  return socket;
+};
+
+const user = JSON.parse(localStorage.getItem("user") || "{}");
+const userId = user?._id || user?.id;
+if (userId) {
+  const sock = getSocket();
+  sock.on("connect", () => {
+    sock.emit("join", userId);
+    console.log("✅ Faculty socket connected and joined:", userId);
+  });
+  if (sock.connected) {
+    sock.emit("join", userId);
+  }
+}
 
 export default function TopBar({ onMenuClick, mobileOpen }) {
   const navigate = useNavigate();
   const [showLogout, setShowLogout] = useState(false);
-
   const [showNotif, setShowNotif] = useState(false);
   const [notifs, setNotifs] = useState(() => {
     try {
@@ -34,25 +54,46 @@ export default function TopBar({ onMenuClick, mobileOpen }) {
   });
   const notifRef = useRef(null);
 
+  // ✅ sync from localStorage when NotificationPage marks as read
   useEffect(() => {
-    localStorage.setItem("faculty_notifs", JSON.stringify(notifs));
-  }, [notifs]);
-
-  useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("user"));
-    const userId = user?._id;
-    if (!userId) return;
-
-    socket.emit("join", userId);
-
-    socket.on("notification", (notif) => {
-      setNotifs((prev) => [notif, ...prev]);
-    });
-
-    return () => socket.off("notification");
+    const syncNotifs = () => {
+      try {
+        const saved = localStorage.getItem("faculty_notifs");
+        setNotifs(saved ? JSON.parse(saved) : []);
+      } catch {}
+    };
+    window.addEventListener("notifs-updated", syncNotifs);
+    return () => window.removeEventListener("notifs-updated", syncNotifs);
   }, []);
 
-  // ── Map icons based on type ──
+  // ✅ socket listener
+  useEffect(() => {
+    const sock = getSocket();
+
+    const handleNotification = (notif) => {
+      console.log("🔔 Faculty GOT NOTIFICATION:", notif);
+      setNotifs((prev) => {
+        const updated = [notif, ...prev];
+        localStorage.setItem("faculty_notifs", JSON.stringify(updated));
+        window.dispatchEvent(new Event("notifs-updated"));
+        return updated;
+      });
+    };
+
+    sock.on("notification", handleNotification);
+    return () => sock.off("notification", handleNotification);
+  }, []);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (notifRef.current && !notifRef.current.contains(event.target)) {
+        setShowNotif(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   const getIcon = (type) => {
     switch (type) {
       case "enrollment":
@@ -71,12 +112,29 @@ export default function TopBar({ onMenuClick, mobileOpen }) {
   const unreadCount = notifs.filter((n) => !n.read).length;
 
   const markAllAsRead = () => {
-    setNotifs(notifs.map((n) => ({ ...n, read: true })));
+    const updated = notifs.map((n) => ({ ...n, read: true }));
+    setNotifs(updated);
+    localStorage.setItem("faculty_notifs", JSON.stringify(updated));
+    window.dispatchEvent(new Event("notifs-updated"));
+  };
+
+  const markOneRead = (id) => {
+    setNotifs((prev) => {
+      const updated = prev.map((n) => (n.id === id ? { ...n, read: true } : n));
+      localStorage.setItem("faculty_notifs", JSON.stringify(updated));
+      window.dispatchEvent(new Event("notifs-updated"));
+      return updated;
+    });
   };
 
   const handleLogout = () => {
     localStorage.removeItem("user");
     localStorage.removeItem("token");
+    localStorage.removeItem("faculty_notifs");
+    if (socket) {
+      socket.disconnect();
+      socket = null;
+    }
     navigate("/login");
   };
 
@@ -86,7 +144,6 @@ export default function TopBar({ onMenuClick, mobileOpen }) {
         className={`${styles.topNav} d-flex align-items-center justify-content-between px-3 px-md-4 w-100`}
         style={{ zIndex: 1035 }}
       >
-        {/* Left: Hamburger (mobile) + Brand */}
         <div className="d-flex align-items-center gap-3">
           {mobileOpen ? (
             <FaXmark
@@ -103,7 +160,6 @@ export default function TopBar({ onMenuClick, mobileOpen }) {
               style={{ pointerEvents: "auto", zIndex: 1040 }}
             />
           )}
-
           <div
             className="d-flex flex-column"
             style={{ justifyContent: "center" }}
@@ -115,9 +171,7 @@ export default function TopBar({ onMenuClick, mobileOpen }) {
           </div>
         </div>
 
-        {/* Right: Icons */}
         <div className={styles.iconGroup}>
-          {/* ── NOTIFICATION WRAPPER ── */}
           <div className={styles.notifWrap} ref={notifRef}>
             <div
               className={`${styles.iconBtn} ${showNotif ? styles.iconBtnActive : ""}`}
@@ -129,7 +183,6 @@ export default function TopBar({ onMenuClick, mobileOpen }) {
               )}
             </div>
 
-            {/* Notification Dropdown Panel */}
             {showNotif && (
               <div className={styles.notifDropdown}>
                 <div className={styles.notifHeader}>
@@ -149,6 +202,12 @@ export default function TopBar({ onMenuClick, mobileOpen }) {
                     notifs.map((notif) => (
                       <div
                         key={notif.id}
+                        onClick={() => {
+                          markOneRead(notif.id);
+                          if (notif.link) navigate(notif.link);
+                          setShowNotif(false);
+                        }}
+                        style={{ cursor: "pointer" }}
                         className={`${styles.notifItem} ${!notif.read ? styles.unreadBg : ""}`}
                       >
                         <div className={styles.notifIconWrap}>
@@ -171,10 +230,7 @@ export default function TopBar({ onMenuClick, mobileOpen }) {
                           <span className={styles.notifTime}>
                             {new Date(notif.createdAt).toLocaleTimeString(
                               "en-PH",
-                              {
-                                hour: "2-digit",
-                                minute: "2-digit",
-                              },
+                              { hour: "2-digit", minute: "2-digit" },
                             )}
                           </span>
                         </div>
@@ -206,15 +262,12 @@ export default function TopBar({ onMenuClick, mobileOpen }) {
             )}
           </div>
 
-          {/* Profile */}
           <div
             className={styles.iconBtn}
             onClick={() => navigate("/faculty/profile")}
           >
             <FaCircleUser size={22} className={styles.actionIcon} />
           </div>
-
-          {/* Sign out */}
           <div className={styles.iconBtn} onClick={() => setShowLogout(true)}>
             <FaArrowRightFromBracket size={21} className={styles.actionIcon} />
           </div>

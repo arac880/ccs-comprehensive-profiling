@@ -32,7 +32,7 @@ const TYPE_COLORS = {
 };
 
 const user = JSON.parse(localStorage.getItem("user") || "{}");
-const role = user?.role || "student";
+const role = user?.isDean || user?.isChair ? "faculty" : "student";
 const storageKey = role === "faculty" ? "faculty_notifs" : "student_notifs";
 
 export default function NotificationPage() {
@@ -40,7 +40,7 @@ export default function NotificationPage() {
 
   const [notifs, setNotifs] = useState(() => {
     try {
-      const saved = localStorage.getItem("student_notifs");
+      const saved = localStorage.getItem(storageKey);
       return saved ? JSON.parse(saved) : [];
     } catch {
       return [];
@@ -48,10 +48,6 @@ export default function NotificationPage() {
   });
 
   const [activeFilter, setActiveFilter] = useState("All");
-
-  useEffect(() => {
-    localStorage.setItem("student_notifs", JSON.stringify(notifs));
-  }, [notifs]);
 
   const getIcon = (type) => {
     switch (type) {
@@ -89,17 +85,38 @@ export default function NotificationPage() {
     {},
   );
 
-  const markAllRead = () =>
-    setNotifs((prev) => prev.map((n) => ({ ...n, read: true })));
+  useEffect(() => {
+    const syncFromStorage = () => {
+      try {
+        const saved = localStorage.getItem(storageKey);
+        setNotifs(saved ? JSON.parse(saved) : []);
+      } catch {}
+    };
 
-  const markOneRead = (id) =>
-    setNotifs((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, read: true } : n)),
-    );
+    window.addEventListener("notifs-updated", syncFromStorage);
+    return () => window.removeEventListener("notifs-updated", syncFromStorage);
+  }, []);
+
+  const markAllRead = () => {
+    const updated = notifs.map((n) => ({ ...n, read: true }));
+    setNotifs(updated);
+    localStorage.setItem(storageKey, JSON.stringify(updated));
+    window.dispatchEvent(new Event("notifs-updated"));
+  };
+
+  const markOneRead = (id) => {
+    setNotifs((prev) => {
+      const updated = prev.map((n) => (n.id === id ? { ...n, read: true } : n));
+      localStorage.setItem(storageKey, JSON.stringify(updated));
+      window.dispatchEvent(new Event("notifs-updated"));
+      return updated;
+    });
+  };
 
   const clearAll = () => {
     setNotifs([]);
-    localStorage.removeItem("student_notifs");
+    localStorage.removeItem(storageKey);
+    window.dispatchEvent(new Event("notifs-updated"));
   };
 
   const handleClick = (notif) => {

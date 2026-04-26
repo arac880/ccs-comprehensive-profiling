@@ -15,22 +15,34 @@ import {
   FaRegBellSlash,
   FaChalkboardUser,
 } from "react-icons/fa6";
-
 import LogoutModal from "../LogoutModal";
 
 let socket;
-
 const getSocket = () => {
   if (!socket) {
-    socket = io("http://localhost:5000");
+    socket = io("http://localhost:5000", {
+      transports: ["websocket", "polling"], // ← add this
+    });
   }
   return socket;
 };
 
+const user = JSON.parse(localStorage.getItem("user") || "{}");
+const userId = user?._id || user?.id;
+if (userId) {
+  const sock = getSocket();
+  sock.on("connect", () => {
+    sock.emit("join", userId);
+    console.log("✅ Socket connected and joined:", userId);
+  });
+  if (sock.connected) {
+    sock.emit("join", userId);
+  }
+}
+
 export default function TopNavBar({ onSignOut, onMenuClick }) {
   const navigate = useNavigate();
   const [showLogout, setShowLogout] = useState(false);
-
   const [showNotif, setShowNotif] = useState(false);
   const [notifs, setNotifs] = useState(() => {
     try {
@@ -43,25 +55,34 @@ export default function TopNavBar({ onSignOut, onMenuClick }) {
   const notifRef = useRef(null);
 
   useEffect(() => {
-    localStorage.setItem("student_notifs", JSON.stringify(notifs));
-  }, [notifs]);
+    const syncNotifs = () => {
+      try {
+        const saved = localStorage.getItem("student_notifs");
+        setNotifs(saved ? JSON.parse(saved) : []);
+      } catch {}
+    };
+
+    window.addEventListener("notifs-updated", syncNotifs);
+    return () => window.removeEventListener("notifs-updated", syncNotifs);
+  }, []);
 
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("user"));
-    const userId = user?._id;
-    console.log("👤 Student joining room:", userId); // ← add
-    if (!userId) return;
-
     const sock = getSocket();
 
-    socket.emit("join", userId);
+    const handleNotification = (notif) => {
+      console.log("🔔 GOT NOTIFICATION:", notif);
+      setNotifs((prev) => {
+        const updated = [notif, ...prev];
+        localStorage.setItem("student_notifs", JSON.stringify(updated));
+        window.dispatchEvent(new Event("notifs-updated"));
+        return updated;
+      });
+    };
 
-    socket.on("notification", (notif) => {
-      console.log("🔔 Notification received:", notif); // ← add
-      setNotifs((prev) => [notif, ...prev]);
-    });
+    sock.on("notification", handleNotification);
 
-    return () => socket.off("notification");
+    // ✅ only remove listener, never disconnect
+    return () => sock.off("notification", handleNotification);
   }, []);
 
   useEffect(() => {
@@ -80,12 +101,12 @@ export default function TopNavBar({ onSignOut, onMenuClick }) {
         return <FaClipboardCheck size={16} />;
       case "assignment":
         return <FaChalkboardUser size={16} />;
-      case "reminder":
-        return <FaCalendarDay size={16} />;
+      // case "reminder":
+      //   return <FaCalendarDay size={16} />;
       case "announcement":
-        return <FaScrewdriverWrench size={16} />;
+        return <FaCalendarDay size={16} />;
       case "violation":
-        return <FaTriangleExclamation size={16} color="#E65100" />; // ← add
+        return <FaTriangleExclamation size={16} color="#E65100" />;
       default:
         return <FaBell size={16} />;
     }
@@ -94,13 +115,19 @@ export default function TopNavBar({ onSignOut, onMenuClick }) {
   const unreadCount = notifs.filter((n) => !n.read).length;
 
   const markAllAsRead = () => {
-    setNotifs(notifs.map((n) => ({ ...n, read: true })));
+    const updated = notifs.map((n) => ({ ...n, read: true }));
+    setNotifs(updated);
+    localStorage.setItem("student_notifs", JSON.stringify(updated));
+    window.dispatchEvent(new Event("notifs-updated"));
   };
 
   const markOneRead = (id) => {
-    setNotifs((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, read: true } : n)),
-    );
+    setNotifs((prev) => {
+      const updated = prev.map((n) => (n.id === id ? { ...n, read: true } : n));
+      localStorage.setItem("student_notifs", JSON.stringify(updated));
+      window.dispatchEvent(new Event("notifs-updated"));
+      return updated;
+    });
   };
 
   const handleMenuClick = (e) => {
@@ -111,7 +138,13 @@ export default function TopNavBar({ onSignOut, onMenuClick }) {
   const handleLogout = () => {
     localStorage.removeItem("user");
     localStorage.removeItem("token");
-    // localStorage.removeItem("student_notifs");
+    // localStorage.removeItem("student_notifs");/
+
+    if (socket) {
+      socket.disconnect();
+      socket = null;
+    }
+
     navigate("/login");
   };
 
@@ -128,7 +161,6 @@ export default function TopNavBar({ onSignOut, onMenuClick }) {
             onClick={handleMenuClick}
             style={{ pointerEvents: "auto", zIndex: 1040 }}
           />
-
           <div className="d-flex flex-column justify-content-center">
             <span className={styles.brandTitle}>CCS</span>
             <span className={`${styles.brandSub} d-none d-sm-block`}>
@@ -138,7 +170,6 @@ export default function TopNavBar({ onSignOut, onMenuClick }) {
         </div>
 
         <div className="d-flex align-items-center gap-3">
-          {/* ── NOTIFICATION WRAPPER ── */}
           <div className={styles.notifWrap} ref={notifRef}>
             <div
               className={`${styles.iconBtn} ${showNotif ? styles.iconBtnActive : ""}`}
@@ -150,7 +181,6 @@ export default function TopNavBar({ onSignOut, onMenuClick }) {
               )}
             </div>
 
-            {/* Notification Dropdown Panel */}
             {showNotif && (
               <div className={styles.notifDropdown}>
                 <div className={styles.notifHeader}>
@@ -186,7 +216,7 @@ export default function TopNavBar({ onSignOut, onMenuClick }) {
                       >
                         <div className={styles.notifIconWrap}>
                           {getIcon(notif.type)}
-                        </div>{" "}
+                        </div>
                         <div className={styles.notifContent}>
                           <div className={styles.notifItemHeader}>
                             <span className={styles.notifItemTitle}>
@@ -209,7 +239,7 @@ export default function TopNavBar({ onSignOut, onMenuClick }) {
                                 minute: "2-digit",
                               },
                             )}
-                          </span>{" "}
+                          </span>
                         </div>
                       </div>
                     ))
