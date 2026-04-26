@@ -5,6 +5,8 @@ import {
   Navigate,
 } from "react-router-dom";
 
+import ScheduleManagement from "./scheduleManagement";
+
 import Login from "./pages/Login";
 import ProtectedRoute from "./components/ProtectedRoute";
 
