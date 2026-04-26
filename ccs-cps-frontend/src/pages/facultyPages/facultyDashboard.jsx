@@ -105,29 +105,6 @@ const StatCard = ({ icon, label, value, sub, color, loading }) => (
   </div>
 );
 
-const SCHEDULE = [
-  {
-    subject: "Data Structures",
-    code: "CS 311",
-    room: "Lab 2",
-    time: "7:30–9:00 AM",
-    day: "MWF",
-  },
-  {
-    subject: "OOP",
-    code: "CS 321",
-    room: "Room 204",
-    time: "9:30–11:00 AM",
-    day: "TTh",
-  },
-  {
-    subject: "Intro to Programming",
-    code: "CS 401",
-    room: "Room 301",
-    time: "1:00–2:30 PM",
-    day: "MWF",
-  },
-];
 
 const QUICK_ACTIONS = [
   {
@@ -157,6 +134,8 @@ function getInitials(name) {
 /* ── Main Dashboard ── */
 const FacultyDashboard = () => {
   const navigate = useNavigate();
+  const [schedule, setSchedule] = useState([]);
+  const [scheduleLoading, setScheduleLoading] = useState(true);
 
   const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
   const facultyName = storedUser.lastName
@@ -194,6 +173,25 @@ const FacultyDashboard = () => {
     "December",
   ];
 
+  const TIMES = [
+    "7:00 AM",
+    "8:00 AM",
+    "9:00 AM",
+    "10:00 AM",
+    "11:00 AM",
+    "12:00 PM",
+    "1:00 PM",
+    "2:00 PM",
+    "3:00 PM",
+    "4:00 PM",
+    "5:00 PM",
+    "6:00 PM",
+    "7:00 PM",
+    "8:00 PM",
+    "9:00 PM",
+  ];
+
+  const formatTime = (i) => TIMES[i] ?? "";
   const today = {
     day: now.getDate(),
     dow: DOWS_S[now.getDay()],
@@ -280,6 +278,62 @@ const FacultyDashboard = () => {
 
     fetchEvents();
   }, []);
+
+  const getFacultyIdFromStorage = () => {
+    try {
+      const raw = localStorage.getItem("user");
+      if (!raw) return null;
+      const parsed = JSON.parse(raw);
+      const id = parsed?._id ?? parsed?.id ?? parsed?.facultyId ?? null;
+      if (!id || id === "null" || id === "undefined") return null;
+      return String(id);
+    } catch {
+      return null;
+    }
+  };
+const facultyId = getFacultyIdFromStorage();
+
+useEffect(() => {
+  if (!facultyId) {
+    setScheduleLoading(false);
+    return;
+  }
+
+  fetch(`http://localhost:5000/api/schedules/faculty/${facultyId}`)
+    .then((res) => res.json())
+    .then((data) => {
+      const mapped = Array.isArray(data)
+        ? data.map((s) => ({
+            subject: s.title,
+            code: s.sub,
+            room: s.room,
+            time: `${formatTime(s.start)} - ${formatTime(s.start + (s.span || 1))}`,
+            day: s.day,
+          }))
+        : [];
+
+      setSchedule(mapped);
+    })
+    .catch((err) => {
+      console.error("Schedule fetch error:", err);
+      setSchedule([]);
+    })
+    .finally(() => setScheduleLoading(false));
+}, [facultyId]);
+
+const getDayName = (day) => {
+  const map = {
+    0: "Monday",
+    1: "Tuesday",
+    2: "Wednesday",
+    3: "Thursday",
+    4: "Friday",
+    5: "Saturday",
+    6: "Sunday",
+  };
+
+  return map[Number(day)] ?? "";
+};
 
   return (
     <div className={styles.dashboardContent}>
@@ -409,21 +463,33 @@ const FacultyDashboard = () => {
               </span>
             </div>
             <div className={styles.scheduleList}>
-              {SCHEDULE.map((s, i) => (
-                <div key={i} className={styles.scheduleItem}>
-                  <div className={styles.scheduleAccent} />
-                  <div className={styles.scheduleInfo}>
-                    <p className={styles.scheduleSubject}>{s.subject}</p>
-                    <p className={styles.scheduleMeta}>
-                      {s.code} · {s.room}
-                    </p>
-                  </div>
-                  <div className={styles.scheduleTime}>
-                    <span className={styles.scheduleTimeText}>{s.time}</span>
-                    <span className={styles.scheduleDay}>{s.day}</span>
-                  </div>
-                </div>
-              ))}
+              <div className={styles.scheduleList}>
+                {scheduleLoading ? (
+                  <p>Loading...</p>
+                ) : schedule.length === 0 ? (
+                  <p>No schedule yet</p>
+                ) : (
+                  schedule.slice(0, 3).map((s, i) => (
+                    <div key={i} className={styles.scheduleItem}>
+                      <div className={styles.scheduleAccent} />
+                      <div className={styles.scheduleInfo}>
+                        <p className={styles.scheduleSubject}>{s.subject}</p>
+                        <p className={styles.scheduleMeta}>
+                          {s.code} · {s.room}
+                        </p>
+                      </div>
+                      <div className={styles.scheduleTime}>
+                        <span className={styles.scheduleTimeText}>
+                          {s.time}
+                        </span>
+                        <span className={styles.scheduleDay}>
+                          {getDayName(s.day)}
+                        </span>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
             </div>
           </div>
         </div>

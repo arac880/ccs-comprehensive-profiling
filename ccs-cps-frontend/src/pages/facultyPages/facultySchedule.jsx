@@ -118,7 +118,7 @@ const FacultySchedule = () => {
       return;
     }
 
-    console.log(" Fetching schedules for facultyId:", facultyId);
+  
 
     fetch(`http://localhost:5000/api/schedules/faculty/${facultyId}`)
       .then((res) => {
@@ -126,7 +126,7 @@ const FacultySchedule = () => {
         return res.json();
       })
       .then((data) => {
-        console.log(" Schedules received:", data);
+       
         const mapped = Array.isArray(data)
           ? data.map((s) => ({
               ...s,
