@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { io } from "socket.io-client";
 import { useNavigate } from "react-router-dom";
 import {
   FaBell,
@@ -16,69 +17,50 @@ import {
 import styles from "../../pages/facultyPages/facultyStyles/TopNavbar.module.css";
 import LogoutModal from "../LogoutModal";
 
-// ── DUMMY NOTIFICATION DATA ──
-const DUMMY_NOTIFS = [
-  {
-    id: 1,
-    type: "clearance",
-    title: "Clearance Update",
-    message: "Library clearance status changed to Cleared.",
-    time: "2 hours ago",
-    unread: true,
-    icon: <FaClipboardCheck size={16} />,
-  },
-  {
-    id: 2,
-    type: "action",
-    title: "Action Required",
-    message:
-      "You have pending instructor evaluations to complete for the current semester.",
-    time: "1 day ago",
-    unread: false,
-    icon: <FaChalkboardUser size={16} />,
-  },
-  {
-    id: 3,
-    type: "event",
-    title: "Upcoming Event",
-    message: "General Assembly starts tomorrow at 8 AM.",
-    time: "1 day ago",
-    unread: true,
-    icon: <FaCalendarDay size={16} />,
-  },
-  {
-    id: 4,
-    type: "system",
-    title: "System Maintenance",
-    message: "System down for maintenance this Saturday.",
-    time: "3 days ago",
-    unread: false,
-    icon: <FaScrewdriverWrench size={16} />,
-  },
-];
+const socket = io("http://localhost:5000");
 
 export default function TopBar({ onMenuClick, mobileOpen }) {
   const navigate = useNavigate();
   const [showLogout, setShowLogout] = useState(false);
 
   const [showNotif, setShowNotif] = useState(false);
-  const [notifs, setNotifs] = useState(DUMMY_NOTIFS);
+  const [notifs, setNotifs] = useState([]);
   const notifRef = useRef(null);
 
-  const unreadCount = notifs.filter((n) => n.unread).length;
-
   useEffect(() => {
-    function handleClickOutside(event) {
-      if (notifRef.current && !notifRef.current.contains(event.target)) {
-        setShowNotif(false);
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    const user = JSON.parse(localStorage.getItem("user"));
+    const userId = user?._id;
+    if (!userId) return;
+
+    socket.emit("join", userId);
+
+    socket.on("notification", (notif) => {
+      setNotifs((prev) => [notif, ...prev]);
+    });
+
+    return () => socket.off("notification");
   }, []);
 
+  // ── Map icons based on type ──
+  const getIcon = (type) => {
+    switch (type) {
+      case "enrollment":
+        return <FaClipboardCheck size={16} />;
+      case "assignment":
+        return <FaChalkboardUser size={16} />;
+      case "reminder":
+        return <FaCalendarDay size={16} />;
+      case "announcement":
+        return <FaScrewdriverWrench size={16} />;
+      default:
+        return <FaBell size={16} />;
+    }
+  };
+
+  const unreadCount = notifs.filter((n) => !n.read).length;
+
   const markAllAsRead = () => {
-    setNotifs(notifs.map((n) => ({ ...n, unread: false })));
+    setNotifs(notifs.map((n) => ({ ...n, read: true })));
   };
 
   const handleLogout = () => {
@@ -156,15 +138,17 @@ export default function TopBar({ onMenuClick, mobileOpen }) {
                     notifs.map((notif) => (
                       <div
                         key={notif.id}
-                        className={`${styles.notifItem} ${notif.unread ? styles.unreadBg : ""}`}
+                        className={`${styles.notifItem} ${!notif.read ? styles.unreadBg : ""}`}
                       >
-                        <div className={styles.notifIconWrap}>{notif.icon}</div>
+                        <div className={styles.notifIconWrap}>
+                          {getIcon(notif.type)}
+                        </div>
                         <div className={styles.notifContent}>
                           <div className={styles.notifItemHeader}>
                             <span className={styles.notifItemTitle}>
-                              {notif.title}
+                              {notif.title || notif.type}
                             </span>
-                            {notif.unread && (
+                            {!notif.read && (
                               <FaCircle
                                 size={8}
                                 color="#E65100"
@@ -173,7 +157,15 @@ export default function TopBar({ onMenuClick, mobileOpen }) {
                             )}
                           </div>
                           <p className={styles.notifItemMsg}>{notif.message}</p>
-                          <span className={styles.notifTime}>{notif.time}</span>
+                          <span className={styles.notifTime}>
+                            {new Date(notif.createdAt).toLocaleTimeString(
+                              "en-PH",
+                              {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              },
+                            )}
+                          </span>
                         </div>
                       </div>
                     ))
