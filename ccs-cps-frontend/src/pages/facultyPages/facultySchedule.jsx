@@ -13,6 +13,7 @@ import { FiPlus } from "react-icons/fi";
 import AddScheduleModal from "../../components/facultyComponents/AddScheduleModal";
 import AppButton from "../../components/ui/AppButton";
 import AppToast from "../../components/ui/AppToast";
+import SubjectDetailPage from "../../pages/facultyPages/SubjectDetailPage";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 const TIMES = [
@@ -73,18 +74,13 @@ const TYPE_COLOR = {
   Applied: "blockAmber",
 };
 
-// ─── Helper: safely read facultyId from localStorage ─────────────────────────
-// The login controller stores `_id` (MongoDB ObjectId stringified) in the user
-// object. We need this exact string to query /api/schedules/faculty/:facultyId
-// because the backend converts it back to ObjectId for the DB query.
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 const getFacultyIdFromStorage = () => {
   try {
     const raw = localStorage.getItem("user");
     if (!raw) return null;
     const parsed = JSON.parse(raw);
-    // Try every key the login controller might use
     const id = parsed?._id ?? parsed?.id ?? parsed?.facultyId ?? null;
-    // Guard against literal "null" / "undefined" strings
     if (!id || id === "null" || id === "undefined") return null;
     return String(id);
   } catch {
@@ -92,20 +88,28 @@ const getFacultyIdFromStorage = () => {
   }
 };
 
+const getUserRole = () => {
+  try {
+    return localStorage.getItem("role");
+  } catch {
+    return null;
+  }
+};
+
 // ─── Component ────────────────────────────────────────────────────────────────
 const FacultySchedule = () => {
+  const facultyId = getFacultyIdFromStorage();
+  const userRole = getUserRole();
+
   const [classes, setClasses] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selected, setSelected] = useState(null);
+  const [selectedSubject, setSelectedSubject] = useState(null);
   const [showAddModal, setShowAddModal] = useState(false);
   const [toast, setToast] = useState({
     isVisible: false,
     message: "",
     type: "success",
   });
-
-  // Resolve facultyId once on mount (localStorage doesn't change mid-session)
-  const facultyId = getFacultyIdFromStorage();
 
   // ── Fetch schedules ─────────────────────────────────────────────────────────
   useEffect(() => {
@@ -118,19 +122,17 @@ const FacultySchedule = () => {
       return;
     }
 
-  
-
     fetch(`http://localhost:5000/api/schedules/faculty/${facultyId}`)
       .then((res) => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return res.json();
       })
       .then((data) => {
-       
         const mapped = Array.isArray(data)
           ? data.map((s) => ({
               ...s,
               color: TYPE_COLOR[s.type] ?? "blockBlue",
+              timeLabel: `${TIMES[s.start]} – ${TIMES[s.start + s.span] ?? "End"}`,
             }))
           : [];
         setClasses(mapped);
@@ -150,15 +152,17 @@ const FacultySchedule = () => {
 
   // ── Handle save from AddScheduleModal ──────────────────────────────────────
   const handleAddSave = (newEntry) => {
-    // Compare as strings — both facultyId and newEntry.facultyId should be strings now
     const entryFacultyId = String(newEntry.facultyId ?? "");
     const currentFacultyId = String(facultyId ?? "");
 
-  
     if (entryFacultyId === currentFacultyId) {
       setClasses((prev) => [
         ...prev,
-        { ...newEntry, color: TYPE_COLOR[newEntry.type] ?? "blockBlue" },
+        {
+          ...newEntry,
+          color: TYPE_COLOR[newEntry.type] ?? "blockBlue",
+          timeLabel: `${TIMES[newEntry.start]} – ${TIMES[newEntry.start + newEntry.span] ?? "End"}`,
+        },
       ]);
     }
 
@@ -173,7 +177,15 @@ const FacultySchedule = () => {
     (_, i) => classes.filter((c) => c.day === i).length,
   );
 
-  const closeModal = () => setSelected(null);
+  // ── Navigate to subject detail page ────────────────────────────────────────
+  if (selectedSubject) {
+    return (
+      <SubjectDetailPage
+        cls={selectedSubject}
+        onBack={() => setSelectedSubject(null)}
+      />
+    );
+  }
 
   // ─── Render ─────────────────────────────────────────────────────────────────
   return (
@@ -203,13 +215,15 @@ const FacultySchedule = () => {
             <span className={styles.headerStatLbl}>Subjects</span>
           </div>
 
-          <AppButton
-            variant="primary"
-            onClick={() => setShowAddModal(true)}
-            style={{ marginLeft: 12 }}
-          >
-            <FiPlus size={16} /> Add Schedule
-          </AppButton>
+          {(userRole === "dean" || userRole === "chair") && (
+            <AppButton
+              variant="primary"
+              onClick={() => setShowAddModal(true)}
+              style={{ marginLeft: 12 }}
+            >
+              <FiPlus size={16} /> Add Schedule
+            </AppButton>
+          )}
         </div>
       </div>
 
@@ -315,7 +329,7 @@ const FacultySchedule = () => {
                         {cls && (
                           <div
                             className={`${styles.schedBlock} ${styles[cls.color]}`}
-                            onClick={() => setSelected({ cls, rowIndex: row })}
+                            onClick={() => setSelectedSubject(cls)}
                           >
                             <div className={styles.schedBlockInner}>
                               <div className={styles.schedBlockType}>
@@ -403,110 +417,6 @@ const FacultySchedule = () => {
           – 9:00 PM
         </span>
       </div>
-
-      {/* ── Class Detail Modal ── */}
-      {selected && (
-        <div className={styles.modalOverlay} onClick={closeModal}>
-          <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-            <div className={styles.modalHead}>
-              <div
-                className={styles.modalIcon}
-                style={{
-                  background: TYPE_META[selected.cls.type]?.bg,
-                  color: TYPE_META[selected.cls.type]?.color,
-                }}
-              >
-                {TYPE_META[selected.cls.type]?.icon}
-              </div>
-              <div className={styles.modalInfo}>
-                <div
-                  className={styles.modalTypeTag}
-                  style={{ color: TYPE_META[selected.cls.type]?.color }}
-                >
-                  {selected.cls.type}
-                </div>
-                <div className={styles.modalTitle}>{selected.cls.title}</div>
-                <div className={styles.modalSub}>{selected.cls.sub}</div>
-              </div>
-              <button className={styles.modalClose} onClick={closeModal}>
-                ✕
-              </button>
-            </div>
-
-            <div className={styles.modalDivider} />
-
-            <div className={styles.modalRows}>
-              <div className={styles.modalRow}>
-                <div
-                  className={styles.modalRowIcon}
-                  style={{ background: "#fff0e0", color: "#e65100" }}
-                >
-                  <FaClock size={15} />
-                </div>
-                <div>
-                  <div className={styles.modalRowLabel}>Time</div>
-                  <div className={styles.modalRowVal}>
-                    {TIMES[selected.rowIndex]} –{" "}
-                    {TIMES[selected.rowIndex + selected.cls.span] ?? "End"}
-                  </div>
-                </div>
-              </div>
-
-              <div className={styles.modalRow}>
-                <div
-                  className={styles.modalRowIcon}
-                  style={{ background: "#e6f1fb", color: "#185fa5" }}
-                >
-                  <FaLocationDot size={15} />
-                </div>
-                <div>
-                  <div className={styles.modalRowLabel}>Room</div>
-                  <div className={styles.modalRowVal}>{selected.cls.room}</div>
-                </div>
-              </div>
-
-              <div className={styles.modalRow}>
-                <div
-                  className={styles.modalRowIcon}
-                  style={{ background: "#e6f4ea", color: "#2d7a3c" }}
-                >
-                  <FaUserGroup size={15} />
-                </div>
-                <div>
-                  <div className={styles.modalRowLabel}>Section</div>
-                  <div className={styles.modalRowVal}>{selected.cls.sub}</div>
-                </div>
-              </div>
-
-              <div className={styles.modalRow}>
-                <div
-                  className={styles.modalRowIcon}
-                  style={{ background: "#fde8e8", color: "#c0390a" }}
-                >
-                  <FaClipboardList size={15} />
-                </div>
-                <div>
-                  <div className={styles.modalRowLabel}>Duration</div>
-                  <div className={styles.modalRowVal}>
-                    {selected.cls.span} hour{selected.cls.span > 1 ? "s" : ""}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className={styles.modalDivider} />
-
-            <div className={styles.modalFooter}>
-              <button
-                className={`${styles.modalBtn} ${styles.modalBtnSec}`}
-                onClick={closeModal}
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* ── Add Schedule Modal ── */}
       {showAddModal && (

@@ -12,6 +12,7 @@ const studentRoutes = require("./routes/studentRoutes");
 const authRoutes = require("./routes/authRoutes");
 const eventRoutes = require("./routes/eventRoutes");
 const facultyRoutes = require("./routes/facultyRoutes");
+const postRoutes = require("./routes/posts");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -19,6 +20,7 @@ const PORT = process.env.PORT || 5000;
 // ─── Middleware ─────────────────────────────────────────────
 app.use(cors());
 app.use(express.json());
+app.use("/uploads", express.static("uploads"));
 
 // ─── Routes ────────────────────────────────────────────────
 app.use("/api/students", studentRoutes);
@@ -39,10 +41,10 @@ const startServer = async () => {
 
     app.listen(PORT, () => {
       console.log(`Server running on http://localhost:${PORT}`);
-      console.log("MongoDB Connected Successfully 🚀");
+      console.log("MongoDB Connected Successfully");
     });
   } catch (error) {
-    console.error("❌ Failed to start server:", error.message);
+    console.error("Failed to start server:", error.message);
   }
 };
 
