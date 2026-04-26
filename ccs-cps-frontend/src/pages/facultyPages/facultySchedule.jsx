@@ -12,7 +12,7 @@ import {
 import { FiPlus } from "react-icons/fi";
 import AddScheduleModal from "../../components/facultyComponents/AddScheduleModal";
 import AppButton from "../../components/ui/AppButton";
-import AppToast from "../../components/ui/AppToast"; // ← adjust path if needed
+import AppToast from "../../components/ui/AppToast";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 const TIMES = [
@@ -73,37 +73,60 @@ const TYPE_COLOR = {
   Applied: "blockAmber",
 };
 
+// ─── Helper: safely read facultyId from localStorage ─────────────────────────
+// The login controller stores `_id` (MongoDB ObjectId stringified) in the user
+// object. We need this exact string to query /api/schedules/faculty/:facultyId
+// because the backend converts it back to ObjectId for the DB query.
+const getFacultyIdFromStorage = () => {
+  try {
+    const raw = localStorage.getItem("user");
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    // Try every key the login controller might use
+    const id = parsed?._id ?? parsed?.id ?? parsed?.facultyId ?? null;
+    // Guard against literal "null" / "undefined" strings
+    if (!id || id === "null" || id === "undefined") return null;
+    return String(id);
+  } catch {
+    return null;
+  }
+};
+
 // ─── Component ────────────────────────────────────────────────────────────────
 const FacultySchedule = () => {
   const [classes, setClasses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState(null);
   const [showAddModal, setShowAddModal] = useState(false);
-
-  // Toast state
   const [toast, setToast] = useState({
     isVisible: false,
     message: "",
     type: "success",
   });
 
-  // ── Get logged-in faculty from localStorage ──────────────────────────────
-  const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
-  const facultyId = storedUser._id ?? storedUser.id ?? null;
+  // Resolve facultyId once on mount (localStorage doesn't change mid-session)
+  const facultyId = getFacultyIdFromStorage();
 
-  // ── Fetch schedules for this faculty on mount ────────────────────────────
+  // ── Fetch schedules ─────────────────────────────────────────────────────────
   useEffect(() => {
     if (!facultyId) {
+      console.warn(
+        "No valid facultyId found in localStorage. User object:",
+        JSON.parse(localStorage.getItem("user") || "{}"),
+      );
       setLoading(false);
       return;
     }
 
+    console.log(" Fetching schedules for facultyId:", facultyId);
+
     fetch(`http://localhost:5000/api/schedules/faculty/${facultyId}`)
       .then((res) => {
-        if (!res.ok) throw new Error("Failed to fetch schedules");
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return res.json();
       })
       .then((data) => {
+        console.log(" Schedules received:", data);
         const mapped = Array.isArray(data)
           ? data.map((s) => ({
               ...s,
@@ -119,28 +142,23 @@ const FacultySchedule = () => {
       .finally(() => setLoading(false));
   }, [facultyId]);
 
-  // ── Helpers ──────────────────────────────────────────────────────────────
-  const showToast = (message, type = "success") => {
+  // ── Toast helpers ───────────────────────────────────────────────────────────
+  const showToast = (message, type = "success") =>
     setToast({ isVisible: true, message, type });
-  };
 
-  const closeToast = () => {
-    setToast((t) => ({ ...t, isVisible: false }));
-  };
+  const closeToast = () => setToast((t) => ({ ...t, isVisible: false }));
 
-  // ── Handle new schedule saved ─────────────────────────────────────────────
+  // ── Handle save from AddScheduleModal ──────────────────────────────────────
   const handleAddSave = (newEntry) => {
-    // Only add to grid if it belongs to the current faculty
-    if (
-      newEntry.facultyId === facultyId ||
-      newEntry.facultyId === storedUser._id
-    ) {
+    // Compare as strings — both facultyId and newEntry.facultyId should be strings now
+    const entryFacultyId = String(newEntry.facultyId ?? "");
+    const currentFacultyId = String(facultyId ?? "");
+
+  
+    if (entryFacultyId === currentFacultyId) {
       setClasses((prev) => [
         ...prev,
-        {
-          ...newEntry,
-          color: TYPE_COLOR[newEntry.type] ?? "blockBlue",
-        },
+        { ...newEntry, color: TYPE_COLOR[newEntry.type] ?? "blockBlue" },
       ]);
     }
 
@@ -148,7 +166,7 @@ const FacultySchedule = () => {
     showToast(`"${newEntry.title}" schedule added successfully!`, "success");
   };
 
-  // ── Derived stats ─────────────────────────────────────────────────────────
+  // ── Derived stats ───────────────────────────────────────────────────────────
   const totalClasses = classes.length;
   const uniqueSubjects = new Set(classes.map((c) => c.title)).size;
   const classesPerDay = DAYS.map(
@@ -157,7 +175,7 @@ const FacultySchedule = () => {
 
   const closeModal = () => setSelected(null);
 
-  // ─── Render ───────────────────────────────────────────────────────────────
+  // ─── Render ─────────────────────────────────────────────────────────────────
   return (
     <div className={styles.pageContent}>
       {/* ── Header ── */}
@@ -195,6 +213,26 @@ const FacultySchedule = () => {
         </div>
       </div>
 
+      {/* ── No facultyId warning ── */}
+      {!loading && !facultyId && (
+        <div
+          style={{
+            textAlign: "center",
+            padding: "32px 24px",
+            color: "#c0390a",
+          }}
+        >
+          <i
+            className="bi bi-exclamation-triangle"
+            style={{ fontSize: 32, display: "block", marginBottom: 8 }}
+          />
+          <div style={{ fontWeight: 600 }}>Session error</div>
+          <div style={{ fontSize: 13, marginTop: 4 }}>
+            Could not read your account ID. Please log out and log in again.
+          </div>
+        </div>
+      )}
+
       {/* ── Loading state ── */}
       {loading && (
         <div
@@ -224,7 +262,7 @@ const FacultySchedule = () => {
       )}
 
       {/* ── Schedule Card ── */}
-      {!loading && (
+      {!loading && facultyId && (
         <div className={styles.scheduleCard}>
           {/* Sticky day-header row */}
           <div className={styles.stickyHeader}>
@@ -314,7 +352,7 @@ const FacultySchedule = () => {
       )}
 
       {/* ── Empty state ── */}
-      {!loading && classes.length === 0 && (
+      {!loading && facultyId && classes.length === 0 && (
         <div
           style={{
             textAlign: "center",
@@ -479,7 +517,7 @@ const FacultySchedule = () => {
         />
       )}
 
-      {/* ── Toast Notification ── */}
+      {/* ── Toast ── */}
       <AppToast
         isVisible={toast.isVisible}
         message={toast.message}

@@ -56,7 +56,7 @@ const STEPS = [
 ];
 
 // ─── Component ────────────────────────────────────────────────────────────────
-const AddScheduleModal = ({ onClose, onSave }) => {
+const AddScheduleModal = ({ onClose, onSave, onSaveError }) => {
   const [step, setStep] = useState(0);
 
   const programs = PROGRAM_DATA.map(({ program, code }) => ({ program, code }));
@@ -74,10 +74,12 @@ const AddScheduleModal = ({ onClose, onSave }) => {
   const [day, setDay] = useState(DAYS[0]);
   const [startTime, setStartTime] = useState(TIMES[2]);
   const [duration, setDuration] = useState(1);
+  const [saving, setSaving] = useState(false);
 
   const [faculties, setFaculties] = useState([]);
   const [facultySearch, setFacultySearch] = useState("");
   const [facultyLoading, setFacultyLoading] = useState(false);
+  const [existingSchedules, setExistingSchedules] = useState([]);
 
   // ── Effects ──────────────────────────────────────────────────────────────
   useEffect(() => {
@@ -101,6 +103,13 @@ const AddScheduleModal = ({ onClose, onSave }) => {
     setSubjects(yearObj ? yearObj.subjects : []);
     setSelSubject(null);
   }, [selYear]);
+
+  useEffect(() => {
+    fetch("http://localhost:5000/api/schedules")
+      .then((res) => res.json())
+      .then((data) => setExistingSchedules(Array.isArray(data) ? data : []))
+      .catch(() => setExistingSchedules([]));
+  }, []);
 
   useEffect(() => {
     if (step !== 3) return;
@@ -132,43 +141,74 @@ const AddScheduleModal = ({ onClose, onSave }) => {
     if (canNext()) setStep((s) => s + 1);
   };
   const back = () => setStep((s) => s - 1);
+const hasConflict = (newSched) => {
+  return existingSchedules.some((s) => {
+    const sameDay = s.day === newSched.day;
 
-  const handleSave = async () => {
-    const scheduleData = {
-      day: DAYS.indexOf(day),
-      start: TIMES.indexOf(startTime),
-      span: Math.round(duration),
-      title: selSubject.title,
-      subjectCode: selSubject.code,
-      sub: `${selProgram.code} ${selYear.year.replace(/[^0-9]/g, "")}${selSection}`,
-      room: room.trim(),
-      type: selType,
-      program: selProgram.code,
-      year: selYear.year,
-      section: selSection,
-      facultyId: selFaculty._id,
-      facultyName: `${selFaculty.firstName} ${selFaculty.lastName}`,
-    };
+    const sameFaculty = s.facultyId === newSched.facultyId;
 
-    try {
-      const res = await fetch("http://localhost:5000/api/schedules", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(scheduleData),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        alert("Schedule saved successfully!");
-        onSave(scheduleData);
-        onClose();
-      } else {
-        alert(data.message || "Failed to save");
-      }
-    } catch (err) {
-      console.error(err);
-      alert("Error saving schedule");
-    }
-  };
+    const existingStart = s.start;
+    const existingEnd = s.start + s.span;
+
+    const newStart = newSched.start;
+    const newEnd = newSched.start + newSched.span;
+
+    const overlap = newStart < existingEnd && newEnd > existingStart;
+
+   
+    return sameDay && sameFaculty && overlap;
+  });
+};
+  // ── Save ─────────────────────────────────────────────────────────────────
+ const handleSave = async () => {
+   setSaving(true);
+
+   const scheduleData = {
+     day: DAYS.indexOf(day),
+     start: TIMES.indexOf(startTime),
+     span: Math.round(duration),
+     title: selSubject.title,
+     subjectCode: selSubject.code,
+     sub: `${selProgram.code} ${selYear.year.replace(/[^0-9]/g, "")}${selSection}`,
+     room: room.trim(),
+     type: selType,
+     program: selProgram.code,
+     year: selYear.year,
+     section: selSection,
+     facultyId: selFaculty._id,
+     facultyName: `${selFaculty.firstName} ${selFaculty.lastName}`,
+   };
+
+   // 🔥 CHECK CONFLICT BEFORE SAVING
+   if (hasConflict(scheduleData)) {
+     setSaving(false);
+     onSaveError?.(
+       "Schedule conflict! Faculty has another class occupied at this time.",
+     );
+     return;
+   }
+
+   try {
+     const res = await fetch("http://localhost:5000/api/schedules", {
+       method: "POST",
+       headers: { "Content-Type": "application/json" },
+       body: JSON.stringify(scheduleData),
+     });
+
+     const data = await res.json();
+
+     if (res.ok) {
+       setExistingSchedules((prev) => [...prev, scheduleData]);
+       onSave({ ...scheduleData, ...data });
+     } else {
+       onSaveError?.(data.message || "Failed to save schedule.");
+     }
+   } catch (err) {
+     onSaveError?.("Network error. Please try again.");
+   } finally {
+     setSaving(false);
+   }
+ };
 
   // ── Render ────────────────────────────────────────────────────────────────
   return (
@@ -401,7 +441,7 @@ const AddScheduleModal = ({ onClose, onSave }) => {
               <FaLocationDot
                 size={10}
                 style={{ color: "var(--ccs-primary)" }}
-              />
+              />{" "}
               Room
             </label>
             <div className={styles.inputWrap}>
@@ -435,8 +475,7 @@ const AddScheduleModal = ({ onClose, onSave }) => {
             <div className={styles.row2col}>
               <div style={{ flex: 1 }}>
                 <label className={styles.fieldLabel}>
-                  <i className="bi bi-clock" />
-                  Start Time
+                  <i className="bi bi-clock" /> Start Time
                 </label>
                 <select
                   className={styles.select}
@@ -450,8 +489,7 @@ const AddScheduleModal = ({ onClose, onSave }) => {
               </div>
               <div style={{ flex: 1 }}>
                 <label className={styles.fieldLabel}>
-                  <i className="bi bi-hourglass-split" />
-                  Duration (hrs)
+                  <i className="bi bi-hourglass-split" /> Duration (hrs)
                 </label>
                 <select
                   className={styles.select}
@@ -470,8 +508,7 @@ const AddScheduleModal = ({ onClose, onSave }) => {
             {/* Summary Preview */}
             <div className={styles.previewCard}>
               <div className={styles.previewTitle}>
-                <i className="bi bi-card-checklist" />
-                Summary
+                <i className="bi bi-card-checklist" /> Summary
               </div>
               <PRow label="Subject" val={selSubject?.title} />
               <PRow
@@ -500,29 +537,38 @@ const AddScheduleModal = ({ onClose, onSave }) => {
       <div className={styles.footer}>
         {step > 0 ? (
           <AppButton variant="secondary" onClick={back}>
-            <i className="bi bi-arrow-left" style={{ marginRight: 6 }} />
-            Back
+            <i className="bi bi-arrow-left" style={{ marginRight: 6 }} /> Back
           </AppButton>
         ) : (
           <AppButton variant="secondary" onClick={onClose}>
-            <i className="bi bi-x-circle" style={{ marginRight: 6 }} />
-            Cancel
+            <i className="bi bi-x-circle" style={{ marginRight: 6 }} /> Cancel
           </AppButton>
         )}
 
         {step < STEPS.length - 1 ? (
           <AppButton variant="primary" onClick={next} disabled={!canNext()}>
-            Next
-            <i className="bi bi-arrow-right" style={{ marginLeft: 6 }} />
+            Next <i className="bi bi-arrow-right" style={{ marginLeft: 6 }} />
           </AppButton>
         ) : (
           <AppButton
             variant="primary"
             onClick={handleSave}
-            disabled={!canNext()}
+            disabled={!canNext() || saving}
           >
-            <i className="bi bi-check2-circle" style={{ marginRight: 6 }} />
-            Save Schedule
+            {saving ? (
+              <>
+                <i
+                  className="bi bi-hourglass-split"
+                  style={{ marginRight: 6 }}
+                />{" "}
+                Saving…
+              </>
+            ) : (
+              <>
+                <i className="bi bi-check2-circle" style={{ marginRight: 6 }} />{" "}
+                Save Schedule
+              </>
+            )}
           </AppButton>
         )}
       </div>
