@@ -19,33 +19,27 @@ router.get("/ping", (_req, res) => {
 });
 
 // ── GET /api/schedules/faculty/:facultyId ─────────────────────────────────────
-// NOTE: This MUST be declared before any /:id route to avoid conflicts
 router.get("/faculty/:facultyId", async (req, res) => {
   try {
     const db = getDB();
     const { facultyId } = req.params;
 
-    console.log("🔍 GET /faculty/:facultyId called with:", facultyId);
+    console.log("GET /faculty/:facultyId called with:", facultyId);
 
-    // Guard against bad values
     if (!facultyId || facultyId === "null" || facultyId === "undefined") {
       return res.status(400).json({ message: "Invalid or missing facultyId." });
     }
 
     const objId = toObjectId(facultyId);
-    console.log(" Converted ObjectId:", objId);
-
-    // Try both ObjectId and string to cover any inconsistency in stored data
     const seen = new Set();
     const schedules = [];
 
     const queries = [];
     if (objId) queries.push({ facultyId: objId });
-    queries.push({ facultyId: facultyId }); // string fallback
+    queries.push({ facultyId: facultyId });
 
     for (const query of queries) {
       const rows = await db.collection("schedules").find(query).toArray();
-      console.log(`   Query ${JSON.stringify(query)} → ${rows.length} row(s)`);
       for (const row of rows) {
         const key = row._id.toString();
         if (!seen.has(key)) {
@@ -59,7 +53,6 @@ router.get("/faculty/:facultyId", async (req, res) => {
       }
     }
 
-    console.log(` Returning ${schedules.length} schedule(s)`);
     res.json(schedules);
   } catch (err) {
     console.error(" GET /faculty/:facultyId error:", err);
@@ -67,7 +60,41 @@ router.get("/faculty/:facultyId", async (req, res) => {
   }
 });
 
-// ── GET /api/schedules (all — for admin/dean/chair) ───────────────────────────
+// ── GET /api/schedules/section/:section ───────────────────────────────────────
+router.get("/section/:section", async (req, res) => {
+  try {
+    const db = getDB();
+    const { section } = req.params;
+
+    console.log("GET /section/:section called with:", section);
+
+    if (!section || section === "null" || section === "undefined") {
+      return res.status(400).json({ message: "Invalid or missing section." });
+    }
+
+    const schedules = await db
+      .collection("schedules")
+      .find({ section })
+      .toArray();
+
+    console.log(
+      `Found ${schedules.length} schedule(s) for section: ${section}`,
+    );
+
+    res.json(
+      schedules.map((s) => ({
+        ...s,
+        _id: s._id.toString(),
+        facultyId: s.facultyId?.toString?.() ?? s.facultyId,
+      })),
+    );
+  } catch (err) {
+    console.error("GET /section/:section error:", err);
+    res.status(500).json({ message: "Server error.", error: err.message });
+  }
+});
+
+// ── GET /api/schedules (all) ──────────────────────────────────────────────────
 router.get("/", async (_req, res) => {
   try {
     const db = getDB();
@@ -109,7 +136,7 @@ router.post("/", async (req, res) => {
       program: body.program,
       year: body.year,
       section: body.section,
-      facultyId: facultyObjId, // stored as ObjectId in MongoDB
+      facultyId: facultyObjId,
       facultyName: body.facultyName,
       createdAt: new Date(),
     };
@@ -121,7 +148,7 @@ router.post("/", async (req, res) => {
       message: "Schedule saved successfully.",
       _id: result.insertedId.toString(),
       ...doc,
-      facultyId: facultyObjId.toString(), // send back as string
+      facultyId: facultyObjId.toString(),
     });
   } catch (err) {
     console.error("POST / error:", err);

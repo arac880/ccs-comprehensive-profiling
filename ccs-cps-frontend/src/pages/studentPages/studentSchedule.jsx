@@ -1,34 +1,72 @@
 import { useState, useEffect } from "react";
-import { FaCalendarAlt, FaMapMarkerAlt, FaUserTie, FaRegClock, FaMugHot } from "react-icons/fa";
+import {
+  FaCalendarAlt,
+  FaMapMarkerAlt,
+  FaUserTie,
+  FaRegClock,
+  FaMugHot,
+} from "react-icons/fa";
 
 import schedStyles from "./studentStyles/schedule.module.css";
 import layoutStyles from "./studentStyles/dashboard.module.css";
 
+// ─── Constants ────────────────────────────────────────────────────────────────
 const MOBILE_BREAKPOINT = 992;
 
-const days = ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"];
-
-// Schedule from COR — Section 4IT-D
-const scheduleData = [
-  // ITP113 — LEC: M/W/Th 14:00–17:00
-  { day: "MONDAY",    startHour: 14, startMin: 0, duration: 3, course: "ITP113", title: "IT Practicum (500 hours)",    room: "VRCCS-1",        instructor: "Prof. Montecillo",    type: "LEC" },
-  { day: "WEDNESDAY", startHour: 14, startMin: 0, duration: 3, course: "ITP113", title: "IT Practicum (500 hours)",    room: "VRCCS-1",        instructor: "Prof. Montecillo",    type: "LEC" },
-  { day: "THURSDAY",  startHour: 14, startMin: 0, duration: 3, course: "ITP113", title: "IT Practicum (500 hours)",    room: "VRCCS-1",        instructor: "Prof. Montecillo",    type: "LEC" },
-
-  // ITP113 — LAB: Th 13:00–16:00
-  { day: "THURSDAY",  startHour: 13, startMin: 0, duration: 3, course: "ITP113", title: "IT Practicum (500 hours)",    room: "VRCCS-1/VRCCS-1", instructor: "Prof. Montecillo",   type: "LAB" },
-
-  // ITEW6 — LEC: M 10:00–13:00
-  { day: "MONDAY",    startHour: 10, startMin: 0, duration: 3, course: "ITEW6",  title: "Web Development Frameworks", room: "COMLAB 3",       instructor: "Prof. Eusebio", type: "LEC" },
+const DAYS = [
+  "MONDAY",
+  "TUESDAY",
+  "WEDNESDAY",
+  "THURSDAY",
+  "FRIDAY",
+  "SATURDAY",
+  "SUNDAY",
 ];
 
-const PALETTE = ["#4A90E2", "#E65100", "#43A047", "#8E44AD", "#009688", "#D32F2F", "#F39C12"];
+// DB stores day as 0=Monday, 1=Tuesday, etc.
+const DAY_NUM_TO_STR = {
+  0: "MONDAY",
+  1: "TUESDAY",
+  2: "WEDNESDAY",
+  3: "THURSDAY",
+  4: "FRIDAY",
+  5: "SATURDAY",
+  6: "SUNDAY",
+};
 
-const uniqueCourses = [...new Set(scheduleData.map(c => c.course))];
-const courseColors = {};
-uniqueCourses.forEach((course, index) => {
-  courseColors[course] = PALETTE[index % PALETTE.length];
-});
+// DB stores start as slot index: 0=7AM, 1=8AM, 2=9AM ...
+const SLOT_TO_HOUR = (slot) => 7 + Number(slot);
+
+const DAY_MAP_JS = {
+  0: "SUNDAY",
+  1: "MONDAY",
+  2: "TUESDAY",
+  3: "WEDNESDAY",
+  4: "THURSDAY",
+  5: "FRIDAY",
+  6: "SATURDAY",
+};
+
+const PALETTE = [
+  "#4A90E2",
+  "#E65100",
+  "#43A047",
+  "#8E44AD",
+  "#009688",
+  "#D32F2F",
+  "#F39C12",
+];
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+const getStudentFromStorage = () => {
+  try {
+    const raw = localStorage.getItem("user");
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+};
 
 const hexToRgba = (hex, alpha) => {
   const r = parseInt(hex.slice(1, 3), 16);
@@ -37,162 +75,303 @@ const hexToRgba = (hex, alpha) => {
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 };
 
-const formatTime = (hour, min) => {
+const formatTime = (hour, min = 0) => {
   const ampm = hour >= 12 ? "PM" : "AM";
   const h12 = hour % 12 || 12;
-  const m = min === 0 ? "00" : min < 10 ? `0${min}` : min;
+  const m = min === 0 ? "00" : min < 10 ? `0${min}` : `${min}`;
   return `${h12}:${m} ${ampm}`;
 };
 
-const getEndTime = (startHour, startMin, durationHours) => {
-  let endH = startHour + Math.floor(durationHours);
-  let endM = startMin + (durationHours % 1) * 60;
-  if (endM >= 60) { endH += 1; endM -= 60; }
-  return formatTime(endH, endM);
+const getEndTime = (startHour, durationHours) => {
+  const endH = startHour + Number(durationHours);
+  return formatTime(endH, 0);
 };
 
-export default function StudentSchedule() {
-  const [isMobile, setIsMobile] = useState(window.innerWidth < MOBILE_BREAKPOINT);
-  
-  const TODAY_JS = new Date().getDay(); 
-  const DAY_MAP = { 1: "MONDAY", 2: "TUESDAY", 3: "WEDNESDAY", 4: "THURSDAY", 5: "FRIDAY", 6: "SATURDAY", 0: "SUNDAY" };
-  const initialDay = DAY_MAP[TODAY_JS] || "MONDAY";
-  const [activeDay, setActiveDay] = useState(initialDay);
+// Map raw MongoDB Schedule doc → shape this component uses
+const normalizeSchedule = (s) => ({
+  day: DAY_NUM_TO_STR[Number(s.day)] ?? "MONDAY",
+  startHour: SLOT_TO_HOUR(s.start), // 0 → 7, 1 → 8, 2 → 9 ...
+  duration: Number(s.span) ?? 1,
+  course: s.subjectCode ?? "",
+  title: s.title ?? "",
+  room: s.room ?? "",
+  instructor: s.facultyName ?? "",
+  type: s.type ?? "Lecture",
+  sub: s.sub ?? "",
+});
 
+// ─── Component ────────────────────────────────────────────────────────────────
+export default function StudentSchedule() {
+  const [isMobile, setIsMobile] = useState(
+    window.innerWidth < MOBILE_BREAKPOINT,
+  );
+  const [scheduleData, setScheduleData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [activeDay, setActiveDay] = useState(
+    DAY_MAP_JS[new Date().getDay()] || "MONDAY",
+  );
+
+  const student = getStudentFromStorage();
+  const section = student?.section ?? null;
+
+  // ── Responsive ─────────────────────────────────────────────────────────────
   useEffect(() => {
     const onResize = () => setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
     window.addEventListener("resize", onResize);
     return () => window.removeEventListener("resize", onResize);
   }, []);
 
+  // ── Fetch schedules by section ──────────────────────────────────────────────
+  useEffect(() => {
+    if (!section) {
+      setLoading(false);
+      return;
+    }
+
+    const url = `http://localhost:5000/api/schedules/section/${encodeURIComponent(section)}`;
+    console.log("[StudentSchedule] Fetching:", url);
+
+    fetch(url)
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json();
+      })
+      .then((data) => {
+        console.log("[StudentSchedule] Raw data:", data);
+        const mapped = Array.isArray(data) ? data.map(normalizeSchedule) : [];
+        setScheduleData(mapped);
+      })
+      .catch((err) => {
+        console.error("[StudentSchedule] Error:", err);
+        setError("Failed to load your schedule. Please try again.");
+      })
+      .finally(() => setLoading(false));
+  }, [section]);
+
+  // ── Derived: course colours ─────────────────────────────────────────────────
+  const uniqueCourses = [...new Set(scheduleData.map((c) => c.course))];
+  const courseColors = Object.fromEntries(
+    uniqueCourses.map((course, i) => [course, PALETTE[i % PALETTE.length]]),
+  );
+
+  // ── Derived: classes for active day sorted by time ──────────────────────────
   const todaysClasses = scheduleData
     .filter((c) => c.day === activeDay)
-    .sort((a, b) => (a.startHour + a.startMin / 60) - (b.startHour + b.startMin / 60));
+    .sort((a, b) => a.startHour - b.startHour);
 
-  const scheduleUI = (
-    <div className={schedStyles.scheduleContainer}>
-
-      {/* ── Page Header ── */}
-      <div className={schedStyles.pageHeader}>
-        <div className={schedStyles.titleWrapper}>
-          <div className={schedStyles.iconBox}>
-            <FaCalendarAlt size={18} color="#ffffff" />
+  // ─── Render ──────────────────────────────────────────────────────────────────
+  return (
+    <main
+      className={isMobile ? layoutStyles.mobileMain : layoutStyles.mainContent}
+    >
+      <div className={schedStyles.scheduleContainer}>
+        {/* ── Header ── */}
+        <div className={schedStyles.pageHeader}>
+          <div className={schedStyles.titleWrapper}>
+            <div className={schedStyles.iconBox}>
+              <FaCalendarAlt size={18} color="#ffffff" />
+            </div>
+            <h2 className={schedStyles.pageTitle}>Daily Class Schedule</h2>
           </div>
-          <h2 className={schedStyles.pageTitle}>Daily Class Schedule</h2>
-        </div>
-
-        <div className={schedStyles.headerControls}>
-          <div className={schedStyles.headerNote}>
-            Class Section: <strong>4IT-D</strong>
-          </div>
-        </div>
-      </div>
-
-      {/* ── Main Agenda Widget ── */}
-      <div className={schedStyles.agendaWidget}>
-        
-        {/* 1. Interactive Day Picker */}
-        <div className={schedStyles.dayNavScroll}>
-          <div className={schedStyles.dayNav}>
-            {days.map((day) => (
-              <button
-                key={day}
-                onClick={() => setActiveDay(day)}
-                className={`${schedStyles.dayBtn} ${activeDay === day ? schedStyles.activeDayBtn : ""}`}
-              >
-                <span className={schedStyles.dayNameFull}>{day}</span>
-                <span className={schedStyles.dayNameShort}>{day.substring(0, 3)}</span>
-                {scheduleData.some(c => c.day === day) && <span className={schedStyles.classIndicatorDot}></span>}
-              </button>
-            ))}
+          <div className={schedStyles.headerControls}>
+            <div className={schedStyles.headerNote}>
+              Class Section: <strong>{section ?? "—"}</strong>
+            </div>
           </div>
         </div>
 
-        {/* 2. Timeline Layout for the Selected Day */}
-        <div className={schedStyles.agendaContent}>
-          {todaysClasses.length > 0 ? (
-            <div className={schedStyles.timeline}>
-              {todaysClasses.map((cls, idx) => {
-                const mainColor = courseColors[cls.course];
-                const startTime = formatTime(cls.startHour, cls.startMin);
-                const endTime = getEndTime(cls.startHour, cls.startMin, cls.duration);
+        {/* ── No section ── */}
+        {!loading && !section && (
+          <div
+            style={{
+              textAlign: "center",
+              padding: "40px 24px",
+              color: "#c0390a",
+            }}
+          >
+            <div style={{ fontWeight: 600 }}>Session error</div>
+            <div style={{ fontSize: 13, marginTop: 4 }}>
+              Could not read your section. Please log out and log in again.
+            </div>
+          </div>
+        )}
 
-                return (
-                  <div key={idx} className={schedStyles.timelineRow}>
-                    
-                    <div className={schedStyles.timeTrack}>
-                      <span className={schedStyles.timeStart}>{startTime}</span>
-                      <span className={schedStyles.timeEnd}>{endTime}</span>
-                    </div>
+        {/* ── Loading ── */}
+        {loading && (
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 10,
+              padding: "48px 0",
+              color: "#a8917f",
+              fontSize: 14,
+            }}
+          >
+            <div
+              style={{
+                width: 18,
+                height: 18,
+                border: "2.5px solid #fde0cc",
+                borderTop: "2.5px solid #e8641a",
+                borderRadius: "50%",
+                animation: "spin 0.75s linear infinite",
+              }}
+            />
+            Loading your schedule…
+            <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+          </div>
+        )}
 
-                    <div className={schedStyles.nodeTrack}>
-                      <div className={schedStyles.nodeLine}></div>
-                      <div className={schedStyles.nodeDot} style={{ borderColor: mainColor }}></div>
-                    </div>
+        {/* ── Error ── */}
+        {!loading && error && (
+          <div
+            style={{
+              textAlign: "center",
+              padding: "40px 24px",
+              color: "#c0390a",
+            }}
+          >
+            <div style={{ fontWeight: 600 }}>{error}</div>
+          </div>
+        )}
 
-                    <div className={schedStyles.cardTrack}>
-                      <div 
-                        className={schedStyles.agendaCard}
-                        style={{ 
-                          background: `linear-gradient(${hexToRgba(mainColor, 0.08)}, ${hexToRgba(mainColor, 0.08)}), #ffffff`,
-                          borderLeft: `4px solid ${mainColor}`,
-                          borderTop: `1px solid ${hexToRgba(mainColor, 0.2)}`,
-                          borderRight: `1px solid ${hexToRgba(mainColor, 0.2)}`,
-                          borderBottom: `1px solid ${hexToRgba(mainColor, 0.2)}`,
-                        }}
-                      >
-                        <div className={schedStyles.cardHeaderRow}>
-                          <span className={schedStyles.courseCode} style={{ color: mainColor }}>{cls.course}</span>
-                          <span 
-                            className={cls.type === "LAB" ? schedStyles.tagLab : schedStyles.tagLec}
-                            style={{ 
-                              color: mainColor, 
-                              backgroundColor: cls.type === "LAB" ? "#fff" : hexToRgba(mainColor, 0.15),
-                              borderColor: mainColor
+        {/* ── Agenda widget ── */}
+        {!loading && section && !error && (
+          <div className={schedStyles.agendaWidget}>
+            {/* Day picker */}
+            <div className={schedStyles.dayNavScroll}>
+              <div className={schedStyles.dayNav}>
+                {DAYS.map((day) => (
+                  <button
+                    key={day}
+                    onClick={() => setActiveDay(day)}
+                    className={`${schedStyles.dayBtn} ${
+                      activeDay === day ? schedStyles.activeDayBtn : ""
+                    }`}
+                  >
+                    <span className={schedStyles.dayNameFull}>{day}</span>
+                    <span className={schedStyles.dayNameShort}>
+                      {day.substring(0, 3)}
+                    </span>
+                    {scheduleData.some((c) => c.day === day) && (
+                      <span className={schedStyles.classIndicatorDot} />
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Timeline */}
+            <div className={schedStyles.agendaContent}>
+              {todaysClasses.length > 0 ? (
+                <div className={schedStyles.timeline}>
+                  {todaysClasses.map((cls, idx) => {
+                    const mainColor = courseColors[cls.course] ?? PALETTE[0];
+                    const startTime = formatTime(cls.startHour);
+                    const endTime = getEndTime(cls.startHour, cls.duration);
+
+                    return (
+                      <div key={idx} className={schedStyles.timelineRow}>
+                        {/* Time */}
+                        <div className={schedStyles.timeTrack}>
+                          <span className={schedStyles.timeStart}>
+                            {startTime}
+                          </span>
+                          <span className={schedStyles.timeEnd}>{endTime}</span>
+                        </div>
+
+                        {/* Node */}
+                        <div className={schedStyles.nodeTrack}>
+                          <div className={schedStyles.nodeLine} />
+                          <div
+                            className={schedStyles.nodeDot}
+                            style={{ borderColor: mainColor }}
+                          />
+                        </div>
+
+                        {/* Card */}
+                        <div className={schedStyles.cardTrack}>
+                          <div
+                            className={schedStyles.agendaCard}
+                            style={{
+                              background: `linear-gradient(${hexToRgba(
+                                mainColor,
+                                0.08,
+                              )}, ${hexToRgba(mainColor, 0.08)}), #ffffff`,
+                              borderLeft: `4px solid ${mainColor}`,
+                              borderTop: `1px solid ${hexToRgba(mainColor, 0.2)}`,
+                              borderRight: `1px solid ${hexToRgba(mainColor, 0.2)}`,
+                              borderBottom: `1px solid ${hexToRgba(mainColor, 0.2)}`,
                             }}
                           >
-                            {cls.type}
-                          </span>
-                        </div>
-                        
-                        <h3 className={schedStyles.courseTitle}>{cls.title}</h3>
-                        
-                        <div className={schedStyles.cardMetaRow}>
-                          <div className={schedStyles.metaItem}>
-                            <FaRegClock color={mainColor} /> {cls.duration} Hours
-                          </div>
-                          <div className={schedStyles.metaItem}>
-                            <FaMapMarkerAlt color={mainColor} /> {cls.room}
-                          </div>
-                          <div className={schedStyles.metaItem}>
-                            <FaUserTie color={mainColor} /> {cls.instructor}
+                            <div className={schedStyles.cardHeaderRow}>
+                              <span
+                                className={schedStyles.courseCode}
+                                style={{ color: mainColor }}
+                              >
+                                {cls.course}
+                              </span>
+                              <span
+                                className={
+                                  cls.type === "Laboratory"
+                                    ? schedStyles.tagLab
+                                    : schedStyles.tagLec
+                                }
+                                style={{
+                                  color: mainColor,
+                                  backgroundColor:
+                                    cls.type === "Laboratory"
+                                      ? "#fff"
+                                      : hexToRgba(mainColor, 0.15),
+                                  borderColor: mainColor,
+                                }}
+                              >
+                                {cls.type === "Laboratory" ? "LAB" : "LEC"}
+                              </span>
+                            </div>
+
+                            <h3 className={schedStyles.courseTitle}>
+                              {cls.title}
+                            </h3>
+
+                            <div className={schedStyles.cardMetaRow}>
+                              <div className={schedStyles.metaItem}>
+                                <FaRegClock color={mainColor} /> {cls.duration}{" "}
+                                Hour{cls.duration !== 1 ? "s" : ""}
+                              </div>
+                              <div className={schedStyles.metaItem}>
+                                <FaMapMarkerAlt color={mainColor} /> {cls.room}
+                              </div>
+                              <div className={schedStyles.metaItem}>
+                                <FaUserTie color={mainColor} /> {cls.instructor}
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className={schedStyles.emptyState}>
+                  <div className={schedStyles.emptyIconWrap}>
+                    <FaMugHot size={32} />
                   </div>
-                );
-              })}
+                  <h3 className={schedStyles.emptyTitle}>Free Day!</h3>
+                  <p className={schedStyles.emptyText}>
+                    You have no classes on{" "}
+                    {activeDay.charAt(0) + activeDay.slice(1).toLowerCase()}.
+                    Enjoy your break!
+                  </p>
+                </div>
+              )}
             </div>
-          ) : (
-            <div className={schedStyles.emptyState}>
-              <div className={schedStyles.emptyIconWrap}>
-                <FaMugHot size={32} />
-              </div>
-              <h3 className={schedStyles.emptyTitle}>Free Day!</h3>
-              <p className={schedStyles.emptyText}>You have no classes scheduled for {activeDay.toLowerCase()}. Enjoy your break or use this time to catch up on research.</p>
-            </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
-
-    </div>
-  );
-
-  return (
-    <main className={isMobile ? layoutStyles.mobileMain : layoutStyles.mainContent}>
-      {scheduleUI}
     </main>
   );
 }
