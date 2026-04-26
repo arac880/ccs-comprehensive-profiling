@@ -24,7 +24,7 @@ router.get("/faculty/:facultyId", async (req, res) => {
     const db = getDB();
     const { facultyId } = req.params;
 
-    console.log("GET /faculty/:facultyId called with:", facultyId);
+  
 
     if (!facultyId || facultyId === "null" || facultyId === "undefined") {
       return res.status(400).json({ message: "Invalid or missing facultyId." });
@@ -66,7 +66,7 @@ router.get("/section/:section", async (req, res) => {
     const db = getDB();
     const { section } = req.params;
 
-    console.log("GET /section/:section called with:", section);
+   
 
     if (!section || section === "null" || section === "undefined") {
       return res.status(400).json({ message: "Invalid or missing section." });
@@ -77,9 +77,7 @@ router.get("/section/:section", async (req, res) => {
       .find({ section })
       .toArray();
 
-    console.log(
-      `Found ${schedules.length} schedule(s) for section: ${section}`,
-    );
+   
 
     res.json(
       schedules.map((s) => ({

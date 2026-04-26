@@ -1,13 +1,15 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import styles from "../../pages/facultyPages/facultyStyles/events.module.css";
+import AddEventModal from "../../components/facultyComponents/AddEventModal";
+import EditEventModal from "../../components/facultyComponents/EditEventModal";
+import ConfirmModal from "../../components/ui/ConfirmModal";
+import AppToast from "../../components/ui/AppToast";
 
-const FILTERS = ["All", "Meeting", "Event",  "Academic", "Assembly"];
-const TYPES = ["Meeting", "Event",  "Academic", "Assembly"];
+const FILTERS = ["All", "Meeting", "Event", "Academic", "Assembly"];
 
 const TYPE_BADGE = {
   Meeting: { bg: "#e65100", light: "#fff0e0", text: "#7a3800" },
   Event: { bg: "#2d7a3c", light: "#e6f4ea", text: "#1a4a24" },
- 
   Academic: { bg: "#185fa5", light: "#e6f1fb", text: "#0c3a6b" },
   Assembly: { bg: "#666", light: "#f0f0f0", text: "#333" },
 };
@@ -15,34 +17,15 @@ const TYPE_BADGE = {
 const TYPE_ICON = {
   Meeting: "bi-people-fill",
   Event: "bi-stars",
- 
   Academic: "bi-mortarboard-fill",
   Assembly: "bi-megaphone-fill",
 };
 
-const EMPTY_FORM = {
-  title: "",
-  description: "",
-  date: "",
-  time: "",
-  location: "",
-  type: "Event",
-  driveLink: "",
-};
-
 function getDriveFileName(link) {
   if (!link) return "View PDF";
-
   try {
-    // If filename exists in URL (rare)
-    const url = new URL(link);
-
-    // fallback: generic name with ID
     const match = link.match(/\/d\/(.*?)\//);
-    if (match && match[1]) {
-      return `PDF File (${match[1].slice(0, 6)})`;
-    }
-
+    if (match && match[1]) return `PDF File (${match[1].slice(0, 6)})`;
     return "View PDF";
   } catch {
     return "View PDF";
@@ -51,222 +34,10 @@ function getDriveFileName(link) {
 
 function getDrivePreviewLink(link) {
   if (!link) return "";
-
   const match = link.match(/\/d\/(.*?)\//);
-  if (match && match[1]) {
+  if (match && match[1])
     return `https://drive.google.com/file/d/${match[1]}/preview`;
-  }
-
-  return link; // fallback
-}
-
-/* ── Add Event Modal ── */
-function AddEventModal({ isOpen, onClose, onSuccess }) {
-  const [form, setForm] = useState(EMPTY_FORM);
-  const [errors, setErrors] = useState({});
-  const [loading, setLoading] = useState(false);
-  const [serverError, setServerError] = useState("");
-
-  useEffect(() => {
-    if (!isOpen) {
-      setForm(EMPTY_FORM);
-      setErrors({});
-      setServerError("");
-    }
-  }, [isOpen]);
-
-  if (!isOpen) return null;
-
-  const set = (field) => (e) =>
-    setForm((f) => ({ ...f, [field]: e.target.value }));
-
-  function validate() {
-    const e = {};
-    if (!form.title.trim()) e.title = "Title is required.";
-    if (!form.date) e.date = "Date is required.";
-    setErrors(e);
-    return Object.keys(e).length === 0;
-  }
-
-  async function handleSubmit() {
-    setServerError("");
-    if (!validate()) return;
-    setLoading(true);
-    try {
-      const token = localStorage.getItem("token");
-      const res = await fetch("http://localhost:5000/api/events", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(form),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Failed to save event.");
-      onSuccess?.();
-      onClose();
-    } catch (err) {
-      setServerError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  const colors = TYPE_BADGE[form.type] || TYPE_BADGE.Assembly;
-
-  return (
-    <div className={styles.modalOverlay} onClick={onClose}>
-      <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-        <div className={styles.modalHeader}>
-          <h3 className={styles.modalTitle}>Add New Event</h3>
-          <button className={styles.modalCloseBtn} onClick={onClose}>
-            <i className="bi bi-x-lg" />
-          </button>
-        </div>
-
-        <div className={styles.modalBody}>
-          {serverError && (
-            <div className={styles.serverError}>{serverError}</div>
-          )}
-
-          {/* Type pills */}
-          <div className={styles.formGroup}>
-            <label>Event Type</label>
-            <div className={styles.typePillsWrap}>
-              {TYPES.map((t) => {
-                const c = TYPE_BADGE[t];
-                const active = form.type === t;
-                return (
-                  <button
-                    key={t}
-                    type="button"
-                    className={styles.typePill}
-                    style={
-                      active
-                        ? {
-                            background: c.light,
-                            color: c.text,
-                            borderColor: c.bg,
-                          }
-                        : {}
-                    }
-                    onClick={() => setForm((f) => ({ ...f, type: t }))}
-                  >
-                    {t}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          <div className={styles.formGrid}>
-            <div className={`${styles.formGroup} ${styles.fullWidth}`}>
-              <label>
-                Title <span style={{ color: "#c0390a" }}>*</span>
-              </label>
-              <input
-                placeholder="e.g. CCS Department Meeting"
-                className={errors.title ? styles.inputError : ""}
-                value={form.title}
-                onChange={set("title")}
-              />
-              {errors.title && (
-                <span className={styles.errorMsg}>{errors.title}</span>
-              )}
-            </div>
-
-            <div className={`${styles.formGroup} ${styles.fullWidth}`}>
-              <label>Description</label>
-              <textarea
-                placeholder="Briefly describe the event..."
-                value={form.description}
-                onChange={set("description")}
-              />
-            </div>
-
-            <div className={styles.formGroup}>
-              <label>
-                Date <span style={{ color: "#c0390a" }}>*</span>
-              </label>
-              <input
-                type="date"
-                className={errors.date ? styles.inputError : ""}
-                value={form.date}
-                onChange={set("date")}
-              />
-              {errors.date && (
-                <span className={styles.errorMsg}>{errors.date}</span>
-              )}
-            </div>
-
-            <div className={styles.formGroup}>
-              <label>Time</label>
-              <input
-                placeholder="e.g. 2:00 PM – 4:00 PM"
-                value={form.time}
-                onChange={set("time")}
-              />
-            </div>
-
-            <div className={`${styles.formGroup} ${styles.fullWidth}`}>
-              <label>Location</label>
-              <input
-                placeholder="e.g. Conference Room 2"
-                value={form.location}
-                onChange={set("location")}
-              />
-            </div>
-          </div>
-
-          <div className={`${styles.formGroup} ${styles.fullWidth}`}>
-            <label>Google Drive PDF Link</label>
-            <input
-              placeholder="Paste Google Drive share link..."
-              value={form.driveLink}
-              onChange={set("driveLink")}
-            />
-          </div>
-
-          {/* Live preview */}
-          <div
-            className={styles.previewStrip}
-            style={{ borderLeftColor: colors.bg, background: colors.light }}
-          >
-            <span
-              className={styles.previewTitle}
-              style={{ color: colors.text }}
-            >
-              {form.title || "Event title preview"}
-            </span>
-            <span className={styles.previewMeta} style={{ color: colors.text }}>
-              {form.date || "Date"}
-              {form.time ? ` · ${form.time}` : ""}
-              {form.location ? ` · ${form.location}` : ""}
-            </span>
-          </div>
-        </div>
-
-        <div className={styles.modalFooter}>
-          <button
-            className={styles.cancelBtn}
-            onClick={onClose}
-            disabled={loading}
-          >
-            Cancel
-          </button>
-          <button
-            className={styles.submitBtn}
-            onClick={handleSubmit}
-            disabled={loading}
-          >
-            <i className="bi bi-calendar-plus-fill" />
-            {loading ? "Saving..." : "Add Event"}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
+  return link;
 }
 
 /* ── Main Page ── */
@@ -277,6 +48,25 @@ const FacultyEvents = () => {
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [previewLink, setPreviewLink] = useState(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [deleteId, setDeleteId] = useState(null);
+  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  // Toast state
+  const [toast, setToast] = useState({
+    isVisible: false,
+    message: "",
+    type: "success",
+  });
+
+  const showToast = useCallback((message, type = "success") => {
+    setToast({ isVisible: true, message, type });
+  }, []);
+
+  const hideToast = useCallback(() => {
+    setToast((prev) => ({ ...prev, isVisible: false }));
+  }, []);
 
   const role = localStorage.getItem("role");
   const canAdd = role === "dean" || role === "chair";
@@ -289,6 +79,7 @@ const FacultyEvents = () => {
       setEvents(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error("Failed to fetch events:", err);
+      showToast("Failed to load events.", "error");
     } finally {
       setLoading(false);
     }
@@ -297,6 +88,30 @@ const FacultyEvents = () => {
   useEffect(() => {
     fetchEvents();
   }, []);
+
+  const handleDelete = async () => {
+    try {
+      setIsDeleting(true);
+      const token = localStorage.getItem("token");
+
+      const res = await fetch(`http://localhost:5000/api/events/${deleteId}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Delete failed.");
+
+      setConfirmOpen(false);
+      setDeleteId(null);
+      showToast("Event deleted successfully.", "success");
+      fetchEvents();
+    } catch (err) {
+      showToast(err.message || "Failed to delete event.", "error");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   const filtered = events.filter((e) => {
     const matchFilter = activeFilter === "All" || e.type === activeFilter;
@@ -309,6 +124,15 @@ const FacultyEvents = () => {
 
   return (
     <div className={styles.pageContent}>
+      {/* Toast */}
+      <AppToast
+        isVisible={toast.isVisible}
+        message={toast.message}
+        type={toast.type}
+        onClose={hideToast}
+        duration={3500}
+      />
+
       {/* Header */}
       <div className={styles.pageHeader}>
         <div className={styles.headerLeft}>
@@ -438,6 +262,25 @@ const FacultyEvents = () => {
                       </span>
                     </button>
                   )}
+
+                  <div className={styles.eventActions}>
+                    <button
+                      className={styles.editBtn}
+                      onClick={() => setSelectedEvent(e)}
+                    >
+                      <i className="bi bi-pencil-square" /> Edit
+                    </button>
+
+                    <button
+                      className={styles.deleteBtn}
+                      onClick={() => {
+                        setDeleteId(e._id);
+                        setConfirmOpen(true);
+                      }}
+                    >
+                      <i className="bi bi-trash-fill" /> Delete
+                    </button>
+                  </div>
                 </div>
               </div>
             );
@@ -449,6 +292,27 @@ const FacultyEvents = () => {
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
         onSuccess={fetchEvents}
+        showToast={showToast}
+      />
+
+      <EditEventModal
+        isOpen={!!selectedEvent}
+        editData={selectedEvent}
+        onClose={() => setSelectedEvent(null)}
+        onSuccess={fetchEvents}
+        showToast={showToast}
+      />
+
+      <ConfirmModal
+        isOpen={confirmOpen}
+        title="Delete Event"
+        message="Are you sure you want to delete this event? This action cannot be undone."
+        onClose={() => {
+          setConfirmOpen(false);
+          setDeleteId(null);
+        }}
+        onConfirm={handleDelete}
+        isProcessing={isDeleting}
       />
 
       {previewLink && (
@@ -469,7 +333,6 @@ const FacultyEvents = () => {
                 ✕
               </button>
             </div>
-
             <iframe src={previewLink} className={styles.pdfFrame} />
           </div>
         </div>

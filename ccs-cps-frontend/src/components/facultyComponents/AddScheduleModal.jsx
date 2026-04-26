@@ -128,6 +128,69 @@ const AddScheduleModal = ({ onClose, onSave, onSaveError }) => {
       .includes(facultySearch.toLowerCase()),
   );
 
+  // ── Get unavailable start times ───────────────────────────────────────────
+  const getUnavailableTimes = () => {
+    if (!selFaculty || !selSection || !selProgram || !selYear) return new Set();
+
+    const selectedDay = DAYS.indexOf(day);
+    const unavailable = new Set();
+
+    TIMES.forEach((time, startIdx) => {
+      const newStart = startIdx;
+      const newEnd = newStart + Math.round(duration);
+
+      const conflict = existingSchedules.some((s) => {
+        if (Number(s.day) !== selectedDay) return false;
+
+        const exStart = Number(s.start);
+        const exEnd = exStart + Number(s.span);
+        const overlap = newStart < exEnd && newEnd > exStart;
+        if (!overlap) return false;
+
+        const sameFaculty =
+          s.facultyId?.toString() === selFaculty._id?.toString();
+
+        // ✅ FIX — program + year + section lahat dapat match
+        const sameSection =
+          s.section === selSection &&
+          s.program === selProgram.code &&
+          s.year === selYear.year;
+
+        const sameRoom =
+          room.trim() &&
+          s.room?.trim().toLowerCase() === room.trim().toLowerCase();
+
+        return sameFaculty || sameSection || sameRoom;
+      });
+
+      if (conflict) unavailable.add(time);
+    });
+
+    return unavailable;
+  };
+
+  // ── Auto-reset startTime if it becomes unavailable ────────────────────────
+  // NOTE: dapat AFTER ng getUnavailableTimes definition
+  useEffect(() => {
+    if (step !== 4) return;
+    const unavailable = getUnavailableTimes();
+    if (unavailable.has(startTime)) {
+      const firstAvailable = TIMES.find((t) => !unavailable.has(t));
+      if (firstAvailable) setStartTime(firstAvailable);
+    }
+  }, [day, duration, selFaculty, selSection, room, step]);
+
+  // ── Auto-reset startTime if it becomes unavailable ──────────────────────
+  useEffect(() => {
+    if (step !== 4) return;
+    const unavailable = getUnavailableTimes();
+    if (unavailable.has(startTime)) {
+      // Find first available time
+      const firstAvailable = TIMES.find((t) => !unavailable.has(t));
+      if (firstAvailable) setStartTime(firstAvailable);
+    }
+  }, [day, duration, selFaculty, selSection, room]);
+
   const canNext = () => {
     if (step === 0) return !!selProgram;
     if (step === 1) return !!selYear && !!selSection;
@@ -141,74 +204,102 @@ const AddScheduleModal = ({ onClose, onSave, onSaveError }) => {
     if (canNext()) setStep((s) => s + 1);
   };
   const back = () => setStep((s) => s - 1);
-const hasConflict = (newSched) => {
-  return existingSchedules.some((s) => {
-    const sameDay = s.day === newSched.day;
 
-    const sameFaculty = s.facultyId === newSched.facultyId;
+  // ── Conflict checker ──────────────────────────────────────────────────────
+  const hasConflict = (newSched) => {
+    for (const s of existingSchedules) {
+      const sameDay = Number(s.day) === Number(newSched.day);
+      if (!sameDay) continue;
 
-    const existingStart = s.start;
-    const existingEnd = s.start + s.span;
+      const existingStart = Number(s.start);
+      const existingEnd = existingStart + Number(s.span);
+      const newStart = Number(newSched.start);
+      const newEnd = newStart + Number(newSched.span);
+      const overlap = newStart < existingEnd && newEnd > existingStart;
+      if (!overlap) continue;
 
-    const newStart = newSched.start;
-    const newEnd = newSched.start + newSched.span;
+      // Faculty conflict
+      const sameFaculty =
+        s.facultyId?.toString() === newSched.facultyId?.toString();
+      if (sameFaculty) {
+        onSaveError?.(
+          `Schedule conflict! ${newSched.facultyName} already has a class at this time on ${DAYS[newSched.day]}.`,
+        );
+        return true;
+      }
 
-    const overlap = newStart < existingEnd && newEnd > existingStart;
+      const sameSection =
+        s.section === newSched.section &&
+        s.program === newSched.program &&
+        s.year === newSched.year;
 
-   
-    return sameDay && sameFaculty && overlap;
-  });
-};
-  // ── Save ─────────────────────────────────────────────────────────────────
- const handleSave = async () => {
-   setSaving(true);
+      if (sameSection) {
+        onSaveError?.(
+          `Schedule conflict! ${newSched.program} ${newSched.year} Section ${newSched.section} already has a class at this time on ${DAYS[newSched.day]}.`,
+        );
+        return true;
+      }
 
-   const scheduleData = {
-     day: DAYS.indexOf(day),
-     start: TIMES.indexOf(startTime),
-     span: Math.round(duration),
-     title: selSubject.title,
-     subjectCode: selSubject.code,
-     sub: `${selProgram.code} ${selYear.year.replace(/[^0-9]/g, "")}${selSection}`,
-     room: room.trim(),
-     type: selType,
-     program: selProgram.code,
-     year: selYear.year,
-     section: selSection,
-     facultyId: selFaculty._id,
-     facultyName: `${selFaculty.firstName} ${selFaculty.lastName}`,
-   };
+      // Room conflict
+      const sameRoom =
+        s.room?.trim().toLowerCase() === newSched.room?.trim().toLowerCase();
+      if (sameRoom && newSched.room?.trim()) {
+        onSaveError?.(
+          `Schedule conflict! Room ${newSched.room} is already occupied at this time on ${DAYS[newSched.day]}.`,
+        );
+        return true;
+      }
+    }
 
-   // 🔥 CHECK CONFLICT BEFORE SAVING
-   if (hasConflict(scheduleData)) {
-     setSaving(false);
-     onSaveError?.(
-       "Schedule conflict! Faculty has another class occupied at this time.",
-     );
-     return;
-   }
+    return false;
+  };
 
-   try {
-     const res = await fetch("http://localhost:5000/api/schedules", {
-       method: "POST",
-       headers: { "Content-Type": "application/json" },
-       body: JSON.stringify(scheduleData),
-     });
+  const handleSave = async () => {
+    setSaving(true);
 
-     const data = await res.json();
+    const scheduleData = {
+      day: DAYS.indexOf(day),
+      start: TIMES.indexOf(startTime),
+      span: Math.round(duration),
+      title: selSubject.title,
+      subjectCode: selSubject.code,
+      sub: `${selProgram.code} ${selYear.year.replace(/[^0-9]/g, "")}${selSection}`,
+      room: room.trim(),
+      type: selType,
+      program: selProgram.code,
+      year: selYear.year,
+      section: selSection,
+      facultyId: selFaculty._id,
+      facultyName: `${selFaculty.firstName} ${selFaculty.lastName}`,
+    };
 
-     if (res.ok) {
-       setExistingSchedules((prev) => [...prev, scheduleData]);
-       onSave({ ...scheduleData, ...data });
-     } else {
-       onSaveError?.(data.message || "Failed to save schedule.");
-     }
-   } catch (err) {
-     onSaveError?.("Network error. Please try again.");
-   } finally {
-     setSaving(false);
-   }
- };
+    // hasConflict na mismo nagtatawag ng onSaveError with specific message
+    if (hasConflict(scheduleData)) {
+      setSaving(false);
+      return;
+    }
+
+    try {
+      const res = await fetch("http://localhost:5000/api/schedules", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(scheduleData),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        setExistingSchedules((prev) => [...prev, scheduleData]);
+        onSave({ ...scheduleData, ...data });
+      } else {
+        onSaveError?.(data.message || "Failed to save schedule.");
+      }
+    } catch (err) {
+      onSaveError?.("Network error. Please try again.");
+    } finally {
+      setSaving(false);
+    }
+  };
 
   // ── Render ────────────────────────────────────────────────────────────────
   return (
@@ -472,6 +563,7 @@ const hasConflict = (newSched) => {
             </div>
 
             {/* Time + Duration */}
+            {/* Time + Duration */}
             <div className={styles.row2col}>
               <div style={{ flex: 1 }}>
                 <label className={styles.fieldLabel}>
@@ -479,20 +571,40 @@ const hasConflict = (newSched) => {
                 </label>
                 <select
                   className={styles.select}
+                  style={{ fontSize: 12, padding: "6px 10px" }}
                   value={startTime}
                   onChange={(e) => setStartTime(e.target.value)}
                 >
-                  {TIMES.map((t) => (
-                    <option key={t}>{t}</option>
-                  ))}
+                  {(() => {
+                    const unavailable = getUnavailableTimes();
+                    return TIMES.map((t) => {
+                      const isUnavailable = unavailable.has(t);
+                      return (
+                        <option
+                          key={t}
+                          value={t}
+                          disabled={isUnavailable}
+                          style={{
+                            color: isUnavailable ? "#bbb" : "inherit",
+                            background: isUnavailable ? "#f9f4f2" : "inherit",
+                            fontSize: 12,
+                          }}
+                        >
+                          {isUnavailable ? `⛔ ${t}` : t}
+                        </option>
+                      );
+                    });
+                  })()}
                 </select>
               </div>
+
               <div style={{ flex: 1 }}>
                 <label className={styles.fieldLabel}>
                   <i className="bi bi-hourglass-split" /> Duration (hrs)
                 </label>
                 <select
                   className={styles.select}
+                  style={{ fontSize: 12, padding: "6px 10px" }}
                   value={duration}
                   onChange={(e) => setDuration(Number(e.target.value))}
                 >
@@ -503,6 +615,20 @@ const hasConflict = (newSched) => {
                   ))}
                 </select>
               </div>
+            </div>
+
+            {/* Legend */}
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 5,
+                marginTop: 4,
+                fontSize: 10,
+                color: "#b89e94",
+              }}
+            >
+              
             </div>
 
             {/* Summary Preview */}
@@ -574,7 +700,7 @@ const hasConflict = (newSched) => {
       </div>
     </AppModal>
   );
-};
+};;;;;;;
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 const StepSection = ({ title, icon, children }) => (

@@ -5,6 +5,8 @@ import {
   FaCheckCircle,
   FaClock,
   FaTimesCircle,
+  FaMapMarkerAlt,
+  FaUserTie,
 } from "react-icons/fa";
 import { BsArrowRightShort } from "react-icons/bs";
 
@@ -15,6 +17,42 @@ import CCSLinks from "../../components/studentComponents/CcsLinks";
 import TitlePages from "../../components/ui/TitlePages";
 import styles from "./studentStyles/dashboard.module.css";
 
+// ─── Constants ────────────────────────────────────────────────────────────────
+const DAY_NUM_TO_STR = {
+  0: "MONDAY",
+  1: "TUESDAY",
+  2: "WEDNESDAY",
+  3: "THURSDAY",
+  4: "FRIDAY",
+  5: "SATURDAY",
+  6: "SUNDAY",
+};
+
+// DB: start slot 0 = 7:00 AM, 1 = 8:00 AM, 2 = 9:00 AM ...
+const SLOT_TO_HOUR = (slot) => 7 + Number(slot);
+
+const formatTime = (hour, min = 0) => {
+  const ampm = hour >= 12 ? "PM" : "AM";
+  const h12 = hour % 12 || 12;
+  const m = min === 0 ? "00" : min < 10 ? `0${min}` : `${min}`;
+  return `${h12}:${m} ${ampm}`;
+};
+
+// JS getDay(): 0=Sun,1=Mon,2=Tue,3=Wed,4=Thu,5=Fri,6=Sat
+// DB day:      0=Mon,1=Tue,2=Wed,3=Thu,4=Fri,5=Sat,6=Sun
+const JS_DAY_TO_DB_DAY = { 0: 6, 1: 0, 2: 1, 3: 2, 4: 3, 5: 4, 6: 5 };
+
+// ─── Helper ───────────────────────────────────────────────────────────────────
+const getStudentFromStorage = () => {
+  try {
+    const raw = localStorage.getItem("user");
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+};
+
+// ─── Widget wrapper ───────────────────────────────────────────────────────────
 function DashWidget({ title, icon, actionText, actionTo, children }) {
   return (
     <div className={styles.widgetCard}>
@@ -23,7 +61,6 @@ function DashWidget({ title, icon, actionText, actionTo, children }) {
           <div className={styles.widgetIcon}>{icon}</div>
           <span className={styles.widgetTitle}>{title}</span>
         </div>
-
         {actionText && actionTo && (
           <Link to={actionTo} className={styles.widgetAction}>
             {actionText} <BsArrowRightShort size={18} />
@@ -35,6 +72,7 @@ function DashWidget({ title, icon, actionText, actionTo, children }) {
   );
 }
 
+// ─── Component ────────────────────────────────────────────────────────────────
 export default function StudentDashboard() {
   const [upcomingEvent, setUpcomingEvent] = useState(null);
   const [loadingEvent, setLoadingEvent] = useState(true);
@@ -46,18 +84,21 @@ export default function StudentDashboard() {
     semesterLabel: "1st Semester • A.Y. 2025–2026",
   });
 
-  // Dynamic Clearance States
   const [isCleared, setIsCleared] = useState(false);
   const [loadingClearance, setLoadingClearance] = useState(true);
 
-  // Handle Resize
+  // ── Next class state ────────────────────────────────────────────────────────
+  const [nextClass, setNextClass] = useState(null);
+  const [loadingSchedule, setLoadingSchedule] = useState(true);
+
+  // ── Resize ──────────────────────────────────────────────────────────────────
   useEffect(() => {
     const onResize = () => setIsMobile(window.innerWidth < 992);
     window.addEventListener("resize", onResize);
     return () => window.removeEventListener("resize", onResize);
   }, []);
 
-  // Fetch Student Profile & Clearance Data
+  // ── Fetch student profile & clearance ──────────────────────────────────────
   useEffect(() => {
     const fetchStudentData = async () => {
       try {
@@ -66,26 +107,28 @@ export default function StudentDashboard() {
 
         const parsedUser = JSON.parse(storedUser);
 
-        // Set banner data from localStorage
         let programAbbr = "CCS";
         if (parsedUser.program) {
-          if (parsedUser.program.includes("Information Technology")) programAbbr = "BSIT";
-          if (parsedUser.program.includes("Computer Science")) programAbbr = "BSCS";
+          if (parsedUser.program.includes("Information Technology"))
+            programAbbr = "BSIT";
+          if (parsedUser.program.includes("Computer Science"))
+            programAbbr = "BSCS";
         }
         setBannerData({
           name: parsedUser.firstName + " " + parsedUser.lastName || "Student",
           programLabel: `${programAbbr} — ${parsedUser.year || ""}`,
-          semesterLabel: "1st Semester • A.Y. 2025–2026", 
+          semesterLabel: "1st Semester • A.Y. 2025–2026",
         });
 
-        // Fetch deep clearance data from backend using the logged-in student's ID
-        const res = await fetch(`http://localhost:5000/api/students/${parsedUser._id}`);
+        const res = await fetch(
+          `http://localhost:5000/api/students/${parsedUser._id}`,
+        );
         const data = await res.json();
 
-        // Calculate overall clearance status
-        if (data && data.clearance && data.clearance.summaryItems) {
-          const overallCleared = data.clearance.summaryItems.every(item => item.isCleared);
-          setIsCleared(overallCleared);
+        if (data?.clearance?.summaryItems) {
+          setIsCleared(
+            data.clearance.summaryItems.every((item) => item.isCleared),
+          );
         }
       } catch (error) {
         console.error("Failed to fetch student data:", error);
@@ -97,7 +140,77 @@ export default function StudentDashboard() {
     fetchStudentData();
   }, []);
 
-  // Fetch Events
+  // ── Fetch schedule & compute next class ────────────────────────────────────
+  useEffect(() => {
+    const fetchSchedule = async () => {
+      try {
+        const student = getStudentFromStorage();
+        const section = student?.section;
+        if (!section) return;
+
+        const res = await fetch(
+          `http://localhost:5000/api/schedules/section/${encodeURIComponent(section)}`,
+        );
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+
+        if (!Array.isArray(data) || data.length === 0) return;
+
+        // Normalize all schedules
+        const normalized = data.map((s) => ({
+          day: Number(s.day), // 0=Mon … 4=Fri (DB format)
+          startHour: SLOT_TO_HOUR(s.start),
+          endHour: SLOT_TO_HOUR(s.start) + Number(s.span),
+          duration: Number(s.span),
+          course: s.subjectCode ?? "",
+          title: s.title ?? "",
+          room: s.room ?? "",
+          instructor: s.facultyName ?? "",
+          type: s.type ?? "Lecture",
+        }));
+
+        // Find next class from today onward
+        const now = new Date();
+        const todayDbDay = JS_DAY_TO_DB_DAY[now.getDay()]; // today in DB format
+        const currentHour = now.getHours() + now.getMinutes() / 60;
+
+        // Sort: today's remaining classes first, then future days
+        const sorted = [...normalized].sort((a, b) => {
+          const aDiff =
+            a.day === todayDbDay
+              ? a.startHour >= currentHour
+                ? a.startHour - currentHour // later today → small positive
+                : a.startHour + 7 - currentHour + 5 // already passed → push to end
+              : ((a.day - todayDbDay + 7) % 7) * 24 + a.startHour;
+
+          const bDiff =
+            b.day === todayDbDay
+              ? b.startHour >= currentHour
+                ? b.startHour - currentHour
+                : b.startHour + 7 - currentHour + 5
+              : ((b.day - todayDbDay + 7) % 7) * 24 + b.startHour;
+
+          return aDiff - bDiff;
+        });
+
+        // Pick the first upcoming class
+        const upcoming = sorted.find((s) => {
+          if (s.day === todayDbDay) return s.startHour >= currentHour;
+          return true;
+        });
+
+        setNextClass(upcoming ?? sorted[0]); // fallback to first if none today
+      } catch (err) {
+        console.error("Failed to fetch schedule:", err);
+      } finally {
+        setLoadingSchedule(false);
+      }
+    };
+
+    fetchSchedule();
+  }, []);
+
+  // ── Fetch events ────────────────────────────────────────────────────────────
   useEffect(() => {
     const fetchUpcomingEvent = async () => {
       try {
@@ -137,6 +250,7 @@ export default function StudentDashboard() {
     fetchUpcomingEvent();
   }, []);
 
+  // ─── Render ───────────────────────────────────────────────────────────────
   const DashboardContent = () => (
     <div className={styles.dashLayout}>
       <div className={styles.heroRow}>
@@ -148,26 +262,68 @@ export default function StudentDashboard() {
       </div>
 
       <div className={styles.widgetsRow}>
-        {/* Next Class - Reverted to your original static layout */}
+        {/* ── Next Class Widget ── */}
         <DashWidget
           title="Next Class"
           icon={<FaClock />}
           actionText="Full Schedule"
           actionTo="/student/schedule"
         >
-          <div className={styles.scheduleWidget}>
-            <div className={styles.timeBlock}>
-              <span className={styles.timeHighlight}>02:00 PM</span>
-              <span className={styles.timeEnd}>to 05:00 PM</span>
+          {loadingSchedule ? (
+            <div
+              style={{
+                padding: "10px 0",
+                color: "#aaa",
+                textAlign: "center",
+                fontSize: 13,
+              }}
+            >
+              Loading schedule…
             </div>
-            <div className={styles.classBlock}>
-              <span className={styles.subject}>ITP113 - ComLab 2</span>
-              <span className={styles.instructor}>Prof. Montecillo</span>
+          ) : nextClass ? (
+            <div className={styles.scheduleWidget}>
+              <div className={styles.timeBlock}>
+                <span className={styles.timeHighlight}>
+                  {formatTime(nextClass.startHour)}
+                </span>
+                <span className={styles.timeEnd}>
+                  to {formatTime(nextClass.endHour)}
+                </span>
+              </div>
+              <div className={styles.classBlock}>
+                <span className={styles.subject}>
+                  {nextClass.course} — {nextClass.room}
+                </span>
+                <span className={styles.instructor}>
+                  {nextClass.instructor}
+                </span>
+                <span
+                  style={{
+                    fontSize: 11,
+                    color: "#a8917f",
+                    marginTop: 2,
+                  }}
+                >
+                  {DAY_NUM_TO_STR[nextClass.day]} •{" "}
+                  {nextClass.type === "Laboratory" ? "LAB" : "LEC"}
+                </span>
+              </div>
             </div>
-          </div>
+          ) : (
+            <div
+              style={{
+                padding: "10px 0",
+                color: "#aaa",
+                textAlign: "center",
+                fontSize: 13,
+              }}
+            >
+              No upcoming classes found.
+            </div>
+          )}
         </DashWidget>
 
-        {/* Dynamic Clearance Widget */}
+        {/* ── Clearance Widget ── */}
         <DashWidget
           title="Clearance Status"
           icon={<FaCheckCircle />}
@@ -175,11 +331,17 @@ export default function StudentDashboard() {
           actionTo="/student/clearance"
         >
           {loadingClearance ? (
-            <div style={{ padding: "10px 0", color: "#666", textAlign: "center" }}>
+            <div
+              style={{ padding: "10px 0", color: "#666", textAlign: "center" }}
+            >
               Checking status...
             </div>
           ) : (
-            <div className={`${styles.clearanceDisplay} ${isCleared ? styles.cleared : styles.notCleared}`}>
+            <div
+              className={`${styles.clearanceDisplay} ${
+                isCleared ? styles.cleared : styles.notCleared
+              }`}
+            >
               <div className={styles.statusMain}>
                 {isCleared ? (
                   <FaCheckCircle size={28} />
@@ -223,7 +385,12 @@ export default function StudentDashboard() {
           <CalendarWidget />
           <div style={{ marginTop: "24px" }}>
             <TitlePages
-              icon={<i className="bi bi-link-45deg" style={{ fontSize: 16, color: "#fff" }} />}
+              icon={
+                <i
+                  className="bi bi-link-45deg"
+                  style={{ fontSize: 16, color: "#fff" }}
+                />
+              }
               title="CCS Links"
               iconBg="#E65100"
               textColor="#7A4F35"
