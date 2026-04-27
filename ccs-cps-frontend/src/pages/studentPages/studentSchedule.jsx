@@ -10,7 +10,7 @@ import { useLocation } from "react-router-dom";
 
 import schedStyles from "./studentStyles/schedule.module.css";
 import layoutStyles from "./studentStyles/dashboard.module.css";
-import SubjectDetailPage from "../../pages/facultyPages/SubjectDetailPage"; // ← import
+import SubjectDetailPage from "../../pages/facultyPages/SubjectDetailPage";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 const MOBILE_BREAKPOINT = 992;
@@ -75,15 +75,6 @@ const PALETTE = [
 ];
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
-const getStudentFromStorage = () => {
-  try {
-    const raw = localStorage.getItem("user");
-    return raw ? JSON.parse(raw) : null;
-  } catch {
-    return null;
-  }
-};
-
 const hexToRgba = (hex, alpha) => {
   const r = parseInt(hex.slice(1, 3), 16);
   const g = parseInt(hex.slice(3, 5), 16);
@@ -102,9 +93,8 @@ const getEndTime = (startHour, durationHours) => {
   return formatTime(startHour + Number(durationHours), 0);
 };
 
-// Map raw MongoDB Schedule doc → shape this component uses
 const normalizeSchedule = (s) => ({
-  ...s, // keep all original fields (section, program, year, etc.)
+  ...s,
   day: DAY_NUM_TO_STR[Number(s.day)] ?? "MONDAY",
   dayNum: Number(s.day),
   startHour: SLOT_TO_HOUR(s.start),
@@ -115,36 +105,11 @@ const normalizeSchedule = (s) => ({
   instructor: s.facultyName ?? "",
   type: s.type ?? "Lecture",
   sub: s.sub ?? "",
-  // timeLabel needed by SubjectDetailPage
   timeLabel: `${TIMES[s.start]} – ${TIMES[s.start + Number(s.span)] ?? "End"}`,
 });
 
-// getInitialDay — jump to nearest day with class
 const getInitialDay = (data) => {
-  const JS_TO_DB = { 0: 6, 1: 0, 2: 1, 3: 2, 4: 3, 5: 4, 6: 5 };
-  const DB_TO_DAYSTR = DAY_NUM_TO_STR;
-  const todayDb = JS_TO_DB[new Date().getDay()];
-  const daysWithClass = [
-    ...new Set(
-      data.map((s) => {
-        const raw = localStorage.getItem("user");
-        const parsed = raw ? JSON.parse(raw) : null;
-        return Number(parsed ? (s.dayNum ?? 0) : 0);
-      }),
-    ),
-  ];
-
-  // simpler — just use the already-normalized day string
   const dayStrings = [...new Set(data.map((s) => s.day))];
-  const DB_TO_IDX = {
-    MONDAY: 0,
-    TUESDAY: 1,
-    WEDNESDAY: 2,
-    THURSDAY: 3,
-    FRIDAY: 4,
-    SATURDAY: 5,
-    SUNDAY: 6,
-  };
   const JS_DAY_TO_DB_STR = {
     0: "SUNDAY",
     1: "MONDAY",
@@ -156,7 +121,6 @@ const getInitialDay = (data) => {
   };
   const todayStr = JS_DAY_TO_DB_STR[new Date().getDay()];
 
-  // Find closest day starting from today
   const ordered = [
     "MONDAY",
     "TUESDAY",
@@ -176,6 +140,7 @@ const getInitialDay = (data) => {
 
 // ─── Component ────────────────────────────────────────────────────────────────
 export default function StudentSchedule() {
+  const location = useLocation();
   const [isMobile, setIsMobile] = useState(
     window.innerWidth < MOBILE_BREAKPOINT,
   );
@@ -185,12 +150,10 @@ export default function StudentSchedule() {
   const [activeDay, setActiveDay] = useState(
     DAY_MAP_JS[new Date().getDay()] || "MONDAY",
   );
-  const [selectedSubject, setSelectedSubject] = useState(null); // ← new
+  const [selectedSubject, setSelectedSubject] = useState(null);
+  const [displaySection, setDisplaySection] = useState("—");
 
-  const student = getStudentFromStorage();
-  const section = student?.section ?? null;
-
-  // ← Add this useEffect — after ma-load ang scheduleData, auto-open ang subject
+  // Auto-open subject if redirected
   useEffect(() => {
     const openSubjectId = location.state?.openSubjectId;
     if (!openSubjectId || scheduleData.length === 0) return;
@@ -201,44 +164,82 @@ export default function StudentSchedule() {
     }
   }, [location.state, scheduleData]);
 
-  console.log(
-    "scheduleData _ids:",
-    scheduleData.map((s) => s._id),
-  );
-  console.log("looking for:", location.state?.openSubjectId);
-
-  // ── Responsive ─────────────────────────────────────────────────────────────
+  // Handle Resize
   useEffect(() => {
     const onResize = () => setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
     window.addEventListener("resize", onResize);
     return () => window.removeEventListener("resize", onResize);
   }, []);
 
-  // ── Fetch schedules by section ──────────────────────────────────────────────
+  // ── ROBUST "FORGIVING" SCHEDULE FETCHING LOGIC ──
   useEffect(() => {
-    if (!section) {
-      setLoading(false);
-      return;
-    }
+    const fetchSchedule = async () => {
+      try {
+        setLoading(true);
+        const rawUser = localStorage.getItem("user");
+        if (!rawUser) throw new Error("No user in local storage.");
+        
+        const parsedUser = JSON.parse(rawUser);
+        const studentId = parsedUser._id || parsedUser.id;
 
-    fetch(
-      `http://localhost:5000/api/schedules/section/${encodeURIComponent(section)}`,
-    )
-      .then((res) => {
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        return res.json();
-      })
-      .then((data) => {
-        const mapped = Array.isArray(data) ? data.map(normalizeSchedule) : [];
+        // 1. Fetch FRESH student data straight from DB (Bypasses stale localStorage)
+        const stuRes = await fetch(`http://localhost:5000/api/students/${studentId}`);
+        if (!stuRes.ok) throw new Error("Failed to fetch fresh student data");
+        const studentDb = await stuRes.json();
+
+        const dbProg = studentDb.program || "";
+        const dbYear = studentDb.year || "";
+        const dbSec = studentDb.section || "";
+        setDisplaySection(dbSec || "—");
+
+        // 2. Fetch ALL schedules created by Dean/Chair
+        const schedRes = await fetch(`http://localhost:5000/api/schedules`);
+        if (!schedRes.ok) throw new Error("Failed to fetch schedules");
+        const allSchedules = await schedRes.json();
+
+        // 3. The "Forgiving Filter" -> Gracefully aligns mismatched formats like "BSIT" vs "BS Information Technology" and "A" vs "4IT-A"
+        const mySchedules = allSchedules.filter((s) => {
+          const sProg = s.program || "";
+          const sYear = s.year || "";
+          const sSec = s.section || "";
+
+          // Program Matcher
+          let matchProg = false;
+          if (!sProg || sProg === dbProg) matchProg = true;
+          else if (dbProg.toLowerCase().includes("information") && sProg.toLowerCase().includes("it")) matchProg = true;
+          else if (dbProg.toLowerCase().includes("computer") && sProg.toLowerCase().includes("cs")) matchProg = true;
+
+          // Year Matcher (Extracts just the number, e.g., "4" matches "4th Year")
+          const dbYearDigit = dbYear.replace(/\D/g, "");
+          const sYearDigit = sYear.replace(/\D/g, "");
+          const matchYear = !sYear || sYear === dbYear || (dbYearDigit && dbYearDigit === sYearDigit);
+
+          // Section Matcher (Checks exact match OR if they end in the same letter like "A" = "4IT-A")
+          const dbSecLetter = dbSec.trim().slice(-1).toUpperCase();
+          const sSecLetter = sSec.trim().slice(-1).toUpperCase();
+          const matchSec = !sSec || sSec === dbSec || (dbSecLetter && dbSecLetter === sSecLetter);
+
+          return matchProg && matchYear && matchSec;
+        });
+
+        // Map it and set active day
+        const mapped = mySchedules.map(normalizeSchedule);
         setScheduleData(mapped);
-        setActiveDay(getInitialDay(mapped));
-      })
-      .catch((err) => {
+        
+        if (mapped.length > 0) {
+           setActiveDay(getInitialDay(mapped));
+        }
+        
+      } catch (err) {
         console.error("[StudentSchedule] Error:", err);
-        setError("Failed to load your schedule. Please try again.");
-      })
-      .finally(() => setLoading(false));
-  }, [section]);
+        setError("Failed to load your schedule. Please ensure you are logged in properly.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSchedule();
+  }, []);
 
   // ── If subject selected, show detail page ──────────────────────────────────
   if (selectedSubject) {
@@ -276,13 +277,13 @@ export default function StudentSchedule() {
           </div>
           <div className={schedStyles.headerControls}>
             <div className={schedStyles.headerNote}>
-              Class Section: <strong>{section ?? "—"}</strong>
+              Class Section: <strong>{displaySection}</strong>
             </div>
           </div>
         </div>
 
         {/* No section */}
-        {!loading && !section && (
+        {!loading && displaySection === "—" && (
           <div
             style={{
               textAlign: "center",
@@ -339,7 +340,7 @@ export default function StudentSchedule() {
         )}
 
         {/* Agenda widget */}
-        {!loading && section && !error && (
+        {!loading && displaySection !== "—" && !error && (
           <div className={schedStyles.agendaWidget}>
             {/* Day picker */}
             <div className={schedStyles.dayNavScroll}>
@@ -375,7 +376,7 @@ export default function StudentSchedule() {
                       <div
                         key={idx}
                         className={schedStyles.timelineRow}
-                        onClick={() => setSelectedSubject(cls)} // ← click to open detail
+                        onClick={() => setSelectedSubject(cls)}
                         style={{ cursor: "pointer" }}
                       >
                         {/* Time */}
