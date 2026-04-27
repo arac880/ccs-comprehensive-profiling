@@ -89,10 +89,7 @@ const createPost = async (req, res) => {
       content: body.content,
       type: body.type || "announcement",
       subjectId: body.subjectId,
-
-      // ✅ AUTHOR FIXED
       author: body.author || "Unknown",
-
       attachments,
       likes: 0,
       createdAt: new Date(),
@@ -100,6 +97,61 @@ const createPost = async (req, res) => {
     };
 
     const result = await db.collection("posts").insertOne(doc);
+
+    // ── Notify enrolled students for ALL post types ──
+    if (body.section && body.program && body.year) {
+      // ← Map short code to full name
+      const PROGRAM_MAP = {
+        BSIT: "BS Information Technology",
+        BSCS: "BS Computer Science",
+      };
+      const fullProgram =
+        PROGRAM_MAP[body.program?.toUpperCase()] ?? body.program;
+      const fullYear = decodeURIComponent(
+        (body.year || "").replace(/\+/g, " "),
+      );
+
+      console.log("Querying students:", {
+        section: body.section,
+        program: fullProgram,
+        year: fullYear,
+      });
+
+      const students = await db
+        .collection("students")
+        .find({
+          section: body.section,
+          program: fullProgram,
+          year: fullYear,
+          isDeleted: { $ne: true },
+        })
+        .toArray();
+
+      console.log(`Found ${students.length} students to notify`);
+
+      // ← Title per type
+      const notifTitle =
+        {
+          announcement: "New Announcement",
+          activity: "New Activity",
+          lesson: "New Lesson",
+        }[body.type] || "New Post";
+
+      students.forEach((student) => {
+        global.io.to(student._id.toString()).emit("notification", {
+          id: Date.now() + Math.random(),
+          type: "announcement", // ← same type para sa icon
+          title: notifTitle,
+          message: `${body.author} posted: "${body.title}"`,
+          link: `/student/schedule`,
+          subjectId: body.subjectId,
+          read: false,
+          createdAt: new Date(),
+        });
+      });
+    }
+
+    console.log("subjectId received:", body.subjectId);
 
     res.status(201).json({ ...doc, _id: result.insertedId });
   } catch (err) {

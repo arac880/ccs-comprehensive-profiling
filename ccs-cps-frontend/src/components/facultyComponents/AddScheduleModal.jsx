@@ -15,7 +15,14 @@ import PROGRAM_DATA from "../../data/programData";
 import styles from "../../pages/facultyPages/facultyStyles/AddScheduleModal.module.css";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
-const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+const DAYS = [
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+];
 const TIMES = [
   "7:00 AM",
   "8:00 AM",
@@ -627,9 +634,7 @@ const AddScheduleModal = ({ onClose, onSave, onSaveError }) => {
                 fontSize: 10,
                 color: "#b89e94",
               }}
-            >
-              
-            </div>
+            ></div>
 
             {/* Summary Preview */}
             <div className={styles.previewCard}>
@@ -700,7 +705,7 @@ const AddScheduleModal = ({ onClose, onSave, onSaveError }) => {
       </div>
     </AppModal>
   );
-};;;;;;;
+};
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 const StepSection = ({ title, icon, children }) => (

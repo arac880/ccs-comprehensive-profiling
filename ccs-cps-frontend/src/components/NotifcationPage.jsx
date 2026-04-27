@@ -31,14 +31,16 @@ const TYPE_COLORS = {
   announcement: { dot: "#6A1B9A" },
 };
 
-const user = JSON.parse(localStorage.getItem("user") || "{}");
-const role = user?.isDean || user?.isChair ? "faculty" : "student";
-const userId = user?._id;
-const storageKey =
-  role === "faculty" ? `faculty_notifs_${userId}` : `student_notifs_${userId}`;
-
 export default function NotificationPage() {
   const navigate = useNavigate();
+
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const role = user?.isDean || user?.isChair ? "faculty" : "student";
+  const userId = user?._id;
+  const storageKey =
+    role === "faculty"
+      ? `faculty_notifs_${userId}`
+      : `student_notifs_${userId}`;
 
   const [notifs, setNotifs] = useState(() => {
     try {
@@ -103,14 +105,14 @@ export default function NotificationPage() {
     const updated = notifs.map((n) => ({ ...n, read: true }));
     setNotifs(updated);
     localStorage.setItem(storageKey, JSON.stringify(updated));
-    window.dispatchEvent(new Event("notifs-updated"));
+    setTimeout(() => window.dispatchEvent(new Event("notifs-updated")), 0);
   };
 
   const markOneRead = (id) => {
     setNotifs((prev) => {
       const updated = prev.map((n) => (n.id === id ? { ...n, read: true } : n));
       localStorage.setItem(storageKey, JSON.stringify(updated));
-      window.dispatchEvent(new Event("notifs-updated"));
+      setTimeout(() => window.dispatchEvent(new Event("notifs-updated")), 0);
       return updated;
     });
   };
@@ -120,13 +122,17 @@ export default function NotificationPage() {
     const userId = user?._id;
     setNotifs([]);
     localStorage.removeItem(`student_notifs_${userId}`);
-    window.dispatchEvent(new Event("notifs-updated"));
+    setTimeout(() => window.dispatchEvent(new Event("notifs-updated")), 0);
   };
 
   const handleClick = (notif) => {
     markOneRead(notif.id);
     if (notif.type === "violation") {
       navigate("/student/profile", { state: { tab: "violations" } });
+    } else if (notif.type === "announcement" && notif.subjectId) {
+      navigate("/student/schedule", {
+        state: { openSubjectId: notif.subjectId },
+      });
     } else if (notif.link) {
       navigate(notif.link);
     }

@@ -6,6 +6,7 @@ import {
   FaRegClock,
   FaMugHot,
 } from "react-icons/fa";
+import { useLocation } from "react-router-dom";
 
 import schedStyles from "./studentStyles/schedule.module.css";
 import layoutStyles from "./studentStyles/dashboard.module.css";
@@ -188,6 +189,23 @@ export default function StudentSchedule() {
 
   const student = getStudentFromStorage();
   const section = student?.section ?? null;
+
+  // ← Add this useEffect — after ma-load ang scheduleData, auto-open ang subject
+  useEffect(() => {
+    const openSubjectId = location.state?.openSubjectId;
+    if (!openSubjectId || scheduleData.length === 0) return;
+
+    const match = scheduleData.find((s) => s._id === openSubjectId);
+    if (match) {
+      setSelectedSubject(match);
+    }
+  }, [location.state, scheduleData]);
+
+  console.log(
+    "scheduleData _ids:",
+    scheduleData.map((s) => s._id),
+  );
+  console.log("looking for:", location.state?.openSubjectId);
 
   // ── Responsive ─────────────────────────────────────────────────────────────
   useEffect(() => {

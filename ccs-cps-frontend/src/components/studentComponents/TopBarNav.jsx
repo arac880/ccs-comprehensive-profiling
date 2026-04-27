@@ -65,10 +65,8 @@ export default function TopBarNav({ onSignOut, onMenuClick }) {
         return <FaClipboardCheck size={16} />;
       case "assignment":
         return <FaChalkboardUser size={16} />;
-      // case "reminder":
-      //   return <FaCalendarDay size={16} />;
       case "announcement":
-        return <FaCalendarDay size={16} />;
+        return <FaBell size={16} color="#E65100" />;
       case "violation":
         return <FaTriangleExclamation size={16} color="#E65100" />;
       default:
@@ -219,6 +217,13 @@ export default function TopBarNav({ onSignOut, onMenuClick }) {
                           if (notif.type === "violation") {
                             navigate("/student/profile", {
                               state: { tab: "violations" },
+                            });
+                          } else if (
+                            notif.type === "announcement" &&
+                            notif.subjectId
+                          ) {
+                            navigate("/student/schedule", {
+                              state: { openSubjectId: notif.subjectId },
                             });
                           } else if (notif.link) {
                             navigate(notif.link);

@@ -577,14 +577,14 @@ const SubjectDetailPage = ({ cls, onBack }) => {
       return;
     }
     setLoading(true);
-   fetch(`${API}/api/posts/subject/${cls._id}`)
-     .then((r) => {
-       if (!r.ok) throw new Error();
-       return r.json();
-     })
-     .then((d) => setPosts(Array.isArray(d) ? d : []))
-     .catch(() => showToast("Failed to load posts.", "error"))
-     .finally(() => setLoading(false));
+    fetch(`${API}/api/posts/subject/${cls._id}`)
+      .then((r) => {
+        if (!r.ok) throw new Error();
+        return r.json();
+      })
+      .then((d) => setPosts(Array.isArray(d) ? d : []))
+      .catch(() => showToast("Failed to load posts.", "error"))
+      .finally(() => setLoading(false));
   }, [cls?._id]);
 
   // ── Fetch students ─────────────────────────────────────────
@@ -667,13 +667,25 @@ const SubjectDetailPage = ({ cls, onBack }) => {
     if (!form.title.trim() || !form.content.trim()) return;
     setSubmitting(true);
 
+    console.log("cls data:", {
+      section: cls?.section,
+      program: cls?.program,
+      year: cls?.year,
+    });
     try {
       const fd = new FormData();
       fd.append("title", form.title.trim());
       fd.append("content", form.content.trim());
       fd.append("type", activeTab);
       fd.append("subjectId", cls?._id);
+
+      console.log("subjectId being sent:", cls?._id);
+
       fd.append("author", authorName);
+
+      fd.append("section", cls?.section ?? "");
+      fd.append("program", cls?.program ?? "");
+      fd.append("year", cls?.year ?? "");
 
       if (activeTab === "activity" && form.dueDate) {
         fd.append("dueDate", form.dueDate);
