@@ -1,7 +1,7 @@
 // components/facultyComponents/FacultyProfileCard.jsx
 import { useRef, useState, useEffect } from "react";
-import styles from "../../pages/facultyPages/facultyStyles/FacultyProfileCard.module.css";
-
+// Tingnan mo yung exact filename sa folder, tapos itamang ang import
+import styles from "../../pages/facultyPages/facultyStyles/facultyProfileCard.module.css";
 const ROLE_COLOR = {
   Dean: { bg: "#fff3e0", color: "#e65100", border: "#ffb74d" },
   "Department Chair": { bg: "#e8f5e9", color: "#2e7d32", border: "#81c784" },
