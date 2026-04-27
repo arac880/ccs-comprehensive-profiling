@@ -15,7 +15,7 @@ const facultySchema = new mongoose.Schema(
       default: "Faculty",
     },
     firstName: { type: String, required: true },
-    middleInitial: { type: String },
+    middleName: { type: String },
     lastName: { type: String, required: true },
     birthdate: { type: String },
     gender: { type: String },
