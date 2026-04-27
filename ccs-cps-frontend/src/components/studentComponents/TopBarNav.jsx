@@ -17,36 +17,17 @@ import {
 } from "react-icons/fa6";
 import LogoutModal from "../LogoutModal";
 
-let socket;
-const getSocket = () => {
-  if (!socket) {
-    socket = io("http://localhost:5000", {
-      transports: ["websocket", "polling"], // ← add this
-    });
-  }
-  return socket;
-};
+let _socket = null;
 
-const user = JSON.parse(localStorage.getItem("user") || "{}");
-const userId = user?._id || user?.id;
-if (userId) {
-  const sock = getSocket();
-  sock.on("connect", () => {
-    sock.emit("join", userId);
-    console.log("✅ Socket connected and joined:", userId);
-  });
-  if (sock.connected) {
-    sock.emit("join", userId);
-  }
-}
-
-export default function TopNavBar({ onSignOut, onMenuClick }) {
+export default function TopBarNav({ onSignOut, onMenuClick }) {
   const navigate = useNavigate();
   const [showLogout, setShowLogout] = useState(false);
   const [showNotif, setShowNotif] = useState(false);
   const [notifs, setNotifs] = useState(() => {
     try {
-      const saved = localStorage.getItem("student_notifs");
+      const user = JSON.parse(localStorage.getItem("user"));
+      const userId = user?._id;
+      const saved = localStorage.getItem(`student_notifs_${userId}`); // ← per user key
       return saved ? JSON.parse(saved) : [];
     } catch {
       return [];
@@ -57,32 +38,15 @@ export default function TopNavBar({ onSignOut, onMenuClick }) {
   useEffect(() => {
     const syncNotifs = () => {
       try {
-        const saved = localStorage.getItem("student_notifs");
+        const user = JSON.parse(localStorage.getItem("user"));
+        const userId = user?._id;
+        const saved = localStorage.getItem(`student_notifs_${userId}`);
         setNotifs(saved ? JSON.parse(saved) : []);
       } catch {}
     };
 
     window.addEventListener("notifs-updated", syncNotifs);
     return () => window.removeEventListener("notifs-updated", syncNotifs);
-  }, []);
-
-  useEffect(() => {
-    const sock = getSocket();
-
-    const handleNotification = (notif) => {
-      console.log("🔔 GOT NOTIFICATION:", notif);
-      setNotifs((prev) => {
-        const updated = [notif, ...prev];
-        localStorage.setItem("student_notifs", JSON.stringify(updated));
-        window.dispatchEvent(new Event("notifs-updated"));
-        return updated;
-      });
-    };
-
-    sock.on("notification", handleNotification);
-
-    // ✅ only remove listener, never disconnect
-    return () => sock.off("notification", handleNotification);
   }, []);
 
   useEffect(() => {
@@ -115,16 +79,20 @@ export default function TopNavBar({ onSignOut, onMenuClick }) {
   const unreadCount = notifs.filter((n) => !n.read).length;
 
   const markAllAsRead = () => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    const userId = user?._id; // ← add
     const updated = notifs.map((n) => ({ ...n, read: true }));
     setNotifs(updated);
-    localStorage.setItem("student_notifs", JSON.stringify(updated));
+    localStorage.setItem(`student_notifs_${userId}`, JSON.stringify(updated)); // ← per user key
     window.dispatchEvent(new Event("notifs-updated"));
   };
 
   const markOneRead = (id) => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    const userId = user?._id; //
     setNotifs((prev) => {
       const updated = prev.map((n) => (n.id === id ? { ...n, read: true } : n));
-      localStorage.setItem("student_notifs", JSON.stringify(updated));
+      localStorage.setItem(`student_notifs_${userId}`, JSON.stringify(updated)); // ← per user key
       window.dispatchEvent(new Event("notifs-updated"));
       return updated;
     });
@@ -135,15 +103,61 @@ export default function TopNavBar({ onSignOut, onMenuClick }) {
     onMenuClick?.(e);
   };
 
+  const socketRef = useRef(null);
+
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    const userId = user?._id;
+    if (!userId) return;
+
+    // ← Kung may existing socket na, disconnect muna
+    if (_socket) {
+      _socket.off("notification");
+      _socket.disconnect();
+      _socket = null;
+    }
+
+    const sock = io("http://localhost:5000", {
+      transports: ["websocket", "polling"],
+      reconnection: true,
+      reconnectionAttempts: 5,
+      reconnectionDelay: 1000,
+    });
+
+    _socket = sock;
+
+    sock.on("connect", () => {
+      sock.emit("join", userId);
+      console.log("✅ Socket connected and joined:", userId);
+    });
+
+    sock.on("notification", (notif) => {
+      console.log("🔔 GOT NOTIFICATION:", notif);
+      setNotifs((prev) => {
+        // ← Prevent duplicate — check kung same id na existing
+        if (prev.some((n) => n.id === notif.id)) return prev;
+        const updated = [notif, ...prev];
+        localStorage.setItem(
+          `student_notifs_${userId}`,
+          JSON.stringify(updated),
+        );
+        window.dispatchEvent(new Event("notifs-updated"));
+        return updated;
+      });
+    });
+
+    return () => {
+      sock.off("notification");
+    };
+  }, []);
+
   const handleLogout = () => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    const userId = user?._id;
     localStorage.removeItem("user");
     localStorage.removeItem("token");
-    // localStorage.removeItem("student_notifs");/
-
-    if (socket) {
-      socket.disconnect();
-      socket = null;
-    }
+    // for removing the notification when its logout( for testing)
+    // localStorage.removeItem(`student_notifs_${userId}`);
 
     navigate("/login");
   };
