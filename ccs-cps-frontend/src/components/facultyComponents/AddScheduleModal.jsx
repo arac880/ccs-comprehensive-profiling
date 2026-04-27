@@ -590,7 +590,7 @@ const AddScheduleModal = ({ onClose, onSave, onSaveError }) => {
                             fontSize: 12,
                           }}
                         >
-                          {isUnavailable ? `⛔ ${t}` : t}
+                          {isUnavailable ? ` ${t}` : t}
                         </option>
                       );
                     });
