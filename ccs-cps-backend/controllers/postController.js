@@ -1,8 +1,29 @@
-// controllers/postController.js
 const { getDB } = require("../config/db");
 const { ObjectId } = require("mongodb");
+const multer = require("multer");
+const path = require("path");
+const fs = require("fs");
 
-// ── Helper ────────────────────────────────────────────────
+// ───────────────── UPLOAD SETUP ─────────────────
+const uploadDir = path.join(__dirname, "../uploads/posts");
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+const storage = multer.diskStorage({
+  destination: (_req, _file, cb) => cb(null, uploadDir),
+  filename: (_req, file, cb) => {
+    const unique = `${Date.now()}-${Math.floor(Math.random() * 1e9)}`;
+    cb(null, unique + path.extname(file.originalname));
+  },
+});
+
+const upload = multer({
+  storage,
+  limits: { fileSize: 50 * 1024 * 1024 },
+});
+
+// ───────────────── HELPERS ─────────────────
 const toObjectId = (id) => {
   try {
     return new ObjectId(id);
@@ -11,169 +32,178 @@ const toObjectId = (id) => {
   }
 };
 
-// ── GET /api/posts/:subjectId ─────────────────────────────
-// Fetch all posts for a specific subject (schedule entry)
+// ───────────────── GET BY SUBJECT ─────────────────
 const getPostsBySubject = async (req, res) => {
   try {
-    const db        = getDB();
-    const subjectId = req.params.subjectId;
-
-    console.log("GET posts for subjectId:", subjectId);
-
-    const objId = toObjectId(subjectId);
-
-    // Query both ObjectId and string forms
-    const query = objId
-      ? { $or: [{ subjectId: objId }, { subjectId: subjectId }] }
-      : { subjectId: subjectId };
+    const db = getDB();
 
     const posts = await db
       .collection("posts")
-      .find(query)
+      .find({ subjectId: req.params.subjectId })
       .sort({ createdAt: -1 })
       .toArray();
 
     res.json(posts);
   } catch (err) {
-    console.error("❌ getPostsBySubject error:", err);
-    res.status(500).json({ message: "Server error.", error: err.message });
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
-// ── POST /api/posts ───────────────────────────────────────
-// Create a new post
+// ───────────────── GET SINGLE POST ─────────────────
+const getPostById = async (req, res) => {
+  try {
+    const db = getDB();
+    const id = toObjectId(req.params.id);
+
+    if (!id) return res.status(400).json({ message: "Invalid ID" });
+
+    const post = await db.collection("posts").findOne({ _id: id });
+
+    if (!post) return res.status(404).json({ message: "Not found" });
+
+    res.json(post);
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// ───────────────── CREATE POST ─────────────────
 const createPost = async (req, res) => {
   try {
-    const db   = getDB();
+    const db = getDB();
     const body = req.body;
 
-    console.log("Creating post:", JSON.stringify(body, null, 2));
-
-    if (!body.title?.trim() || !body.content?.trim()) {
-      return res.status(400).json({ message: "Title and content are required." });
+    if (!body.title || !body.content) {
+      return res.status(400).json({ message: "Missing fields" });
     }
 
-    if (!body.subjectId) {
-      return res.status(400).json({ message: "subjectId is required." });
-    }
-
-    // Store subjectId as ObjectId if valid, else string
-    const subjectObjId = toObjectId(body.subjectId);
+    const attachments = (req.files || []).map((f) => ({
+      name: f.originalname,
+      url: `/uploads/posts/${f.filename}`,
+      size: `${(f.size / 1024).toFixed(0)} KB`,
+    }));
 
     const doc = {
-      title:       body.title.trim(),
-      content:     body.content.trim(),
-      type:        body.type ?? "announcement",
-      subjectId:   subjectObjId ?? body.subjectId,
-      author:      body.author ?? "Instructor",
-      attachments: Array.isArray(body.attachments) ? body.attachments : [],
-      likes:       0,
-      createdAt:   new Date(),
-      updatedAt:   new Date(),
+      title: body.title,
+      content: body.content,
+      type: body.type || "announcement",
+      subjectId: body.subjectId,
+
+      // ✅ AUTHOR FIXED
+      author: body.author || "Unknown",
+
+      attachments,
+      likes: 0,
+      createdAt: new Date(),
+      updatedAt: new Date(),
     };
 
     const result = await db.collection("posts").insertOne(doc);
 
-    const saved = { ...doc, _id: result.insertedId };
-
-    console.log("Post created:", result.insertedId);
-    res.status(201).json(saved);
+    res.status(201).json({ ...doc, _id: result.insertedId });
   } catch (err) {
-    console.error("createPost error:", err);
-    res.status(500).json({ message: "Server error.", error: err.message });
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
-// ── PUT /api/posts/:id ────────────────────────────────────
-// Update a post (title, content, type)
+// ───────────────── UPDATE POST (FIXED 100%) ─────────────────
 const updatePost = async (req, res) => {
   try {
-    const db  = getDB();
-    const id  = req.params.id;
-    const objId = toObjectId(id);
+    const db = getDB();
+    const id = toObjectId(req.params.id);
 
-    if (!objId) {
-      return res.status(400).json({ message: "Invalid post ID." });
-    }
+    if (!id) return res.status(400).json({ message: "Invalid ID" });
 
     const body = req.body;
-    const updates = {};
 
-    if (body.title)   updates.title   = body.title.trim();
-    if (body.content) updates.content = body.content.trim();
-    if (body.type)    updates.type    = body.type;
-    updates.updatedAt = new Date();
-
-    const result = await db.collection("posts").findOneAndUpdate(
-      { _id: objId },
-      { $set: updates },
-      { returnDocument: "after" },
-    );
-
-    if (!result) {
-      return res.status(404).json({ message: "Post not found." });
+    // keep existing attachments
+    let kept = [];
+    if (body.keepAttachments) {
+      try {
+        kept = JSON.parse(body.keepAttachments);
+      } catch {
+        kept = [];
+      }
     }
 
-    console.log("Post updated:", id);
-    res.json(result);
+    // new uploaded files
+    const newFiles = (req.files || []).map((f) => ({
+      name: f.originalname,
+      url: `/uploads/posts/${f.filename}`,
+      size: `${(f.size / 1024).toFixed(0)} KB`,
+    }));
+
+    const updates = {
+      title: body.title,
+      content: body.content,
+
+      // ✅ AUTHOR FIXED
+      author: body.author || "Unknown",
+
+      attachments: [...kept, ...newFiles],
+      updatedAt: new Date(),
+    };
+
+    // ✅ SAFE UPDATE (NO result.value bug)
+    await db.collection("posts").updateOne({ _id: id }, { $set: updates });
+
+    const updated = await db.collection("posts").findOne({ _id: id });
+
+    if (!updated) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+
+    res.json(updated);
   } catch (err) {
-    console.error("❌ updatePost error:", err);
-    res.status(500).json({ message: "Server error.", error: err.message });
+    console.error("UPDATE ERROR:", err);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
-// ── DELETE /api/posts/:id ─────────────────────────────────
-// Delete a post by its _id
+// ───────────────── DELETE POST ─────────────────
 const deletePost = async (req, res) => {
   try {
-    const db    = getDB();
-    const id    = req.params.id;
-    const objId = toObjectId(id);
+    const db = getDB();
+    const id = toObjectId(req.params.id);
 
-    if (!objId) {
-      return res.status(400).json({ message: "Invalid post ID." });
-    }
+    if (!id) return res.status(400).json({ message: "Invalid ID" });
 
-    const result = await db.collection("posts").deleteOne({ _id: objId });
+    await db.collection("posts").deleteOne({ _id: id });
 
-    if (result.deletedCount === 0) {
-      return res.status(404).json({ message: "Post not found." });
-    }
-
-    console.log("Post deleted:", id);
-    res.json({ message: "Post deleted successfully.", id });
+    res.json({ message: "Deleted successfully" });
   } catch (err) {
-    console.error("❌ deletePost error:", err);
-    res.status(500).json({ message: "Server error.", error: err.message });
+    res.status(500).json({ message: "Server error" });
   }
 };
 
-// ── PATCH /api/posts/:id/like ─────────────────────────────
-// Increment likes on a post
+// ───────────────── LIKE POST ─────────────────
 const likePost = async (req, res) => {
   try {
-    const db    = getDB();
-    const objId = toObjectId(req.params.id);
+    const db = getDB();
+    const id = toObjectId(req.params.id);
 
-    if (!objId) {
-      return res.status(400).json({ message: "Invalid post ID." });
-    }
+    const result = await db
+      .collection("posts")
+      .findOneAndUpdate(
+        { _id: id },
+        { $inc: { likes: 1 } },
+        { returnDocument: "after" },
+      );
 
-    const result = await db.collection("posts").findOneAndUpdate(
-      { _id: objId },
-      { $inc: { likes: 1 }, $set: { updatedAt: new Date() } },
-      { returnDocument: "after" },
-    );
-
-    if (!result) {
-      return res.status(404).json({ message: "Post not found." });
-    }
-
-    res.json({ likes: result.likes });
+    res.json(result.value);
   } catch (err) {
-    console.error("likePost error:", err);
-    res.status(500).json({ message: "Server error.", error: err.message });
+    res.status(500).json({ message: "Server error" });
   }
 };
 
-module.exports = { getPostsBySubject, createPost, updatePost, deletePost, likePost };
+module.exports = {
+  upload,
+  getPostsBySubject,
+  getPostById,
+  createPost,
+  updatePost,
+  deletePost,
+  likePost,
+};

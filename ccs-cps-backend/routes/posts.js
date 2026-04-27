@@ -1,35 +1,27 @@
-// routes/posts.js
 const express = require("express");
-const router  = express.Router();
+const router = express.Router();
+
 const {
+  upload,
   getPostsBySubject,
+  getPostById,
   createPost,
   updatePost,
   deletePost,
   likePost,
 } = require("../controllers/postController");
 
-// ── Health check ──────────────────────────────────────────
-// GET /api/posts/ping → { ok: true }
-router.get("/ping", (_req, res) => {
-  res.json({ ok: true, message: "Posts router is alive ✅" });
-});
+router.get("/ping", (_req, res) =>
+  res.json({ ok: true, message: "Posts API OK ✅" }),
+);
 
-// ── CRUD ──────────────────────────────────────────────────
+router.get("/subject/:subjectId", getPostsBySubject);
+router.get("/:id", getPostById);
 
-// GET  /api/posts/:subjectId  — all posts for a subject
-router.get("/:subjectId", getPostsBySubject);
+router.post("/", upload.array("attachments", 20), createPost);
+router.put("/:id", upload.array("attachments", 20), updatePost);
 
-// POST /api/posts             — create new post
-router.post("/", createPost);
-
-// PUT  /api/posts/:id         — update a post
-router.put("/:id", updatePost);
-
-// DELETE /api/posts/:id       — delete a post
 router.delete("/:id", deletePost);
-
-// PATCH /api/posts/:id/like   — like a post
 router.patch("/:id/like", likePost);
 
 module.exports = router;

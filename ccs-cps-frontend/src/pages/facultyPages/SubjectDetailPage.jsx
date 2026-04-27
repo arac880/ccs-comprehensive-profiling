@@ -1,5 +1,5 @@
 // pages/facultyPages/SubjectDetailPage.jsx
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import styles from "../../pages/facultyPages/facultyStyles/SubjectDetail.module.css";
 import {
   FiArrowLeft,
@@ -11,9 +11,6 @@ import {
   FiBook,
   FiCheckSquare,
   FiPaperclip,
-  FiHeart,
-  FiMessageSquare,
-  FiShare2,
   FiTrash2,
   FiFileText,
   FiImage,
@@ -21,10 +18,17 @@ import {
   FiBell,
   FiActivity,
   FiBookOpen,
-  FiFolder,
   FiCalendar,
   FiLayers,
   FiEdit2,
+  FiDownload,
+  FiX,
+  FiSend,
+  FiStar,
+  FiMessageCircle,
+  FiChevronDown,
+  FiChevronUp,
+  FiAlertTriangle,
 } from "react-icons/fi";
 import AppToast from "../../components/ui/AppToast";
 
@@ -48,11 +52,11 @@ const getUser = () => {
 };
 
 const getFileIcon = (name = "") => {
-  const ext = name.split(".").pop()?.toLowerCase();
+  const ext = (name || "").split(".").pop()?.toLowerCase();
   if (ext === "pdf") return <FiFileText style={{ color: "#c0390a" }} />;
   if (["doc", "docx"].includes(ext))
     return <FiFileText style={{ color: "#185fa5" }} />;
-  if (["jpg", "jpeg", "png", "gif"].includes(ext))
+  if (["jpg", "jpeg", "png", "gif", "webp"].includes(ext))
     return <FiImage style={{ color: "#b45309" }} />;
   return <FiFile style={{ color: "#6b5a4e" }} />;
 };
@@ -66,6 +70,24 @@ const formatTime = (date) => {
     month: "short",
     day: "numeric",
   });
+};
+
+const formatDueDate = (date) => {
+  if (!date) return null;
+  const d = new Date(date);
+  const now = new Date();
+  const diff = d - now;
+  return {
+    formatted: d.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    }),
+    isOverdue: diff < 0,
+    diff,
+  };
 };
 
 const POST_TYPES = [
@@ -87,9 +109,427 @@ const POST_TYPES = [
     icon: () => <FiBookOpen size={13} />,
     badge: "badgeLesson",
   },
-
 ];
 
+// ─────────────────────────────────────────────────────────────────────────────
+// SubmissionBin — shown inside activity posts
+// ─────────────────────────────────────────────────────────────────────────────
+const SubmissionBin = ({ post, user, userRole, showToast }) => {
+  const isStudent = userRole === "student";
+  const isFaculty = ["dean", "chair", "faculty"].includes(userRole);
+
+  const [mySubmission, setMySubmission] = useState(null);
+  const [allSubmissions, setAllSubmissions] = useState([]);
+  const [loadingSub, setLoadingSub] = useState(true);
+  const [uploading, setUploading] = useState(false);
+  const [expanded, setExpanded] = useState(false);
+  const [gradingId, setGradingId] = useState(null);
+  const [gradeForm, setGradeForm] = useState({ grade: "", feedback: "" });
+  const [submittingGrade, setSubmittingGrade] = useState(false);
+  const [dragging, setDragging] = useState(false);
+  const fileRef = useRef();
+
+  const studentId = user?.studentId ?? user?._id ?? user?.id ?? "";
+  const studentName = user ? `${user.firstName} ${user.lastName}` : "Student";
+
+  const fetchData = useCallback(async () => {
+    if (!post?._id) return;
+    setLoadingSub(true);
+    try {
+      if (isStudent && studentId) {
+        const res = await fetch(
+          `${API}/api/submissions/student/${studentId}/post/${post._id}`,
+        );
+        const data = await res.json();
+        setMySubmission(data);
+      }
+      if (isFaculty) {
+        const res = await fetch(`${API}/api/submissions/post/${post._id}`);
+        const data = await res.json();
+        setAllSubmissions(Array.isArray(data) ? data : []);
+      }
+    } catch {
+      /* silent */
+    } finally {
+      setLoadingSub(false);
+    }
+  }, [post?._id, isStudent, isFaculty, studentId]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  const handleUpload = async (files) => {
+    if (!files?.length) return;
+    if (!studentId) {
+      showToast("Student ID not found. Please log in again.", "error");
+      return;
+    }
+
+    setUploading(true);
+    const fd = new FormData();
+    fd.append("postId", post._id);
+    fd.append("studentId", studentId);
+    fd.append("studentName", studentName);
+    Array.from(files).forEach((f) => fd.append("files", f));
+
+    try {
+      const res = await fetch(`${API}/api/submissions`, {
+        method: "POST",
+        body: fd,
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message || "Upload failed");
+      }
+      setMySubmission(await res.json());
+      showToast("Files submitted successfully!", "success");
+    } catch (err) {
+      showToast(err.message || "Failed to submit files.", "error");
+    } finally {
+      setUploading(false);
+      if (fileRef.current) fileRef.current.value = "";
+    }
+  };
+
+  const handleRemoveFile = async (fileIndex) => {
+    if (!mySubmission?._id) return;
+    try {
+      const res = await fetch(
+        `${API}/api/submissions/${mySubmission._id}/file/${fileIndex}`,
+        { method: "DELETE" },
+      );
+      if (!res.ok) throw new Error();
+      setMySubmission(await res.json());
+      showToast("File removed.", "info");
+    } catch {
+      showToast("Failed to remove file.", "error");
+    }
+  };
+
+  const onDragOver = (e) => {
+    e.preventDefault();
+    setDragging(true);
+  };
+  const onDragLeave = () => setDragging(false);
+  const onDrop = (e) => {
+    e.preventDefault();
+    setDragging(false);
+    handleUpload(e.dataTransfer.files);
+  };
+
+  const handleGrade = async () => {
+    if (!gradingId) return;
+    setSubmittingGrade(true);
+    try {
+      const res = await fetch(`${API}/api/submissions/${gradingId}/grade`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(gradeForm),
+      });
+      if (!res.ok) throw new Error();
+      const updated = await res.json();
+      setAllSubmissions((prev) =>
+        prev.map((s) => (s._id === updated._id ? updated : s)),
+      );
+      setGradingId(null);
+      setGradeForm({ grade: "", feedback: "" });
+      showToast("Grade saved!", "success");
+    } catch {
+      showToast("Failed to save grade.", "error");
+    } finally {
+      setSubmittingGrade(false);
+    }
+  };
+
+  const due = formatDueDate(post.dueDate);
+
+  // ── Student view ──────────────────────────────────────────
+  if (isStudent) {
+    const hasSubmitted = mySubmission && mySubmission.files?.length > 0;
+    const isGraded = mySubmission?.status === "graded";
+
+    return (
+      <div className={styles.submissionBin}>
+        {due && (
+          <div
+            className={`${styles.dueBanner} ${due.isOverdue ? styles.dueBannerOverdue : ""}`}
+          >
+            <FiAlertTriangle size={13} />
+            {due.isOverdue ? "Overdue — " : "Due: "}
+            <strong>{due.formatted}</strong>
+          </div>
+        )}
+
+        <div className={styles.submissionBinTitle}>
+          <FiSend size={14} /> Your Submission
+        </div>
+
+        {loadingSub ? (
+          <div className={styles.subLoading}>Loading submission…</div>
+        ) : (
+          <>
+            {isGraded && (
+              <div className={styles.gradeDisplay}>
+                <div className={styles.gradeScore}>
+                  <FiStar size={14} style={{ color: "#f59e0b" }} />
+                  Grade: <strong>{mySubmission.grade ?? "—"}</strong>
+                </div>
+                {mySubmission.feedback && (
+                  <div className={styles.gradeFeedback}>
+                    <FiMessageCircle size={12} /> {mySubmission.feedback}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {hasSubmitted && (
+              <div className={styles.submittedFiles}>
+                {mySubmission.files.map((f, i) => (
+                  <div key={i} className={styles.submittedFile}>
+                    <span className={styles.attachmentIcon}>
+                      {getFileIcon(f.originalName)}
+                    </span>
+                    <span className={styles.submittedFileName}>
+                      {f.originalName}
+                    </span>
+                    <span className={styles.submittedFileSize}>{f.size}</span>
+                    <a
+                      href={`${API}${f.url}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className={styles.fileActionBtn}
+                      title="Download"
+                    >
+                      <FiDownload size={13} />
+                    </a>
+                    {!isGraded && (
+                      <button
+                        className={styles.fileActionBtn}
+                        onClick={() => handleRemoveFile(i)}
+                        title="Remove"
+                      >
+                        <FiX size={13} />
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {!isGraded && !(due?.isOverdue && !hasSubmitted) && (
+              <div
+                className={`${styles.dropZone} ${dragging ? styles.dropZoneActive : ""}`}
+                onDragOver={onDragOver}
+                onDragLeave={onDragLeave}
+                onDrop={onDrop}
+                onClick={() => fileRef.current?.click()}
+              >
+                <input
+                  ref={fileRef}
+                  type="file"
+                  multiple
+                  style={{ display: "none" }}
+                  onChange={(e) => handleUpload(e.target.files)}
+                />
+                {uploading ? (
+                  <div className={styles.subLoading}>
+                    <div className={styles.spinner} /> Uploading…
+                  </div>
+                ) : (
+                  <>
+                    <FiUpload size={22} className={styles.dropZoneIcon} />
+                    <div className={styles.dropZoneText}>
+                      {hasSubmitted
+                        ? "Add more files"
+                        : "Click or drag files here to submit"}
+                    </div>
+                    <div className={styles.dropZoneHint}>
+                      PDF, DOCX, images, ZIP — max 50 MB each
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
+
+            {due?.isOverdue && !hasSubmitted && (
+              <div className={styles.overdueNote}>
+                Submission deadline has passed.
+              </div>
+            )}
+            {!hasSubmitted && !due?.isOverdue && (
+              <div className={styles.notSubmittedNote}>
+                No files submitted yet.
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    );
+  }
+
+  // ── Faculty view ──────────────────────────────────────────
+  if (isFaculty) {
+    return (
+      <div className={styles.submissionBin}>
+        {due && (
+          <div
+            className={`${styles.dueBanner} ${due.isOverdue ? styles.dueBannerOverdue : ""}`}
+          >
+            <FiAlertTriangle size={13} />
+            {due.isOverdue ? "Overdue — " : "Due: "}
+            <strong>{due.formatted}</strong>
+          </div>
+        )}
+
+        <button
+          className={styles.submissionBinToggle}
+          onClick={() => setExpanded((v) => !v)}
+        >
+          <FiUsers size={13} />
+          {loadingSub
+            ? "Loading…"
+            : `${allSubmissions.length} Submission${allSubmissions.length !== 1 ? "s" : ""}`}
+          {expanded ? <FiChevronUp size={13} /> : <FiChevronDown size={13} />}
+        </button>
+
+        {expanded && (
+          <div className={styles.allSubmissions}>
+            {allSubmissions.length === 0 ? (
+              <div className={styles.notSubmittedNote}>No submissions yet.</div>
+            ) : (
+              allSubmissions.map((sub) => (
+                <div key={sub._id} className={styles.submissionRow}>
+                  <div className={styles.submissionStudentInfo}>
+                    <div className={styles.submissionStudentName}>
+                      {sub.studentName}
+                    </div>
+                    <div className={styles.submissionStudentMeta}>
+                      {sub.files.length} file{sub.files.length !== 1 ? "s" : ""}{" "}
+                      ·{" "}
+                      {new Date(sub.submittedAt).toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}{" "}
+                      ·{" "}
+                      <span
+                        className={`${styles.subStatus} ${styles[`subStatus_${sub.status}`]}`}
+                      >
+                        {sub.status}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div
+                    className={styles.submittedFiles}
+                    style={{ marginBottom: 8 }}
+                  >
+                    {sub.files.map((f, i) => (
+                      <div key={i} className={styles.submittedFile}>
+                        <span className={styles.attachmentIcon}>
+                          {getFileIcon(f.originalName)}
+                        </span>
+                        <span className={styles.submittedFileName}>
+                          {f.originalName}
+                        </span>
+                        <span className={styles.submittedFileSize}>
+                          {f.size}
+                        </span>
+                        <a
+                          href={`${API}${f.url}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className={styles.fileActionBtn}
+                          title="Download"
+                        >
+                          <FiDownload size={13} />
+                        </a>
+                      </div>
+                    ))}
+                  </div>
+
+                  {gradingId === sub._id ? (
+                    <div className={styles.gradeForm}>
+                      <input
+                        className={styles.gradeInput}
+                        placeholder="Grade (e.g. 95/100)"
+                        value={gradeForm.grade}
+                        onChange={(e) =>
+                          setGradeForm((f) => ({ ...f, grade: e.target.value }))
+                        }
+                      />
+                      <textarea
+                        className={styles.gradeFeedbackInput}
+                        placeholder="Feedback (optional)"
+                        value={gradeForm.feedback}
+                        onChange={(e) =>
+                          setGradeForm((f) => ({
+                            ...f,
+                            feedback: e.target.value,
+                          }))
+                        }
+                      />
+                      <div style={{ display: "flex", gap: 8 }}>
+                        <button
+                          className={styles.btnPrimary}
+                          style={{ fontSize: 12, padding: "6px 14px" }}
+                          onClick={handleGrade}
+                          disabled={submittingGrade}
+                        >
+                          {submittingGrade ? "Saving…" : "Save Grade"}
+                        </button>
+                        <button
+                          className={styles.btnSecondary}
+                          style={{ fontSize: 12, padding: "6px 14px" }}
+                          onClick={() => {
+                            setGradingId(null);
+                            setGradeForm({ grade: "", feedback: "" });
+                          }}
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div
+                      style={{ display: "flex", alignItems: "center", gap: 10 }}
+                    >
+                      {sub.grade && (
+                        <span className={styles.gradeTag}>
+                          <FiStar size={11} /> {sub.grade}
+                        </span>
+                      )}
+                      <button
+                        className={styles.gradeBtn}
+                        onClick={() => {
+                          setGradingId(sub._id);
+                          setGradeForm({
+                            grade: sub.grade ?? "",
+                            feedback: sub.feedback ?? "",
+                          });
+                        }}
+                      >
+                        {sub.grade ? "Edit Grade" : "Grade"}
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ))
+            )}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  return null;
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Main Page
+// ─────────────────────────────────────────────────────────────────────────────
 const SubjectDetailPage = ({ cls, onBack }) => {
   const userRole = getUserRole();
   const user = getUser();
@@ -108,8 +548,11 @@ const SubjectDetailPage = ({ cls, onBack }) => {
   const [filter, setFilter] = useState("all");
   const [showModal, setShowModal] = useState(false);
   const [activeTab, setActiveTab] = useState("announcement");
-  const [form, setForm] = useState({ title: "", content: "" });
+  const [form, setForm] = useState({ title: "", content: "", dueDate: "" });
+
+  // attachments now stores objects with { name, size, file? (File object for new), url? (for existing) }
   const [attachments, setAttachments] = useState([]);
+
   const [submitting, setSubmitting] = useState(false);
   const [editingPost, setEditingPost] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
@@ -127,24 +570,24 @@ const SubjectDetailPage = ({ cls, onBack }) => {
     setToast({ isVisible: true, message, type });
   const closeToast = () => setToast((t) => ({ ...t, isVisible: false }));
 
-  // ── Fetch posts ─────────────────────────────────────────────────────────────
+  // ── Fetch posts ───────────────────────────────────────────
   useEffect(() => {
     if (!cls?._id) {
       setLoading(false);
       return;
     }
     setLoading(true);
-    fetch(`${API}/api/posts/${cls._id}`)
-      .then((r) => {
-        if (!r.ok) throw new Error();
-        return r.json();
-      })
-      .then((d) => setPosts(Array.isArray(d) ? d : []))
-      .catch(() => showToast("Failed to load posts.", "error"))
-      .finally(() => setLoading(false));
+   fetch(`${API}/api/posts/subject/${cls._id}`)
+     .then((r) => {
+       if (!r.ok) throw new Error();
+       return r.json();
+     })
+     .then((d) => setPosts(Array.isArray(d) ? d : []))
+     .catch(() => showToast("Failed to load posts.", "error"))
+     .finally(() => setLoading(false));
   }, [cls?._id]);
 
-  // ── Fetch students (only for non-student roles) ─────────────────────────────
+  // ── Fetch students ─────────────────────────────────────────
   useEffect(() => {
     if (userRole === "student") {
       setLoadingStudents(false);
@@ -154,36 +597,47 @@ const SubjectDetailPage = ({ cls, onBack }) => {
       setLoadingStudents(false);
       return;
     }
-
     setLoadingStudents(true);
     const params = new URLSearchParams({
       section: cls.section,
       program: cls.program,
       year: cls.year,
     });
-
-    fetch(`${API}/api/students?${params.toString()}`)
+    fetch(`${API}/api/students?${params}`)
       .then((r) => {
-        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        if (!r.ok) throw new Error();
         return r.json();
       })
-      .then((data) =>
-        setStudents(Array.isArray(data) ? data : (data.students ?? [])),
-      )
+      .then((d) => setStudents(Array.isArray(d) ? d : (d.students ?? [])))
       .catch(() => setStudents([]))
       .finally(() => setLoadingStudents(false));
   }, [cls?.section, cls?.program, cls?.year, userRole]);
 
-  // ── Modal helpers ───────────────────────────────────────────────────────────
+  // ── Modal open ─────────────────────────────────────────────
   const openModal = (tab = "announcement", postToEdit = null) => {
     setActiveTab(tab);
     if (postToEdit) {
       setEditingPost(postToEdit);
-      setForm({ title: postToEdit.title, content: postToEdit.content });
-      setAttachments(postToEdit.attachments ?? []);
+      setForm({
+        title: postToEdit.title,
+        content: postToEdit.content,
+        dueDate: postToEdit.dueDate
+          ? new Date(postToEdit.dueDate).toISOString().slice(0, 16)
+          : "",
+      });
+      // Load existing attachments as "kept" (no File object)
+      setAttachments(
+        (postToEdit.attachments ?? []).map((a) => ({
+          name: a.name,
+          size: a.size,
+          url: a.url,
+          storedName: a.storedName,
+          isExisting: true,
+        })),
+      );
     } else {
       setEditingPost(null);
-      setForm({ title: "", content: "" });
+      setForm({ title: "", content: "", dueDate: "" });
       setAttachments([]);
     }
     setShowModal(true);
@@ -192,56 +646,73 @@ const SubjectDetailPage = ({ cls, onBack }) => {
   const closeModal = () => {
     setShowModal(false);
     setEditingPost(null);
-    setForm({ title: "", content: "" });
+    setForm({ title: "", content: "", dueDate: "" });
     setAttachments([]);
   };
 
+  // ── File picker for post attachments ───────────────────────
   const handleFileChange = (e) => {
-    setAttachments((prev) => [
-      ...prev,
-      ...Array.from(e.target.files).map((f) => ({
-        name: f.name,
-        size: `${(f.size / 1024).toFixed(0)} KB`,
-        file: f,
-      })),
-    ]);
+    const newFiles = Array.from(e.target.files).map((f) => ({
+      name: f.name,
+      size: `${(f.size / 1024).toFixed(0)} KB`,
+      file: f, // actual File object — will be sent via FormData
+      isExisting: false,
+    }));
+    setAttachments((prev) => [...prev, ...newFiles]);
     e.target.value = "";
   };
 
-  // ── Submit ──────────────────────────────────────────────────────────────────
+  // ── Submit post (FormData, supports real file upload) ──────
   const handleSubmit = async () => {
     if (!form.title.trim() || !form.content.trim()) return;
     setSubmitting(true);
-    const payload = {
-      title: form.title.trim(),
-      content: form.content.trim(),
-      type: activeTab,
-      subjectId: cls?._id,
-      author: authorName,
-      attachments: attachments.map(({ name, size }) => ({ name, size })),
-    };
+
     try {
+      const fd = new FormData();
+      fd.append("title", form.title.trim());
+      fd.append("content", form.content.trim());
+      fd.append("type", activeTab);
+      fd.append("subjectId", cls?._id);
+      fd.append("author", authorName);
+
+      if (activeTab === "activity" && form.dueDate) {
+        fd.append("dueDate", form.dueDate);
+      }
+
+      // Existing attachments to keep (no File object)
+      const kept = attachments
+        .filter((a) => a.isExisting)
+        .map(({ name, size, url, storedName }) => ({
+          name,
+          size,
+          url,
+          storedName,
+        }));
+      fd.append("keepAttachments", JSON.stringify(kept));
+
+      // New files to upload
+      attachments
+        .filter((a) => !a.isExisting && a.file)
+        .forEach((a) => fd.append("attachments", a.file));
+
+      let res;
       if (editingPost) {
-        const res = await fetch(`${API}/api/posts/${editingPost._id}`, {
+        res = await fetch(`${API}/api/posts/${editingPost._id}`, {
           method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
+          body: fd,
         });
-        if (!res.ok) throw new Error();
-        const updated = await res.json();
-        setPosts((prev) =>
-          prev.map((p) => (p._id === updated._id ? updated : p)),
-        );
+      } else {
+        res = await fetch(`${API}/api/posts`, { method: "POST", body: fd });
+      }
+
+      if (!res.ok) throw new Error();
+      const saved = await res.json();
+
+      if (editingPost) {
+        setPosts((prev) => prev.map((p) => (p._id === saved._id ? saved : p)));
         showToast("Post updated successfully!", "success");
       } else {
-        const res = await fetch(`${API}/api/posts`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
-        if (!res.ok) throw new Error();
-        const newPost = await res.json();
-        setPosts((prev) => [newPost, ...prev]);
+        setPosts((prev) => [saved, ...prev]);
         showToast("Post published!", "success");
       }
       closeModal();
@@ -252,7 +723,7 @@ const SubjectDetailPage = ({ cls, onBack }) => {
     }
   };
 
-  // ── Delete ──────────────────────────────────────────────────────────────────
+  // ── Delete post ────────────────────────────────────────────
   const handleDelete = async () => {
     if (!deletingId) return;
     try {
@@ -269,8 +740,6 @@ const SubjectDetailPage = ({ cls, onBack }) => {
     }
   };
 
-
-
   const filtered =
     filter === "all" ? posts : posts.filter((p) => p.type === filter);
 
@@ -283,7 +752,7 @@ const SubjectDetailPage = ({ cls, onBack }) => {
     );
   };
 
-  // ─── Render ──────────────────────────────────────────────────────────────────
+  // ─── Render ───────────────────────────────────────────────
   return (
     <div className={styles.page}>
       {/* Hero */}
@@ -355,7 +824,7 @@ const SubjectDetailPage = ({ cls, onBack }) => {
       {/* Main */}
       <div className={styles.main}>
         <div>
-          {/* Create box — faculty/dean/chair only */}
+          {/* Create box */}
           {canPost && (
             <div className={styles.createBox}>
               <div className={styles.createBoxTop}>
@@ -499,10 +968,31 @@ const SubjectDetailPage = ({ cls, onBack }) => {
                     </div>
                   )}
                 </div>
+
                 <div className={styles.postBody}>
                   <p className={styles.postTitle}>{post.title}</p>
                   <p className={styles.postContent}>{post.content}</p>
                 </div>
+
+                {/* Due date badge */}
+                {post.type === "activity" &&
+                  post.dueDate &&
+                  (() => {
+                    const due = formatDueDate(post.dueDate);
+                    return (
+                      <div
+                        className={`${styles.postDueDateBadge} ${due.isOverdue ? styles.postDueDateBadgeOverdue : ""}`}
+                      >
+                        <FiCalendar size={12} />
+                        Due: {due.formatted}
+                        {due.isOverdue && (
+                          <span className={styles.overdueTag}>Overdue</span>
+                        )}
+                      </div>
+                    );
+                  })()}
+
+                {/* Post attachments (faculty-uploaded files) */}
                 {post.attachments?.length > 0 && (
                   <>
                     <div className={styles.postDivider} />
@@ -512,7 +1002,17 @@ const SubjectDetailPage = ({ cls, onBack }) => {
                         {post.attachments.length > 1 ? "s" : ""}
                       </div>
                       {post.attachments.map((a, i) => (
-                        <span key={i} className={styles.attachmentChip}>
+                        <a
+                          key={i}
+                          href={a.url ? `${API}${a.url}` : undefined}
+                          target="_blank"
+                          rel="noreferrer"
+                          className={styles.attachmentChip}
+                          style={{
+                            textDecoration: "none",
+                            cursor: a.url ? "pointer" : "default",
+                          }}
+                        >
                           <span className={styles.attachmentIcon}>
                             {getFileIcon(a.name)}
                           </span>
@@ -526,18 +1026,36 @@ const SubjectDetailPage = ({ cls, onBack }) => {
                           >
                             {a.size}
                           </span>
-                        </span>
+                          {a.url && (
+                            <FiDownload
+                              size={11}
+                              style={{ marginLeft: 4, color: "#b0a099" }}
+                            />
+                          )}
+                        </a>
                       ))}
                     </div>
                   </>
                 )}
-           
-    </div>         ))}
+
+                {/* Submission Bin for activities */}
+                {post.type === "activity" && (
+                  <>
+                    <div className={styles.postDivider} />
+                    <SubmissionBin
+                      post={post}
+                      user={user}
+                      userRole={userRole}
+                      showToast={showToast}
+                    />
+                  </>
+                )}
+              </div>
+            ))}
         </div>
 
         {/* Sidebar */}
         <div className={styles.sidebar}>
-          {/* Class Schedule */}
           <div className={styles.sideCard}>
             <div className={styles.sideCardHead}>
               <span className={styles.sideCardTitle}>
@@ -565,7 +1083,6 @@ const SubjectDetailPage = ({ cls, onBack }) => {
             </div>
           </div>
 
-          {/* Students — hidden for student role */}
           {userRole !== "student" && (
             <div className={styles.sideCard}>
               <div className={styles.sideCardHead}>
@@ -661,6 +1178,7 @@ const SubjectDetailPage = ({ cls, onBack }) => {
                   </button>
                 ))}
               </div>
+
               <div className={styles.formGroup}>
                 <label className={styles.formLabel}>Title *</label>
                 <input
@@ -672,6 +1190,7 @@ const SubjectDetailPage = ({ cls, onBack }) => {
                   }
                 />
               </div>
+
               <div className={styles.formGroup}>
                 <label className={styles.formLabel}>Content *</label>
                 <textarea
@@ -683,6 +1202,43 @@ const SubjectDetailPage = ({ cls, onBack }) => {
                   }
                 />
               </div>
+
+              {/* Due Date — only for Activity */}
+              {activeTab === "activity" && (
+                <div className={styles.formGroup}>
+                  <label className={styles.formLabel}>
+                    <FiCalendar
+                      size={13}
+                      style={{ marginRight: 5, verticalAlign: "middle" }}
+                    />
+                    Due Date &amp; Time
+                  </label>
+                  <input
+                    type="datetime-local"
+                    className={styles.formInput}
+                    value={form.dueDate}
+                    onChange={(e) =>
+                      setForm((f) => ({ ...f, dueDate: e.target.value }))
+                    }
+                  />
+                  {form.dueDate && (
+                    <div
+                      style={{ fontSize: 12, color: "#b0a099", marginTop: 4 }}
+                    >
+                      Due:{" "}
+                      {new Date(form.dueDate).toLocaleDateString("en-US", {
+                        weekday: "long",
+                        month: "long",
+                        day: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Attachments */}
               <div className={styles.formGroup}>
                 <label className={styles.formLabel}>
                   Attachments (optional)
@@ -697,7 +1253,7 @@ const SubjectDetailPage = ({ cls, onBack }) => {
                   <div className={styles.fileUploadText}>
                     <span>Click to upload</span> or drag and drop
                     <br />
-                    PDF, DOCX, images, and more
+                    PDF, DOCX, images, ZIP, and more
                   </div>
                 </div>
                 <input
@@ -707,12 +1263,26 @@ const SubjectDetailPage = ({ cls, onBack }) => {
                   style={{ display: "none" }}
                   onChange={handleFileChange}
                 />
+
                 {attachments.map((a, i) => (
                   <div key={i} className={styles.attachedFile}>
                     <span className={styles.attachedFileIcon}>
                       {getFileIcon(a.name)}
                     </span>
-                    <span style={{ flex: 1 }}>{a.name}</span>
+                    <span style={{ flex: 1 }}>
+                      {a.name}
+                      {a.isExisting && (
+                        <span
+                          style={{
+                            fontSize: 10,
+                            color: "#b0a099",
+                            marginLeft: 6,
+                          }}
+                        >
+                          (uploaded)
+                        </span>
+                      )}
+                    </span>
                     <span style={{ color: "#b0a099", fontSize: 12 }}>
                       {a.size}
                     </span>
@@ -728,6 +1298,7 @@ const SubjectDetailPage = ({ cls, onBack }) => {
                 ))}
               </div>
             </div>
+
             <div className={styles.modalFooter}>
               <button className={styles.btnSecondary} onClick={closeModal}>
                 Cancel
@@ -798,7 +1369,8 @@ const SubjectDetailPage = ({ cls, onBack }) => {
                 }}
               >
                 ⚠️ This post will be <strong>permanently deleted</strong> and
-                cannot be recovered.
+                cannot be recovered. All student submissions for this activity
+                will also be deleted.
               </div>
             </div>
             <div className={styles.modalFooter}>
