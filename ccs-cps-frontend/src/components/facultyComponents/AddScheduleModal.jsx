@@ -15,7 +15,7 @@ import PROGRAM_DATA from "../../data/programData";
 import styles from "../../pages/facultyPages/facultyStyles/AddScheduleModal.module.css";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
-const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 const TIMES = [
   "7:00 AM",
   "8:00 AM",

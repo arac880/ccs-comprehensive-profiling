@@ -40,6 +40,7 @@ const DAYS = [
   { short: "WED", full: "Wednesday" },
   { short: "THU", full: "Thursday" },
   { short: "FRI", full: "Friday" },
+  { short: "SAT", full: "Saturday" },
 ];
 
 const LEGEND = [
@@ -221,7 +222,7 @@ const FacultySchedule = () => {
               onClick={() => setShowAddModal(true)}
               style={{ marginLeft: 12 }}
             >
-              <FiPlus size={16} /> Add Schedule
+              <FiPlus size={16} /> Create Schedule
             </AppButton>
           )}
         </div>
@@ -366,38 +367,7 @@ const FacultySchedule = () => {
       )}
 
       {/* ── Empty state ── */}
-      {!loading && facultyId && classes.length === 0 && (
-        <div
-          style={{
-            textAlign: "center",
-            padding: "48px 24px",
-            color: "#a8917f",
-          }}
-        >
-          <i
-            className="bi bi-calendar-x"
-            style={{
-              fontSize: 40,
-              display: "block",
-              marginBottom: 10,
-              color: "#fde0cc",
-            }}
-          />
-          <div
-            style={{
-              fontSize: 15,
-              fontWeight: 600,
-              color: "#6b5a4e",
-              marginBottom: 4,
-            }}
-          >
-            No schedules yet
-          </div>
-          <div style={{ fontSize: 13 }}>
-            Click <strong>Add Schedule</strong> to assign your first class.
-          </div>
-        </div>
-      )}
+     
 
       {/* ── Legend ── */}
       <div className={styles.footer}>

@@ -125,7 +125,7 @@
 
 .stickyHeader {
   display: grid;
-  grid-template-columns: var(--time-col) repeat(5, 1fr);
+  grid-template-columns: var(--time-col) repeat(6, 1fr);
   flex-shrink: 0;
   /* Sits on top of the scrollable content */
   position: relative;
