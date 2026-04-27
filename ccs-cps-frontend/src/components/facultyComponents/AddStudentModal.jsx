@@ -10,6 +10,7 @@ import PROGRAM_DATA from "../../data/programData";
 const initialFormState = {
   studentId: "",
   firstName: "",
+  middleName: "",
   lastName: "",
   birthdate: "",
   age: "",
@@ -71,7 +72,7 @@ const AddStudentModal = ({ isOpen, onClose }) => {
     let nextValue = value;
 
     // Restriction: Remove numbers from First and Last Name
-    if (name === "firstName" || name === "lastName") {
+    if (name === "firstName" || name === "middleName" || name === "lastName") {
       nextValue = value.replace(/[0-9]/g, "");
     }
 
@@ -200,6 +201,7 @@ const AddStudentModal = ({ isOpen, onClose }) => {
       const sanitizedData = {
         ...formData,
         firstName: formData.firstName.trim(),
+        middleName: formData.middleName.trim(),
         lastName: formData.lastName.trim(),
         studentId: formData.studentId.trim(),
         email: formData.email.trim(),
@@ -333,6 +335,20 @@ const AddStudentModal = ({ isOpen, onClose }) => {
               <div className={styles.formGroup}>
                 <label>
                   <i className="bi bi-person" style={{ marginRight: "4px" }} />
+                  Middle Name
+                </label>
+                <input
+                  type="text"
+                  name="middleName"
+                  value={formData.middleName}
+                  onChange={handleChange}
+                  placeholder="e.g. Santos"
+                />
+              </div>
+
+              <div className={styles.formGroup}>
+                <label>
+                  <i className="bi bi-person" style={{ marginRight: "4px" }} />
                   Last Name <RequiredMark />
                 </label>
                 <input
@@ -360,12 +376,15 @@ const AddStudentModal = ({ isOpen, onClose }) => {
                   value={formData.birthdate || ""}
                   onChange={handleChange}
                   max={todayString}
-                  onClick={(e) => {
-                    if (e.target.showPicker) e.target.showPicker();
+                  // Change onClick to onFocus with a small check
+                  onFocus={(e) => {
+                    if (e.target.showPicker) {
+                      setTimeout(() => e.target.showPicker(), 10);
+                    }
                   }}
                   style={{
                     borderColor: errors.birthdate ? "#dc3545" : "",
-                    cursor: "pointer",
+                    cursor: "text",
                   }}
                 />
                 <ErrorText message={errors.birthdate} />
@@ -707,6 +726,6 @@ const AddStudentModal = ({ isOpen, onClose }) => {
       />
     </>
   );
-};;
+};
 
 export default AddStudentModal;

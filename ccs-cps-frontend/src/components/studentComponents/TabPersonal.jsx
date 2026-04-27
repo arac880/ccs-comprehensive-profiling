@@ -96,7 +96,7 @@ export default function TabPersonal() {
         action={<EditButton iconOnly onClick={() => setIsEditOpen(true)} />}
       >
         <Field label="First Name" value={student.firstName} />
-        <Field label="Middle Initial" value={student.middleInitial} />
+        <Field label="Middle Name" value={student.middleName} />
         <Field label="Last Name" value={student.lastName} />
         <Field label="Date of Birth" value={student.birthdate} />
         <Field label="Age" value={student.age} />
