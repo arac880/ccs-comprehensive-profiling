@@ -475,7 +475,7 @@ const FacultyStudentProfile = () => {
           >
             <i className="bi bi-arrow-left" /> Back to Student List
           </button>
-          {!isLoading &&
+          {/* {!isLoading &&
             !error &&
             activeTab === "student-info" &&
             !isEditing && (
@@ -488,7 +488,7 @@ const FacultyStudentProfile = () => {
                   Edit Profile
                 </AppButton>
               </div>
-            )}
+            )} */}
         </div>
 
         {isLoading && (
