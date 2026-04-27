@@ -29,16 +29,16 @@ import StudentClearance from "./pages/studentPages/studentClearance";
 import CollegeResearch from "./pages/studentPages/collegeResearch";
 import StudentProfile from "./pages/studentPages/StudentProfile";
 
+import SubjectDetailPage from "./pages/facultyPages/SubjectDetailPage";
+
 function App() {
   return (
     <Router>
       <Routes>
-        {/* Public Routes */}
+        {/* PUBLIC */}
         <Route path="/login" element={<Login />} />
 
-        {/* =========================================
-            FACULTY SECTION (Wrapped in Layout)
-            ========================================= */}
+        {/* FACULTY */}
         <Route
           path="/faculty"
           element={
@@ -47,21 +47,17 @@ function App() {
             </ProtectedRoute>
           }
         >
-          {/* Automatically goes to dashboard if user just hits /faculty */}
           <Route index element={<Navigate to="dashboard" replace />} />
-
           <Route path="dashboard" element={<FacultyDashboard />} />
           <Route path="student-list" element={<FacultyStudentList />} />
           <Route path="schedule" element={<FacultySchedule />} />
           <Route path="events" element={<FacultyEvents />} />
           <Route path="profile" element={<FacultyProfile />} />
-          <Route path="/faculty/notifications" element={<NotificationPage />} />
           <Route path="student/:id" element={<FacultyStudentProfile />} />
+          <Route path="notifications" element={<NotificationPage />} />
         </Route>
 
-        {/* =========================================
-            STUDENT SECTION (Wrapped in Layout)
-            ========================================= */}
+        {/* STUDENT */}
         <Route
           path="/student"
           element={
@@ -70,19 +66,20 @@ function App() {
             </ProtectedRoute>
           }
         >
-          {/* Automatically goes to dashboard if user just hits /student */}
           <Route index element={<Navigate to="dashboard" replace />} />
-
           <Route path="dashboard" element={<StudentDashboard />} />
           <Route path="schedule" element={<StudentSchedule />} />
           <Route path="events" element={<StudentEvents />} />
           <Route path="clearance" element={<StudentClearance />} />
           <Route path="research" element={<CollegeResearch />} />
           <Route path="profile" element={<StudentProfile />} />
-          <Route path="/student/notifications" element={<NotificationPage />} />
+          <Route path="notifications" element={<NotificationPage />} />
         </Route>
 
-        {/* Fallback for undefined URLs */}
+        {/* SUBJECT DETAIL (IMPORTANT) */}
+        <Route path="/subject/:id" element={<SubjectDetailPage />} />
+
+        {/* FALLBACK */}
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </Router>

@@ -200,7 +200,7 @@ const FacultySchedule = () => {
           <div className={styles.headingWrap}>
             <h2 className={styles.pageHeading}>My Schedule</h2>
             <span className={styles.pageSubheading}>
-              A.Y. 2024–2025 · 2nd Semester
+              A.Y. 2025–2026 · 2nd Semester
             </span>
           </div>
         </div>
