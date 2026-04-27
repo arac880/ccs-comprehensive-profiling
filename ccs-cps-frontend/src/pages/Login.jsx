@@ -206,7 +206,7 @@ export default function Login({ onLoginSuccess, onForgotPassword }) {
             </AppButton>
           </form>
 
-          <span className={styles.version}>v1.01</span>
+          <span className={styles.version}>v1.5.1</span>
         </div>
 
         <div className={styles.heroPanel}>
