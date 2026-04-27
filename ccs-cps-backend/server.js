@@ -62,7 +62,7 @@ io.on("connection", (socket) => {
   });
 });
 
-// ─── Middleware FIRST (order matters!) ──────────────────────
+// ─── Middleware ──────────────────────
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
