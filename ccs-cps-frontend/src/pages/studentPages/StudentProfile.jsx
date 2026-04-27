@@ -1,5 +1,6 @@
 // pages/studentProfile.jsx
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 
 import ProfileCard from "../../components/studentComponents/ProfileCard";
 import TabPersonal from "../../components/studentComponents/TabPersonal";
@@ -71,11 +72,41 @@ const ACADEMIC_HISTORY = [
     standing: "Dean's List",
     latin: "Magna Cum Laude",
     subjects: [
-      { code: "IT401", name: "Capstone Project 1", units: 3, grade: "1.25", remarks: "Passed" },
-      { code: "IT402", name: "Cloud Computing", units: 3, grade: "1.50", remarks: "Passed" },
-      { code: "IT403", name: "Artificial Intelligence", units: 3, grade: "1.25", remarks: "Passed" },
-      { code: "IT404", name: "IT Service Management", units: 3, grade: "1.75", remarks: "Passed" },
-      { code: "IT405", name: "Elective 1: Machine Learning", units: 3, grade: "1.50", remarks: "Passed" },
+      {
+        code: "IT401",
+        name: "Capstone Project 1",
+        units: 3,
+        grade: "1.25",
+        remarks: "Passed",
+      },
+      {
+        code: "IT402",
+        name: "Cloud Computing",
+        units: 3,
+        grade: "1.50",
+        remarks: "Passed",
+      },
+      {
+        code: "IT403",
+        name: "Artificial Intelligence",
+        units: 3,
+        grade: "1.25",
+        remarks: "Passed",
+      },
+      {
+        code: "IT404",
+        name: "IT Service Management",
+        units: 3,
+        grade: "1.75",
+        remarks: "Passed",
+      },
+      {
+        code: "IT405",
+        name: "Elective 1: Machine Learning",
+        units: 3,
+        grade: "1.50",
+        remarks: "Passed",
+      },
     ],
   },
   {
@@ -87,11 +118,41 @@ const ACADEMIC_HISTORY = [
     standing: "Dean's List",
     latin: "Magna Cum Laude",
     subjects: [
-      { code: "IT307", name: "Software Engineering 2", units: 3, grade: "1.50", remarks: "Passed" },
-      { code: "IT308", name: "Systems Administration", units: 3, grade: "1.50", remarks: "Passed" },
-      { code: "IT309", name: "Network Security", units: 3, grade: "1.75", remarks: "Passed" },
-      { code: "IT310", name: "IT Research Methods", units: 3, grade: "1.25", remarks: "Passed" },
-      { code: "IT311", name: "Practicum / OJT", units: 6, grade: "1.25", remarks: "Passed" },
+      {
+        code: "IT307",
+        name: "Software Engineering 2",
+        units: 3,
+        grade: "1.50",
+        remarks: "Passed",
+      },
+      {
+        code: "IT308",
+        name: "Systems Administration",
+        units: 3,
+        grade: "1.50",
+        remarks: "Passed",
+      },
+      {
+        code: "IT309",
+        name: "Network Security",
+        units: 3,
+        grade: "1.75",
+        remarks: "Passed",
+      },
+      {
+        code: "IT310",
+        name: "IT Research Methods",
+        units: 3,
+        grade: "1.25",
+        remarks: "Passed",
+      },
+      {
+        code: "IT311",
+        name: "Practicum / OJT",
+        units: 6,
+        grade: "1.25",
+        remarks: "Passed",
+      },
     ],
   },
   {
@@ -102,12 +163,48 @@ const ACADEMIC_HISTORY = [
     gwa: "1.58",
     standing: "Dean's List",
     subjects: [
-      { code: "IT301", name: "Mobile Application Development", units: 3, grade: "1.50", remarks: "Passed" },
-      { code: "IT302", name: "Software Engineering 1", units: 3, grade: "1.75", remarks: "Passed" },
-      { code: "IT303", name: "Information Assurance & Security", units: 3, grade: "1.50", remarks: "Passed" },
-      { code: "IT304", name: "Social & Professional Issues in IT", units: 3, grade: "1.75", remarks: "Passed" },
-      { code: "IT305", name: "Integrative Programming & Technology", units: 3, grade: "1.50", remarks: "Passed" },
-      { code: "IT306", name: "Technopreneurship", units: 3, grade: "1.50", remarks: "Passed" },
+      {
+        code: "IT301",
+        name: "Mobile Application Development",
+        units: 3,
+        grade: "1.50",
+        remarks: "Passed",
+      },
+      {
+        code: "IT302",
+        name: "Software Engineering 1",
+        units: 3,
+        grade: "1.75",
+        remarks: "Passed",
+      },
+      {
+        code: "IT303",
+        name: "Information Assurance & Security",
+        units: 3,
+        grade: "1.50",
+        remarks: "Passed",
+      },
+      {
+        code: "IT304",
+        name: "Social & Professional Issues in IT",
+        units: 3,
+        grade: "1.75",
+        remarks: "Passed",
+      },
+      {
+        code: "IT305",
+        name: "Integrative Programming & Technology",
+        units: 3,
+        grade: "1.50",
+        remarks: "Passed",
+      },
+      {
+        code: "IT306",
+        name: "Technopreneurship",
+        units: 3,
+        grade: "1.50",
+        remarks: "Passed",
+      },
     ],
   },
   {
@@ -118,12 +215,48 @@ const ACADEMIC_HISTORY = [
     gwa: "1.75",
     standing: "Dean's List",
     subjects: [
-      { code: "IT205", name: "System Analysis & Design", units: 3, grade: "1.75", remarks: "Passed" },
-      { code: "IT206", name: "Web Development 2", units: 3, grade: "1.50", remarks: "Passed" },
-      { code: "IT207", name: "Operating Systems", units: 3, grade: "1.75", remarks: "Passed" },
-      { code: "IT208", name: "Human Computer Interaction", units: 3, grade: "1.75", remarks: "Passed" },
-      { code: "IT209", name: "Advanced Database Systems", units: 3, grade: "1.75", remarks: "Passed" },
-      { code: "PE202", name: "Physical Education 4", units: 2, grade: "1.25", remarks: "Passed" },
+      {
+        code: "IT205",
+        name: "System Analysis & Design",
+        units: 3,
+        grade: "1.75",
+        remarks: "Passed",
+      },
+      {
+        code: "IT206",
+        name: "Web Development 2",
+        units: 3,
+        grade: "1.50",
+        remarks: "Passed",
+      },
+      {
+        code: "IT207",
+        name: "Operating Systems",
+        units: 3,
+        grade: "1.75",
+        remarks: "Passed",
+      },
+      {
+        code: "IT208",
+        name: "Human Computer Interaction",
+        units: 3,
+        grade: "1.75",
+        remarks: "Passed",
+      },
+      {
+        code: "IT209",
+        name: "Advanced Database Systems",
+        units: 3,
+        grade: "1.75",
+        remarks: "Passed",
+      },
+      {
+        code: "PE202",
+        name: "Physical Education 4",
+        units: 2,
+        grade: "1.25",
+        remarks: "Passed",
+      },
     ],
   },
   // Add other academic years similarly...
@@ -131,51 +264,168 @@ const ACADEMIC_HISTORY = [
 
 /* NON-ACADEMIC */
 const NON_ACADEMIC = [
-  { category: "Competition", year: "2025", title: "Regional ICT Quiz Bee", role: "Contestant", placement: "1st Place", description: "Represented CCS at the Regional ICT Quiz Bee held at DLSU Manila." },
-  { category: "Event", year: "2025", title: "CCS Night 2025", role: "Committee Head", placement: null, description: "Headed the Logistics Committee for the annual CCS Night gala." },
-  { category: "Competition", year: "2024", title: "Hackathon PH 2024", role: "Team Leader", placement: "Runner-up", description: "Led a 4-person team building an AI-powered health app." },
-  { category: "Seminar", year: "2024", title: "Cybersecurity Awareness Week", role: "Participant", placement: null, description: null },
-  { category: "Competition", year: "2023", title: "Web Dev Challenge", role: "Participant", placement: "3rd Place", description: "Built a full-stack web app in 8 hours." },
+  {
+    category: "Competition",
+    year: "2025",
+    title: "Regional ICT Quiz Bee",
+    role: "Contestant",
+    placement: "1st Place",
+    description:
+      "Represented CCS at the Regional ICT Quiz Bee held at DLSU Manila.",
+  },
+  {
+    category: "Event",
+    year: "2025",
+    title: "CCS Night 2025",
+    role: "Committee Head",
+    placement: null,
+    description:
+      "Headed the Logistics Committee for the annual CCS Night gala.",
+  },
+  {
+    category: "Competition",
+    year: "2024",
+    title: "Hackathon PH 2024",
+    role: "Team Leader",
+    placement: "Runner-up",
+    description: "Led a 4-person team building an AI-powered health app.",
+  },
+  {
+    category: "Seminar",
+    year: "2024",
+    title: "Cybersecurity Awareness Week",
+    role: "Participant",
+    placement: null,
+    description: null,
+  },
+  {
+    category: "Competition",
+    year: "2023",
+    title: "Web Dev Challenge",
+    role: "Participant",
+    placement: "3rd Place",
+    description: "Built a full-stack web app in 8 hours.",
+  },
 ];
 
 /* VIOLATIONS */
 const VIOLATIONS = [
-  { offense: "Late Submission", date: "March 10, 2026", sanction: "Verbal Warning", warningLevel: "1st Warning" },
+  {
+    offense: "Late Submission",
+    date: "March 10, 2026",
+    sanction: "Verbal Warning",
+    warningLevel: "1st Warning",
+  },
 ];
 
 /* SKILLS */
 const SKILLS = [
-  { category: "Programming", name: "JavaScript / React", level: "Advanced", percent: 80 },
-  { category: "Programming", name: "Python", level: "Intermediate", percent: 60 },
+  {
+    category: "Programming",
+    name: "JavaScript / React",
+    level: "Advanced",
+    percent: 80,
+  },
+  {
+    category: "Programming",
+    name: "Python",
+    level: "Intermediate",
+    percent: 60,
+  },
   { category: "Programming", name: "Java", level: "Intermediate", percent: 55 },
-  { category: "Programming", name: "PHP / Laravel", level: "Elementary", percent: 40 },
+  {
+    category: "Programming",
+    name: "PHP / Laravel",
+    level: "Elementary",
+    percent: 40,
+  },
   { category: "Database", name: "MySQL", level: "Advanced", percent: 78 },
   { category: "Database", name: "MongoDB", level: "Intermediate", percent: 58 },
   { category: "Design", name: "Figma / UI-UX", level: "Advanced", percent: 82 },
-  { category: "Design", name: "Adobe Photoshop", level: "Intermediate", percent: 55 },
+  {
+    category: "Design",
+    name: "Adobe Photoshop",
+    level: "Intermediate",
+    percent: 55,
+  },
   { category: "Sports", name: "Badminton", level: "Advanced", percent: 85 },
-  { category: "Sports", name: "Basketball", level: "Intermediate", percent: 60 },
+  {
+    category: "Sports",
+    name: "Basketball",
+    level: "Intermediate",
+    percent: 60,
+  },
 ];
 
 /* AFFILIATIONS */
 const AFFILIATIONS = [
-  { type: "org", org: "ACSS", fullName: "Association of Computer Science Students", college: "College of Computing Studies", color: "#1565C0", records: [
-      { schoolYear: "2025–2026", position: "Vice President for External Affairs", type: "Officer" },
+  {
+    type: "org",
+    org: "ACSS",
+    fullName: "Association of Computer Science Students",
+    college: "College of Computing Studies",
+    color: "#1565C0",
+    records: [
+      {
+        schoolYear: "2025–2026",
+        position: "Vice President for External Affairs",
+        type: "Officer",
+      },
       { schoolYear: "2024–2025", position: "Secretary", type: "Officer" },
-      { schoolYear: "2023–2024", position: "Academic Committee Member", type: "Academic Member" },
-    ] 
+      {
+        schoolYear: "2023–2024",
+        position: "Academic Committee Member",
+        type: "Academic Member",
+      },
+    ],
   },
-  { type: "org", org: "SITES", fullName: "Society of Information Technology Students", college: "College of Computing Studies", color: "#2E7D32", records: [
-      { schoolYear: "2025–2026", position: "General Member", type: "Academic Member" },
-      { schoolYear: "2024–2025", position: "Badminton Representative", type: "Sports Member" },
-    ] 
+  {
+    type: "org",
+    org: "SITES",
+    fullName: "Society of Information Technology Students",
+    college: "College of Computing Studies",
+    color: "#2E7D32",
+    records: [
+      {
+        schoolYear: "2025–2026",
+        position: "General Member",
+        type: "Academic Member",
+      },
+      {
+        schoolYear: "2024–2025",
+        position: "Badminton Representative",
+        type: "Sports Member",
+      },
+    ],
   },
-  { type: "org", org: "CCS", fullName: "College of Computing Studies Student", college: "College of Computing Studies", color: "#E65100", records: [
-      { schoolYear: "2025–2026", position: "Council Representative", type: "Officer" },
-    ] 
+  {
+    type: "org",
+    org: "CCS",
+    fullName: "College of Computing Studies Student",
+    college: "College of Computing Studies",
+    color: "#E65100",
+    records: [
+      {
+        schoolYear: "2025–2026",
+        position: "Council Representative",
+        type: "Officer",
+      },
+    ],
   },
-  { type: "sport", name: "Badminton", team: "CCS Women's Badminton Team", years: "2023–2026", achievements: ["Intramural Champion 2025", "College Cup Finalist 2024"] },
-  { type: "sport", name: "Basketball (3x3)", team: "CCS 3x3 Basketball Team", years: "2024–2025", achievements: [] },
+  {
+    type: "sport",
+    name: "Badminton",
+    team: "CCS Women's Badminton Team",
+    years: "2023–2026",
+    achievements: ["Intramural Champion 2025", "College Cup Finalist 2024"],
+  },
+  {
+    type: "sport",
+    name: "Basketball (3x3)",
+    team: "CCS 3x3 Basketball Team",
+    years: "2024–2025",
+    achievements: [],
+  },
 ];
 
 /* TABS */
@@ -193,7 +443,20 @@ const TABS = [
    COMPONENT
 ═══════════════════════════════════════════ */
 export default function StudentProfile() {
-  const [activeTab, setActiveTab] = useState("personal");
+  const location = useLocation();
+  const [activeTab, setActiveTab] = useState(location.state?.tab || "personal");
+  const [violations, setViolations] = useState([]);
+
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    const userId = user?._id;
+    if (!userId) return;
+
+    fetch(`http://localhost:5000/api/students/${userId}`)
+      .then((res) => res.json())
+      .then((data) => setViolations(data.violations || []))
+      .catch(console.error);
+  }, []);
 
   const renderTab = () => {
     switch (activeTab) {
@@ -204,7 +467,7 @@ export default function StudentProfile() {
       case "nonacademic":
         return <TabNonAcademic activities={NON_ACADEMIC} />;
       case "violations":
-        return <TabViolations violations={VIOLATIONS} />;
+        return <TabViolations violations={violations} />;
       case "skills":
         return <TabSkills skills={SKILLS} />;
       case "affiliations":
@@ -235,14 +498,13 @@ export default function StudentProfile() {
             {TABS.map((t) => (
               <button
                 key={t.key}
-                className={`${styles.tabBtn} ${
-                  activeTab === t.key ? styles.tabActive : ""
-                }`}
+                className={`${styles.tabBtn} ${activeTab === t.key ? styles.tabActive : ""}`}
                 onClick={() => setActiveTab(t.key)}
               >
                 {t.label}
-                {t.key === "violations" && VIOLATIONS.length > 0 && (
-                  <span className={styles.tabBadge}>{VIOLATIONS.length}</span>
+                {/* ← real violations.length na */}
+                {t.key === "violations" && violations.length > 0 && (
+                  <span className={styles.tabBadge}>{violations.length}</span>
                 )}
               </button>
             ))}

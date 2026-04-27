@@ -1,39 +1,89 @@
 import { useState, useRef, useEffect } from "react";
+import { io } from "socket.io-client";
 import { useNavigate } from "react-router-dom";
 import styles from "../../pages/studentPages/studentStyles/TopBarNav.module.css";
 import {
   FaBell,
   FaCircleUser,
   FaArrowRightFromBracket,
+  FaTriangleExclamation,
   FaBars,
   FaCircle,
-  FaAward,
   FaClipboardCheck,
   FaCalendarDay,
   FaScrewdriverWrench,
-  FaRegBellSlash, 
+  FaRegBellSlash,
   FaChalkboardUser,
 } from "react-icons/fa6";
-
 import LogoutModal from "../LogoutModal";
 
-// ── DUMMY NOTIFICATION DATA ──
-const DUMMY_NOTIFS = [
-  { id: 1, type: "clearance", title: "Clearance Update", message: "Library clearance status changed to Cleared.", time: "2 hours ago", unread: true, icon: <FaClipboardCheck size={16} /> },
-  { id: 2, type: "action", title: "Action Required", message: "You have pending instructor evaluations to complete for the current semester.", time: "1 day ago", unread: false, icon: <FaChalkboardUser size={16} /> },  
-  { id: 3, type: "event", title: "Upcoming Event", message: "General Assembly starts tomorrow at 8 AM.", time: "1 day ago", unread: true, icon: <FaCalendarDay size={16} /> },
-  { id: 4, type: "system", title: "System Maintenance", message: "System down for maintenance this Saturday.", time: "3 days ago", unread: false, icon: <FaScrewdriverWrench size={16} /> },
-];
+let socket;
+const getSocket = () => {
+  if (!socket) {
+    socket = io("http://localhost:5000", {
+      transports: ["websocket", "polling"], // ← add this
+    });
+  }
+  return socket;
+};
+
+const user = JSON.parse(localStorage.getItem("user") || "{}");
+const userId = user?._id || user?.id;
+if (userId) {
+  const sock = getSocket();
+  sock.on("connect", () => {
+    sock.emit("join", userId);
+    console.log("✅ Socket connected and joined:", userId);
+  });
+  if (sock.connected) {
+    sock.emit("join", userId);
+  }
+}
 
 export default function TopNavBar({ onSignOut, onMenuClick }) {
   const navigate = useNavigate();
   const [showLogout, setShowLogout] = useState(false);
-  
   const [showNotif, setShowNotif] = useState(false);
-  const [notifs, setNotifs] = useState(DUMMY_NOTIFS);
+  const [notifs, setNotifs] = useState(() => {
+    try {
+      const saved = localStorage.getItem("student_notifs");
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
   const notifRef = useRef(null);
-  
-  const unreadCount = notifs.filter(n => n.unread).length;
+
+  useEffect(() => {
+    const syncNotifs = () => {
+      try {
+        const saved = localStorage.getItem("student_notifs");
+        setNotifs(saved ? JSON.parse(saved) : []);
+      } catch {}
+    };
+
+    window.addEventListener("notifs-updated", syncNotifs);
+    return () => window.removeEventListener("notifs-updated", syncNotifs);
+  }, []);
+
+  useEffect(() => {
+    const sock = getSocket();
+
+    const handleNotification = (notif) => {
+      console.log("🔔 GOT NOTIFICATION:", notif);
+      setNotifs((prev) => {
+        const updated = [notif, ...prev];
+        localStorage.setItem("student_notifs", JSON.stringify(updated));
+        window.dispatchEvent(new Event("notifs-updated"));
+        return updated;
+      });
+    };
+
+    sock.on("notification", handleNotification);
+
+    // ✅ only remove listener, never disconnect
+    return () => sock.off("notification", handleNotification);
+  }, []);
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -45,8 +95,39 @@ export default function TopNavBar({ onSignOut, onMenuClick }) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  const getIcon = (type) => {
+    switch (type) {
+      case "enrollment":
+        return <FaClipboardCheck size={16} />;
+      case "assignment":
+        return <FaChalkboardUser size={16} />;
+      // case "reminder":
+      //   return <FaCalendarDay size={16} />;
+      case "announcement":
+        return <FaCalendarDay size={16} />;
+      case "violation":
+        return <FaTriangleExclamation size={16} color="#E65100" />;
+      default:
+        return <FaBell size={16} />;
+    }
+  };
+
+  const unreadCount = notifs.filter((n) => !n.read).length;
+
   const markAllAsRead = () => {
-    setNotifs(notifs.map(n => ({ ...n, unread: false })));
+    const updated = notifs.map((n) => ({ ...n, read: true }));
+    setNotifs(updated);
+    localStorage.setItem("student_notifs", JSON.stringify(updated));
+    window.dispatchEvent(new Event("notifs-updated"));
+  };
+
+  const markOneRead = (id) => {
+    setNotifs((prev) => {
+      const updated = prev.map((n) => (n.id === id ? { ...n, read: true } : n));
+      localStorage.setItem("student_notifs", JSON.stringify(updated));
+      window.dispatchEvent(new Event("notifs-updated"));
+      return updated;
+    });
   };
 
   const handleMenuClick = (e) => {
@@ -57,6 +138,13 @@ export default function TopNavBar({ onSignOut, onMenuClick }) {
   const handleLogout = () => {
     localStorage.removeItem("user");
     localStorage.removeItem("token");
+    // localStorage.removeItem("student_notifs");/
+
+    if (socket) {
+      socket.disconnect();
+      socket = null;
+    }
+
     navigate("/login");
   };
 
@@ -73,7 +161,6 @@ export default function TopNavBar({ onSignOut, onMenuClick }) {
             onClick={handleMenuClick}
             style={{ pointerEvents: "auto", zIndex: 1040 }}
           />
-
           <div className="d-flex flex-column justify-content-center">
             <span className={styles.brandTitle}>CCS</span>
             <span className={`${styles.brandSub} d-none d-sm-block`}>
@@ -83,8 +170,6 @@ export default function TopNavBar({ onSignOut, onMenuClick }) {
         </div>
 
         <div className="d-flex align-items-center gap-3">
-          
-          {/* ── NOTIFICATION WRAPPER ── */}
           <div className={styles.notifWrap} ref={notifRef}>
             <div
               className={`${styles.iconBtn} ${showNotif ? styles.iconBtnActive : ""}`}
@@ -96,51 +181,86 @@ export default function TopNavBar({ onSignOut, onMenuClick }) {
               )}
             </div>
 
-            {/* Notification Dropdown Panel */}
             {showNotif && (
               <div className={styles.notifDropdown}>
                 <div className={styles.notifHeader}>
                   <span className={styles.notifHeaderTitle}>Notifications</span>
                   {unreadCount > 0 && (
-                    <span className={styles.notifMarkRead} onClick={markAllAsRead}>
+                    <span
+                      className={styles.notifMarkRead}
+                      onClick={markAllAsRead}
+                    >
                       Mark all as read
                     </span>
                   )}
                 </div>
-                
+
                 <div className={styles.notifList}>
                   {notifs.length > 0 ? (
                     notifs.map((notif) => (
-                      <div 
-                        key={notif.id} 
-                        className={`${styles.notifItem} ${notif.unread ? styles.unreadBg : ""}`}
+                      <div
+                        key={notif.id}
+                        onClick={() => {
+                          markOneRead(notif.id);
+                          if (notif.type === "violation") {
+                            navigate("/student/profile", {
+                              state: { tab: "violations" },
+                            });
+                          } else if (notif.link) {
+                            navigate(notif.link);
+                          }
+                          setShowNotif(false);
+                        }}
+                        style={{ cursor: "pointer" }}
+                        className={`${styles.notifItem} ${!notif.read ? styles.unreadBg : ""}`}
                       >
                         <div className={styles.notifIconWrap}>
-                          {notif.icon}
+                          {getIcon(notif.type)}
                         </div>
                         <div className={styles.notifContent}>
                           <div className={styles.notifItemHeader}>
-                            <span className={styles.notifItemTitle}>{notif.title}</span>
-                            {notif.unread && <FaCircle size={8} color="#E65100" className={styles.unreadDot} />}
+                            <span className={styles.notifItemTitle}>
+                              {notif.title || notif.type}
+                            </span>
+                            {!notif.read && (
+                              <FaCircle
+                                size={8}
+                                color="#E65100"
+                                className={styles.unreadDot}
+                              />
+                            )}
                           </div>
                           <p className={styles.notifItemMsg}>{notif.message}</p>
-                          <span className={styles.notifTime}>{notif.time}</span>
+                          <span className={styles.notifTime}>
+                            {new Date(notif.createdAt).toLocaleTimeString(
+                              "en-PH",
+                              {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              },
+                            )}
+                          </span>
                         </div>
                       </div>
                     ))
                   ) : (
                     <div className={styles.emptyNotif}>
-                      <FaRegBellSlash size={32} className={styles.emptyNotifIcon} />
-                      <span className={styles.emptyNotifText}>You're all caught up!</span>
+                      <FaRegBellSlash
+                        size={32}
+                        className={styles.emptyNotifIcon}
+                      />
+                      <span className={styles.emptyNotifText}>
+                        You're all caught up!
+                      </span>
                     </div>
                   )}
                 </div>
 
-                <div 
+                <div
                   className={styles.notifFooter}
                   onClick={() => {
                     setShowNotif(false);
-                    navigate("/student/"); 
+                    navigate("/student/notifications");
                   }}
                 >
                   View All Notifications

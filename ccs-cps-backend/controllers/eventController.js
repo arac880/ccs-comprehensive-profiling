@@ -27,11 +27,9 @@ const TYPE_ICONS = {
 
 // Helper: try to match _id as string first, then as ObjectId
 async function findEventById(collection, id) {
-  // 1. Try string match (new events created with Date.now().toString())
   let doc = await collection.findOne({ _id: id });
   if (doc) return { doc, matchedId: id };
 
-  // 2. Try ObjectId match (legacy events inserted before the string-ID change)
   if (ObjectId.isValid(id)) {
     const oid = new ObjectId(id);
     doc = await collection.findOne({ _id: oid });
@@ -39,6 +37,38 @@ async function findEventById(collection, id) {
   }
 
   return { doc: null, matchedId: null };
+}
+
+// Helper: emit notification to all students and faculty
+async function emitEventNotification(db, notif) {
+  try {
+    const io = global.io;
+    if (!io) {
+      console.log("❌ global.io is undefined!");
+      return;
+    }
+
+    // ✅ query both collections separately
+    const students = await db
+      .collection("students")
+      .find({}, { projection: { _id: 1 } })
+      .toArray();
+
+    const faculty = await db
+      .collection("faculty")
+      .find({}, { projection: { _id: 1 } })
+      .toArray();
+
+    const allUsers = [...students, ...faculty];
+
+    console.log(`📢 Emitting to ${allUsers.length} users`);
+
+    allUsers.forEach((u) => {
+      io.to(u._id.toString()).emit("notification", notif);
+    });
+  } catch (err) {
+    console.error("Failed to emit event notification:", err);
+  }
 }
 
 // GET EVENTS
@@ -92,6 +122,22 @@ const createEvent = async (req, res) => {
 
     const db = getDB();
     await db.collection("events").insertOne(newEvent);
+
+    console.log("✅ Event inserted, global.io:", !!global.io); // ← add this
+    console.log("📢 About to emit notification...");
+
+    // ── Emit notification to all students and faculty ──
+    const notif = {
+      id: `notif_${Date.now()}`,
+      type: "reminder",
+      title: `New ${newEvent.type} Posted`,
+      message: `${newEvent.title} — ${newEvent.month} ${newEvent.day}, ${newEvent.year} · ${newEvent.location}`,
+      createdAt: new Date().toISOString(),
+      read: false,
+      link: "/student/events",
+    };
+    await emitEventNotification(db, notif);
+
     return res.status(201).json(newEvent);
   } catch (err) {
     console.error("CREATE EVENT ERROR:", err);
@@ -138,11 +184,8 @@ const updateEvent = async (req, res) => {
     const db = getDB();
     const { doc, matchedId } = await findEventById(db.collection("events"), id);
 
-    if (!doc) {
-      return res.status(404).json({ message: "Event not found." });
-    }
+    if (!doc) return res.status(404).json({ message: "Event not found." });
 
-    // findOneAndUpdate — returnDocument: "after" returns the updated doc directly
     const updatedDoc = await db
       .collection("events")
       .findOneAndUpdate(
@@ -151,8 +194,19 @@ const updateEvent = async (req, res) => {
         { returnDocument: "after" },
       );
 
-    // MongoDB driver v5+ returns the doc directly (not wrapped in .value)
     const result = updatedDoc?.value ?? updatedDoc;
+
+    // ── Emit notification to all students and faculty ──
+    const notif = {
+      id: `notif_${Date.now()}`,
+      type: "announcement",
+      title: `Event Updated: ${updatedFields.title}`,
+      message: `${updatedFields.title} has been updated — ${updatedFields.month} ${updatedFields.day}, ${updatedFields.year} · ${updatedFields.location}`,
+      createdAt: new Date().toISOString(),
+      read: false,
+      link: "/student/events",
+    };
+    await emitEventNotification(db, notif);
 
     return res.status(200).json(result);
   } catch (err) {
@@ -177,15 +231,13 @@ const deleteEvent = async (req, res) => {
     const db = getDB();
     const { matchedId } = await findEventById(db.collection("events"), id);
 
-    if (!matchedId) {
+    if (!matchedId)
       return res.status(404).json({ message: "Event not found." });
-    }
 
     const result = await db.collection("events").deleteOne({ _id: matchedId });
 
-    if (result.deletedCount === 0) {
+    if (result.deletedCount === 0)
       return res.status(404).json({ message: "Event not found." });
-    }
 
     return res.status(200).json({ message: "Event deleted successfully." });
   } catch (err) {

@@ -105,20 +105,18 @@ const StatCard = ({ icon, label, value, sub, color, loading }) => (
   </div>
 );
 
-
 const QUICK_ACTIONS = [
   {
     icon: "bi-person-plus-fill",
     label: "Add Student",
     path: "/faculty/student-list",
   },
- 
+
   {
     icon: "bi-calendar-plus-fill",
     label: "Add Event",
     path: "/faculty/events",
   },
-
 ];
 
 function getInitials(name) {
@@ -291,49 +289,49 @@ const FacultyDashboard = () => {
       return null;
     }
   };
-const facultyId = getFacultyIdFromStorage();
+  const facultyId = getFacultyIdFromStorage();
 
-useEffect(() => {
-  if (!facultyId) {
-    setScheduleLoading(false);
-    return;
-  }
+  useEffect(() => {
+    if (!facultyId) {
+      setScheduleLoading(false);
+      return;
+    }
 
-  fetch(`http://localhost:5000/api/schedules/faculty/${facultyId}`)
-    .then((res) => res.json())
-    .then((data) => {
-      const mapped = Array.isArray(data)
-        ? data.map((s) => ({
-            subject: s.title,
-            code: s.sub,
-            room: s.room,
-            time: `${formatTime(s.start)} - ${formatTime(s.start + (s.span || 1))}`,
-            day: s.day,
-          }))
-        : [];
+    fetch(`http://localhost:5000/api/schedules/faculty/${facultyId}`)
+      .then((res) => res.json())
+      .then((data) => {
+        const mapped = Array.isArray(data)
+          ? data.map((s) => ({
+              subject: s.title,
+              code: s.sub,
+              room: s.room,
+              time: `${formatTime(s.start)} - ${formatTime(s.start + (s.span || 1))}`,
+              day: s.day,
+            }))
+          : [];
 
-      setSchedule(mapped);
-    })
-    .catch((err) => {
-      console.error("Schedule fetch error:", err);
-      setSchedule([]);
-    })
-    .finally(() => setScheduleLoading(false));
-}, [facultyId]);
+        setSchedule(mapped);
+      })
+      .catch((err) => {
+        console.error("Schedule fetch error:", err);
+        setSchedule([]);
+      })
+      .finally(() => setScheduleLoading(false));
+  }, [facultyId]);
 
-const getDayName = (day) => {
-  const map = {
-    0: "Monday",
-    1: "Tuesday",
-    2: "Wednesday",
-    3: "Thursday",
-    4: "Friday",
-    5: "Saturday",
-    6: "Sunday",
+  const getDayName = (day) => {
+    const map = {
+      0: "Monday",
+      1: "Tuesday",
+      2: "Wednesday",
+      3: "Thursday",
+      4: "Friday",
+      5: "Saturday",
+      6: "Sunday",
+    };
+
+    return map[Number(day)] ?? "";
   };
-
-  return map[Number(day)] ?? "";
-};
 
   return (
     <div className={styles.dashboardContent}>
@@ -416,9 +414,7 @@ const getDayName = (day) => {
           <div className={styles.dashboardCard}>
             <div className={styles.cardHeader}>
               <div className={styles.cardTitle}>
-                <span className={styles.cardTitleIcon}>
-                  <i className="bi bi-megaphone-fill" />
-                </span>
+                <span className={styles.cardTitleIcon}></span>
                 Announcements
               </div>
               <span className={styles.cardBadge}>

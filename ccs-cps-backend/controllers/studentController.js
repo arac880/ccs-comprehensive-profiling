@@ -38,7 +38,7 @@ const getStudents = async (req, res) => {
   }
 };
 const generateDefaultClearance = () => {
-  const isGradesCleared = Math.random() > 0.5; 
+  const isGradesCleared = Math.random() > 0.5;
   const isAccountCleared = Math.random() > 0.5;
   const isLibraryCleared = Math.random() > 0.2;
   const isReqsCleared = Math.random() > 0.5;
@@ -47,40 +47,83 @@ const generateDefaultClearance = () => {
 
   return {
     summaryItems: [
-      { isCleared: isGradesCleared, text: isGradesCleared ? "All grades for the 1st Semester have been submitted." : "Your grades for the 1st Semester have not all been submitted." },
-      { isCleared: isAccountCleared, text: isAccountCleared ? "You have fully settled your account balance." : "You have pending miscellaneous/school fees." },
-      { isCleared: isLibraryCleared, text: isLibraryCleared ? "You have no records of pending book/s borrowed." : "You have unreturned books or fines." },
+      {
+        isCleared: isGradesCleared,
+        text: isGradesCleared
+          ? "All grades for the 1st Semester have been submitted."
+          : "Your grades for the 1st Semester have not all been submitted.",
+      },
+      {
+        isCleared: isAccountCleared,
+        text: isAccountCleared
+          ? "You have fully settled your account balance."
+          : "You have pending miscellaneous/school fees.",
+      },
+      {
+        isCleared: isLibraryCleared,
+        text: isLibraryCleared
+          ? "You have no records of pending book/s borrowed."
+          : "You have unreturned books or fines.",
+      },
       { isCleared: true, text: "You do not have any on-hold records." },
-      { isCleared: isReqsCleared, text: isReqsCleared ? "All physical requirements are submitted." : "You have missing physical requirements." },
+      {
+        isCleared: isReqsCleared,
+        text: isReqsCleared
+          ? "All physical requirements are submitted."
+          : "You have missing physical requirements.",
+      },
     ],
     pathway: {
       gradeStatus: {
         isCleared: isGradesCleared,
         statusText: isGradesCleared ? "COMPLETE" : "NOT YET COMPLETE",
-        subtext: isGradesCleared ? "All grades have been verified." : "Grades for the 1st Semester have not all been submitted.",
-        missingItems: isGradesCleared ? [] : ["ITP113 - IT Practicum", "ITEW6 - Web Development "]
+        subtext: isGradesCleared
+          ? "All grades have been verified."
+          : "Grades for the 1st Semester have not all been submitted.",
+        missingItems: isGradesCleared
+          ? []
+          : ["ITP113 - IT Practicum", "ITEW6 - Web Development "],
       },
       accountStatus: {
         isCleared: isAccountCleared,
-        statusText: isAccountCleared ? "CLEARED: ₱0.00" : `REMAINING BALANCE: ₱${randomBalance}.00`, 
-        subtext: isAccountCleared ? "All financial obligations have been met." : "You have pending financial obligations for this semester.",
-        tags: isAccountCleared ? ["All Fees Settled"] : ["ID Fee (Pending)", "Thesis Fee (Pending)"]
+        statusText: isAccountCleared
+          ? "CLEARED: ₱0.00"
+          : `REMAINING BALANCE: ₱${randomBalance}.00`,
+        subtext: isAccountCleared
+          ? "All financial obligations have been met."
+          : "You have pending financial obligations for this semester.",
+        tags: isAccountCleared
+          ? ["All Fees Settled"]
+          : ["ID Fee (Pending)", "Thesis Fee (Pending)"],
       },
       libraryStatus: {
         isCleared: isLibraryCleared,
         statusText: isLibraryCleared ? "CLEARED" : "PENDING FINES/BOOKS",
-        subtext: isLibraryCleared ? "No unreturned books or outstanding fines." : "Please visit the library to settle your account."
+        subtext: isLibraryCleared
+          ? "No unreturned books or outstanding fines."
+          : "Please visit the library to settle your account.",
       },
       requirements: {
         isCleared: isReqsCleared,
         statusText: isReqsCleared ? "ALL SUBMITTED" : "INCOMPLETE",
-        subtext: isReqsCleared ? "All hardcopy documents have been verified." : "Pending hardcopy documents for verification.",
-        tags: isReqsCleared ? ["Form 138 (Submitted)", "PSA Birth Cert (Submitted)", "Good Moral (Submitted)"] : ["Form 138 (Missing)", "PSA Birth Cert (Submitted)", "Good Moral (Missing)"]
-      }
-    }
+        subtext: isReqsCleared
+          ? "All hardcopy documents have been verified."
+          : "Pending hardcopy documents for verification.",
+        tags: isReqsCleared
+          ? [
+              "Form 138 (Submitted)",
+              "PSA Birth Cert (Submitted)",
+              "Good Moral (Submitted)",
+            ]
+          : [
+              "Form 138 (Missing)",
+              "PSA Birth Cert (Submitted)",
+              "Good Moral (Missing)",
+            ],
+      },
+    },
   };
 };
-
 
 const addStudent = async (req, res) => {
   try {
@@ -104,7 +147,7 @@ const addStudent = async (req, res) => {
       activities: [],
       organizations: [],
       sports: [],
-      clearance: generateDefaultClearance() 
+      clearance: generateDefaultClearance(),
     };
 
     const result = await db.collection("students").insertOne(newStudent);
@@ -135,14 +178,16 @@ const getStudentById = async (req, res) => {
         .status(404)
         .json({ message: "Student not found or has been removed" });
 
-        if (!student.clearance || Object.keys(student.clearance).length === 0) {
+    if (!student.clearance || Object.keys(student.clearance).length === 0) {
       const newClearance = generateDefaultClearance();
       student.clearance = newClearance;
-      
-      await db.collection("students").updateOne(
-        { _id: new ObjectId(id) },
-        { $set: { clearance: newClearance } }
-      );
+
+      await db
+        .collection("students")
+        .updateOne(
+          { _id: new ObjectId(id) },
+          { $set: { clearance: newClearance } },
+        );
     }
 
     res.status(200).json(student);
@@ -160,8 +205,15 @@ const updateStudent = async (req, res) => {
     if (!ObjectId.isValid(id))
       return res.status(400).json({ message: "Invalid student ID format" });
 
-    const { _id, violations, academicHistory, password, role, clearance, ...updateData } =
-      req.body;
+    const {
+      _id,
+      violations,
+      academicHistory,
+      password,
+      role,
+      clearance,
+      ...updateData
+    } = req.body;
 
     const result = await db
       .collection("students")
@@ -181,22 +233,28 @@ const updateStudentClearance = async (req, res) => {
   try {
     const db = getDB();
     const { id } = req.params;
-    
-    if (!ObjectId.isValid(id)) return res.status(400).json({ message: "Invalid student ID format" });
-    if (!req.body.clearance) return res.status(400).json({ message: "Clearance data is required" });
 
-    const result = await db.collection("students").updateOne(
-      { _id: new ObjectId(id) },
-      { $set: { clearance: req.body.clearance } }
-    );
+    if (!ObjectId.isValid(id))
+      return res.status(400).json({ message: "Invalid student ID format" });
+    if (!req.body.clearance)
+      return res.status(400).json({ message: "Clearance data is required" });
 
-    if (result.matchedCount === 0) return res.status(404).json({ message: "Student not found" });
+    const result = await db
+      .collection("students")
+      .updateOne(
+        { _id: new ObjectId(id) },
+        { $set: { clearance: req.body.clearance } },
+      );
+
+    if (result.matchedCount === 0)
+      return res.status(404).json({ message: "Student not found" });
     res.status(200).json({ message: "Student clearance updated successfully" });
   } catch (error) {
-    res.status(500).json({ message: "Failed to update clearance", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Failed to update clearance", error: error.message });
   }
 };
-
 
 const deleteStudent = async (req, res) => {
   try {
@@ -262,6 +320,21 @@ const addViolation = async (req, res) => {
       );
 
     if (!result) return res.status(404).json({ message: "Student not found" });
+
+    // ── Notify student in real-time ── ✅
+    const studentId = result._id.toString();
+    console.log("Emitting to room:", studentId); //
+
+    global.io.to(studentId).emit("notification", {
+      id: Date.now(),
+      type: "violation",
+      title: "Violation Recorded",
+      message: `A ${severity || "Minor"} violation has been recorded: "${description}"`,
+      link: "/student/profile",
+      read: false,
+      createdAt: new Date(),
+    });
+
     res
       .status(200)
       .json({ message: "Violation added", violations: result.violations });
@@ -350,10 +423,9 @@ module.exports = {
   addStudent,
   getStudentById,
   updateStudent,
-  updateStudentClearance, 
+  updateStudentClearance,
   deleteStudent,
   addViolation,
   deleteViolation,
   changePassword,
 };
-

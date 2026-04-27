@@ -4,12 +4,63 @@ dns.setServers(["8.8.8.8", "8.8.4.4"]);
 const express = require("express");
 const cors    = require("cors");
 const path    = require("path");
+const http = require("http");
+const { Server } = require("socket.io");
 require("dotenv").config();
 
 const { connectDB } = require("./config/db");
 
 const app  = express();
+const server = http.createServer(app);
 const PORT = process.env.PORT || 5000;
+
+// ─── Socket.io Setup ────────────────────────────────────────
+const io = new Server(server, {
+  cors: {
+    origin: "http://localhost:5173", // ← URL ng React app mo
+    methods: ["GET", "POST"],
+  },
+});
+
+// I-export para magamit sa ibang files (routes, controllers)
+global.io = io;
+
+io.on("connection", (socket) => {
+  console.log("User connected:", socket.id);
+
+  socket.on("join", (userId) => {
+    socket.join(userId);
+    console.log(`User ${userId} joined their room`);
+  });
+
+  socket.on("disconnect", () => {
+    console.log("User disconnected:", socket.id);
+  });
+});
+
+// ─── Socket.io Setup ────────────────────────────────────────
+const io = new Server(server, {
+  cors: {
+    origin: "http://localhost:5173", // ← URL ng React app mo
+    methods: ["GET", "POST"],
+  },
+});
+
+// I-export para magamit sa ibang files (routes, controllers)
+global.io = io;
+
+io.on("connection", (socket) => {
+  console.log("User connected:", socket.id);
+
+  socket.on("join", (userId) => {
+    socket.join(userId);
+    console.log(`User ${userId} joined their room`);
+  });
+
+  socket.on("disconnect", () => {
+    console.log("User disconnected:", socket.id);
+  });
+});
 
 // ─── Middleware FIRST (order matters!) ──────────────────────
 app.use(cors());
