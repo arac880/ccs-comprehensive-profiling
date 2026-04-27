@@ -33,7 +33,9 @@ const TYPE_COLORS = {
 
 const user = JSON.parse(localStorage.getItem("user") || "{}");
 const role = user?.isDean || user?.isChair ? "faculty" : "student";
-const storageKey = role === "faculty" ? "faculty_notifs" : "student_notifs";
+const userId = user?._id;
+const storageKey =
+  role === "faculty" ? `faculty_notifs_${userId}` : `student_notifs_${userId}`;
 
 export default function NotificationPage() {
   const navigate = useNavigate();
@@ -114,8 +116,10 @@ export default function NotificationPage() {
   };
 
   const clearAll = () => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    const userId = user?._id;
     setNotifs([]);
-    localStorage.removeItem(storageKey);
+    localStorage.removeItem(`student_notifs_${userId}`);
     window.dispatchEvent(new Event("notifs-updated"));
   };
 
