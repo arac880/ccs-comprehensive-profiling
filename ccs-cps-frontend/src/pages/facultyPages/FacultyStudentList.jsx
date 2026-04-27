@@ -486,11 +486,17 @@ const FacultyStudentList = () => {
           {/* ── Footer ── */}
           <div className={styles.tableFooter}>
             <span className={styles.tableFooterText}>
-              Showing {Math.min(currentPage * ITEMS_PER_PAGE, filtered.length)}{" "}
-              of {filtered.length} students
+              Showing{" "}
+              {Math.min(
+                (currentPage - 1) * ITEMS_PER_PAGE + 1,
+                filtered.length,
+              )}
+              –{Math.min(currentPage * ITEMS_PER_PAGE, filtered.length)} of{" "}
+              {filtered.length} students
             </span>
             {totalPages > 1 && (
               <div className={styles.pagination}>
+                {/* Prev */}
                 <button
                   className={styles.pageBtn}
                   onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
@@ -498,17 +504,56 @@ const FacultyStudentList = () => {
                 >
                   ‹
                 </button>
+
+                {/* Page buttons — truncated */}
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                  (page) => (
-                    <button
-                      key={page}
-                      className={`${styles.pageBtn} ${currentPage === page ? styles.pageBtnActive : ""}`}
-                      onClick={() => setCurrentPage(page)}
-                    >
-                      {page}
-                    </button>
-                  ),
+                  (page) => {
+                    const isFirst3 = page <= 3;
+                    const isLast3 = page >= totalPages - 2;
+                    const isNearCurrent = Math.abs(page - currentPage) <= 1;
+
+                    if (isFirst3 || isLast3 || isNearCurrent) {
+                      return (
+                        <button
+                          key={page}
+                          className={`${styles.pageBtn} ${currentPage === page ? styles.pageBtnActive : ""}`}
+                          onClick={() => setCurrentPage(page)}
+                        >
+                          {page}
+                        </button>
+                      );
+                    }
+
+                    // Show ellipsis
+                    if (page === 4 && currentPage > 5) {
+                      return (
+                        <span
+                          key="ellipsis-start"
+                          className={styles.pageEllipsis}
+                        >
+                          ...
+                        </span>
+                      );
+                    }
+                    if (
+                      page === totalPages - 3 &&
+                      currentPage < totalPages - 4
+                    ) {
+                      return (
+                        <span
+                          key="ellipsis-end"
+                          className={styles.pageEllipsis}
+                        >
+                          ...
+                        </span>
+                      );
+                    }
+
+                    return null;
+                  },
                 )}
+
+                {/* Next */}
                 <button
                   className={styles.pageBtn}
                   onClick={() =>
