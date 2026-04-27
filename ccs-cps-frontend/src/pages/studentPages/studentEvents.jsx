@@ -27,7 +27,7 @@ export default function StudentEvents() {
         const res = await fetch(`${import.meta.env.VITE_API_URL}/api/events`);
         const data = await res.json();
 
-        // map backend → frontend format
+        // 🔥 map backend → frontend format
         const mapped = (Array.isArray(data) ? data : []).map((e, i) => {
           const eventDate = new Date(e.date);
 

@@ -137,7 +137,7 @@ const EditStudentModal = ({ isOpen, onClose, student, onSave }) => {
 
       setFormData({
         firstName: student.firstName || "",
-        middleInitial: student.middleInitial || "",
+        middleName: student.middleName || "",
         lastName: student.lastName || "",
         birthdate: student.birthdate || "",
         age: student.age || "",
@@ -314,7 +314,7 @@ const EditStudentModal = ({ isOpen, onClose, student, onSave }) => {
             <div className={styles.formGrid}>
               {[
                 { label: "First Name", name: "firstName" },
-                { label: "Middle Initial", name: "middleInitial" },
+                { label: "Middle Name", name: "middleName" },
                 { label: "Last Name", name: "lastName" },
                 { label: "Place of Birth", name: "placeOfBirth" },
               ].map((field) => (

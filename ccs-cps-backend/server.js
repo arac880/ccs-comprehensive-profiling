@@ -3,39 +3,87 @@ dns.setServers(["8.8.8.8", "8.8.4.4"]);
 
 const express = require("express");
 const cors = require("cors");
+const path = require("path");
+const http = require("http");
+const { Server } = require("socket.io");
 require("dotenv").config();
-const { connectDB } = require("./config/db");
-const studentRoutes = require("./routes/studentRoutes");
-const authRoutes = require("./routes/authRoutes");
-const eventRoutes = require("./routes/eventRoutes");
-const facultyRoutes = require("./routes/facultyRoutes");
 
+const { connectDB } = require("./config/db");
+
+// ─── App + Server Setup ─────────────────────────────
 const app = express();
+const server = http.createServer(app);
 const PORT = process.env.PORT || 5000;
 
-// Middleware
+// ─── Socket.io Setup (ONLY ONCE) ────────────────────
+const io = new Server(server, {
+  cors: {
+    origin: process.env.CLIENT_URL || "http://localhost:5173",
+    methods: ["GET", "POST"],
+  },
+});
+
+// Make socket available globally
+global.io = io;
+
+// Socket events
+io.on("connection", (socket) => {
+  console.log("User connected:", socket.id);
+
+  socket.on("join", (userId) => {
+    socket.join(userId);
+    console.log(`User ${userId} joined their room`);
+  });
+
+  socket.on("disconnect", () => {
+    console.log("User disconnected:", socket.id);
+  });
+});
+
+// ─── Middleware ─────────────────────────────────────
 app.use(
   cors({
-    origin: "https://ccs-cps-beta.vercel.app", // replace with your actual Vercel URL
+    origin: process.env.CLIENT_URL || "http://localhost:5173",
   }),
-); // Allows frontend to make requests to this backend
-app.use(express.json()); // Allows the server to accept JSON data in the req.body
+);
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// Connect to Database
-connectDB();
+// Static files (uploads)
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-// Routes
-app.use("/api/students", studentRoutes);
-app.use("/api/auth", authRoutes);
-app.use("/api/events", eventRoutes);
-app.use("/api/faculty", facultyRoutes);
+// ─── Routes ─────────────────────────────────────────
+app.use("/api/students", require("./routes/studentRoutes"));
+app.use("/api/auth", require("./routes/authRoutes"));
+app.use("/api/events", require("./routes/eventRoutes"));
+app.use("/api/faculty", require("./routes/facultyRoutes"));
+app.use("/api/schedules", require("./routes/schedule"));
+app.use("/api/posts", require("./routes/posts"));
+app.use("/api/submissions", require("./routes/submissions"));
 
-// Root Endpoint (Just for testing)
-app.get("/", (req, res) => {
+// Test route
+app.get("/", (_req, res) => {
   res.send("Student Profiling API is running...");
 });
 
-// Start Server
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-});
+// ─── Start Server ───────────────────────────────────
+const startServer = async () => {
+  try {
+    await connectDB();
+
+    server.listen(PORT, () => {
+      console.log(`Server running on http://localhost:${PORT}`);
+      console.log("MongoDB Connected Successfully");
+    });
+  } catch (error) {
+    console.error("Failed to start server:", error.message);
+  }
+};
+
+// ─── Serve React Frontend (IMPORTANT FOR REFRESH FIX) ───
+// app.use(express.static(path.join(__dirname, "build")));
+
+// app.get("*", (req, res) => {
+//   res.sendFile(path.join(__dirname, "build", "index.html"));
+// });
+startServer();

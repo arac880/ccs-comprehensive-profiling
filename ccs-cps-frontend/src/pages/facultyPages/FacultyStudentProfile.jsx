@@ -215,38 +215,40 @@ const AccordionBlock = ({ group, defaultOpen }) => {
       </div>
 
       {open && (
-        <table className={styles.gradesTable}>
-          <thead>
-            <tr>
-              <th>Course Code</th>
-              <th>Course Name</th>
-              <th className={styles.centered}>Units</th>
-              <th className={styles.centered}>Grade</th>
-              <th className={styles.centered}>Remarks</th>
-            </tr>
-          </thead>
-          <tbody>
-            {group.courses.map((course, i) => (
-              <tr key={i}>
-                <td className={styles.courseCode}>{course.courseCode}</td>
-                <td>{course.courseName}</td>
-                <td className={styles.centered}>{course.units}</td>
-                <td
-                  className={`${styles.centered} ${gradeColor(course.grade)}`}
-                >
-                  {course.grade}
-                </td>
-                <td className={styles.centered}>
-                  <span
-                    className={`${styles.remarkBadge} ${remarkClass(course.remarks)}`}
-                  >
-                    {course.remarks || "—"}
-                  </span>
-                </td>
+        <div style={{ overflowX: "auto" }}>
+          <table className={styles.gradesTable}>
+            <thead>
+              <tr>
+                <th>Course Code</th>
+                <th>Course Name</th>
+                <th className={styles.centered}>Units</th>
+                <th className={styles.centered}>Grade</th>
+                <th className={styles.centered}>Remarks</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {group.courses.map((course, i) => (
+                <tr key={i}>
+                  <td className={styles.courseCode}>{course.courseCode}</td>
+                  <td>{course.courseName}</td>
+                  <td className={styles.centered}>{course.units}</td>
+                  <td
+                    className={`${styles.centered} ${gradeColor(course.grade)}`}
+                  >
+                    {course.grade}
+                  </td>
+                  <td className={styles.centered}>
+                    <span
+                      className={`${styles.remarkBadge} ${remarkClass(course.remarks)}`}
+                    >
+                      {course.remarks || "—"}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   );
@@ -422,11 +424,7 @@ const FacultyStudentProfile = () => {
   };
 
   const fullName = student
-    ? [
-        student.firstName,
-        student.middleInitial ? student.middleInitial + "." : "",
-        student.lastName,
-      ]
+    ? [student.firstName, student.middleName, student.lastName]
         .filter(Boolean)
         .join(" ")
         .trim()
@@ -482,7 +480,7 @@ const FacultyStudentProfile = () => {
           >
             <i className="bi bi-arrow-left" /> Back to Student List
           </button>
-          {!isLoading &&
+          {/* {!isLoading &&
             !error &&
             activeTab === "student-info" &&
             !isEditing && (
@@ -495,7 +493,7 @@ const FacultyStudentProfile = () => {
                   Edit Profile
                 </AppButton>
               </div>
-            )}
+            )} */}
         </div>
 
         {isLoading && (
@@ -625,8 +623,8 @@ const FacultyStudentProfile = () => {
                             value={student.lastName}
                           />
                           <InfoItem
-                            label="Middle Initial"
-                            value={student.middleInitial}
+                            label="Middle Name"
+                            value={student.middleName}
                           />
                           <InfoItem
                             label="Birthdate"
@@ -676,12 +674,11 @@ const FacultyStudentProfile = () => {
                             />
                           </div>
                           <div className={styles.formGroup}>
-                            <label>Middle Initial</label>
+                            <label>Middle Name</label>
                             <input
-                              name="middleInitial"
-                              value={editData.middleInitial || ""}
+                              name="middleName"
+                              value={editData.middleName || ""}
                               onChange={handleChange}
-                              maxLength={2}
                             />
                           </div>
                           <div className={styles.formGroup}>

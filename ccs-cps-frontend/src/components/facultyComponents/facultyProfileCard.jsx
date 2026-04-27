@@ -1,6 +1,6 @@
 // components/facultyComponents/FacultyProfileCard.jsx
 import { useRef, useState, useEffect } from "react";
-import styles from "../../pages/facultyPages/facultyStyles/facultyProfileCard.module.css";
+import styles from "../../pages/facultyPages/facultyStyles/FacultyProfileCard.module.css";
 
 const ROLE_COLOR = {
   Dean: { bg: "#fff3e0", color: "#e65100", border: "#ffb74d" },
@@ -22,18 +22,6 @@ function getInitials(fullName = "") {
   return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
 }
 
-function normalizeRole(role) {
-  if (!role) return "Faculty";
-  const map = {
-    dean: "Dean",
-    faculty: "Faculty",
-    chair: "Department Chair",
-    "department chair": "Department Chair",
-    secretary: "Secretary",
-  };
-  return map[role.toLowerCase()] ?? role;
-}
-
 function getFacultyFromStorage() {
   try {
     const raw = localStorage.getItem("user");
@@ -42,7 +30,7 @@ function getFacultyFromStorage() {
     return {
       fullName: `${u.firstName ?? ""} ${u.lastName ?? ""}`.trim() || "—",
       facultyId: u.id ?? "—",
-      role: normalizeRole(u.role),
+      role: u.role ?? "Faculty",
       department: u.department ?? "—",
       status: u.status ?? null,
       email: u.email ?? "—",
@@ -56,39 +44,12 @@ function getFacultyFromStorage() {
 export default function FacultyProfileCard() {
   const [faculty, setFaculty] = useState(getFacultyFromStorage);
   const [previewUrl, setPreviewUrl] = useState(null);
-
   const fileInputRef = useRef(null);
 
   useEffect(() => {
-    const fetchFaculty = async () => {
-      const raw = localStorage.getItem("user");
-      if (!raw) return;
-      const u = JSON.parse(raw);
-      const id = u?._id || u?.id;
-      if (!id) return;
-
-      try {
-        const res = await fetch(
-          `${import.meta.env.VITE_API_URL}/api/faculty/${id}`,
-        );
-        if (!res.ok) return;
-        const data = await res.json();
-        setFaculty({
-          fullName:
-            `${data.firstName ?? ""} ${data.lastName ?? ""}`.trim() || "—",
-          facultyId: data.facultyId ?? "—", //
-          role: normalizeRole(data.role),
-          department: data.department ?? "—",
-          status: data.status ?? null,
-          email: data.email ?? "—", //
-          avatarUrl: data.avatarUrl ?? null,
-        });
-      } catch (err) {
-        console.error("Failed to fetch faculty profile:", err);
-      }
-    };
-
-    fetchFaculty();
+    const onStorage = () => setFaculty(getFacultyFromStorage());
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
   }, []);
 
   if (!faculty) return null;

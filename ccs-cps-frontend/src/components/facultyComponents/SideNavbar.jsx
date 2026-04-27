@@ -4,7 +4,6 @@ import { FaBars, FaXmark } from "react-icons/fa6";
 import styles from "../../pages/facultyPages/facultyStyles/SideNavbar.module.css";
 import ccsLogo from "../../assets/ccs_logo.png";
 import LogoutModal from "../LogoutModal";
-import { useAuth } from "../../context/AuthContext";
 
 const TABLET_BREAKPOINT = 992;
 const MOBILE_BREAKPOINT = 768;
@@ -43,16 +42,18 @@ export default function SidebarNav({
   setMobileOpen,
 }) {
   const navigate = useNavigate();
-  const { user, logout } = useAuth(); //using auth
 
+  const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
   const faculty = {
     name:
-      `${user?.firstName || ""} ${user?.lastName || ""}`.trim() || "Faculty",
-    id: user?.id || user?.id || "—",
-    isDean: user?.role === "Dean" || false,
-    isChair: user?.role === "Department Chair" || false,
-    department: user?.department || " ",
+      `${storedUser.firstName || ""} ${storedUser.lastName || ""}`.trim() ||
+      "Faculty",
+    id: storedUser.id || "—",
+    isDean: storedUser.isDean || false,
+    isChair: storedUser.isChair || false,
+    department: storedUser.department || " ",
   };
+
   const isMobile = () => window.innerWidth <= MOBILE_BREAKPOINT;
 
   const [collapsed, setCollapsed] = useState(
@@ -80,7 +81,9 @@ export default function SidebarNav({
   }, [mobileOpen]);
 
   const handleLogout = () => {
-    logout(); //
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    localStorage.removeItem("role");
     navigate("/login");
   };
 
@@ -166,6 +169,12 @@ export default function SidebarNav({
                 <p className={styles.profileId}>{faculty.id}</p>
                 {faculty.isDean && (
                   <span className={styles.deanBadge}>Dean</span>
+                )}
+                {faculty.isChair && (
+                  <>
+                    <span className={styles.deanBadge}>Department Chair</span>
+                    <p className={styles.profileId}>{faculty.department}</p>
+                  </>
                 )}
               </div>
               <hr className={styles.profileDivider} />

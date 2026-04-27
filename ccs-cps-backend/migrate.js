@@ -17,34 +17,56 @@ const migrate = async () => {
     const updates = [
       {
         filter: { facultyId: "2203375" },
-        data: { role: "Dean", middleName: "Santos" },
+        data: {
+          role: "Dean",
+          middleName: "Santos",
+          isDean: true,
+          isChair: false,
+        },
       },
       {
         filter: { facultyId: "2203374" },
-        data: { role: "Faculty", middleName: "Escobar" },
+        data: {
+          role: "Faculty",
+          middleName: "Escobar",
+          isDean: false,
+          isChair: false,
+        },
       },
       {
         filter: { facultyId: "3001001" },
-        data: { role: "Department Chair", middleName: "Reyes" },
+        data: {
+          role: "Department Chair",
+          middleName: "Reyes",
+          isDean: false,
+          isChair: true,
+        },
       },
       {
         filter: { facultyId: "3001002" },
-        data: { role: "Department Chair", middleName: "Lopez" },
+        data: {
+          role: "Department Chair",
+          middleName: "Lopez",
+          isDean: false,
+          isChair: false,
+        },
       },
     ];
 
     for (const update of updates) {
       const result = await faculties.updateOne(update.filter, {
         $set: {
+          role: update.data.role, // ←
+          middleName: update.data.middleName, // ←
           gender: null,
           civilStatus: null,
           contactNumber: null,
           address: null,
+          isDean: update.data.isDean,
+          isChair: update.data.isChair,
         },
         $unset: {
-          isDean: "",
-          isChair: "",
-          middleInitial: "",
+          middleInitial: "", //
         },
       });
       console.log(

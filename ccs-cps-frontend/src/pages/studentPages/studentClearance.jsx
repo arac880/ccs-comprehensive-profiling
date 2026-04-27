@@ -1,14 +1,23 @@
 import { useState, useEffect } from "react";
-import { FaPercent, FaBook, FaFileLines } from "react-icons/fa6";
-import { FaPesoSign, FaClipboardCheck } from "react-icons/fa6";
-import { MdOutlineCancel, MdCheckCircle, MdCancel } from "react-icons/md"; 
+import {
+  FaPercent,
+  FaBook,
+  FaFileLines,
+  FaPesoSign,
+  FaClipboardCheck,
+} from "react-icons/fa6";
+import { MdOutlineCancel, MdCheckCircle, MdCancel } from "react-icons/md";
 
 import styles from "./studentStyles/Clearance.module.css";
 
 const MOBILE_BREAKPOINT = 992;
 
-export default function StudentClearance() {
-  const [isMobile, setIsMobile] = useState(window.innerWidth < MOBILE_BREAKPOINT);
+export default function StudentClearance({ studentId }) {
+  const [isMobile, setIsMobile] = useState(
+    window.innerWidth < MOBILE_BREAKPOINT,
+  );
+  const [clearanceData, setClearanceData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const onResize = () => setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
@@ -16,17 +25,70 @@ export default function StudentClearance() {
     return () => window.removeEventListener("resize", onResize);
   }, []);
 
-  const summaryItems = [
-    { isCleared: false, text: "Your grades for Second Semester have not all been submitted." },
-    { isCleared: true, text: "You have fully settled your account balance." },
-    { isCleared: true, text: "You have no records of pending book/s borrowed." },
-    { isCleared: true, text: "You do not have any on-hold records." },
-    { isCleared: false, text: "You have not evaluated all of your instructor/s." },
-  ];
+  // ✅ Dynamic Fetching with localStorage fallback
+  useEffect(() => {
+    const fetchClearance = async () => {
+      try {
+        let currentId = studentId;
+
+        // If no ID prop is passed, check localStorage for the logged-in user
+        if (!currentId) {
+          const storedUser = localStorage.getItem("user");
+          if (storedUser) {
+            const parsedUser = JSON.parse(storedUser);
+            currentId = parsedUser._id;
+          }
+        }
+
+        if (!currentId) {
+          console.warn("No student ID provided for clearance fetch.");
+          setIsLoading(false);
+          return;
+        }
+
+        const res = await fetch(
+          `${import.meta.env.VITE_API_URL}/api/students/${currentId}`,
+        );
+        const data = await res.json();
+
+        if (data && data.clearance) {
+          setClearanceData(data.clearance);
+        }
+      } catch (error) {
+        console.error("Failed to fetch clearance:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchClearance();
+  }, [studentId]);
+
+  if (isLoading) {
+    return (
+      <main className={styles.clearanceContainer}>
+        <div style={{ padding: "2rem", textAlign: "center", color: "#666" }}>
+          Loading your clearance data...
+        </div>
+      </main>
+    );
+  }
+
+  if (!clearanceData) {
+    return (
+      <main className={styles.clearanceContainer}>
+        <div style={{ padding: "2rem", textAlign: "center", color: "#666" }}>
+          Clearance data is currently unavailable.
+        </div>
+      </main>
+    );
+  }
+
+  const { summaryItems, pathway } = clearanceData;
+  const isOverallCleared = summaryItems.every((item) => item.isCleared);
 
   return (
     <main className={styles.clearanceContainer}>
-      
       {/* ── Page Header ── */}
       <div className={styles.pageHeader}>
         <div className={styles.titleWrapper}>
@@ -45,18 +107,33 @@ export default function StudentClearance() {
       <div className={styles.statusBanner}>
         <div className={styles.statusLeft}>
           <div className={styles.statusIconWrap}>
-            <MdOutlineCancel size={48} color="#E65100" />
+            {isOverallCleared ? (
+              <MdCheckCircle size={48} color="#2E7D32" />
+            ) : (
+              <MdOutlineCancel size={48} color="#E65100" />
+            )}
           </div>
-          <span className={styles.statusMainText}>Not Yet Cleared</span>
-          <span className={styles.statusSubText}>Action required on pending items.</span>
+          <span className={styles.statusMainText}>
+            {isOverallCleared ? "Fully Cleared" : "Not Yet Cleared"}
+          </span>
+          <span className={styles.statusSubText}>
+            {isOverallCleared
+              ? "You have met all requirements."
+              : "Action required on pending items."}
+          </span>
         </div>
-        
+
         <div className={styles.statusDivider}></div>
-        
+
         <div className={styles.statusRight}>
           <ul className={styles.summaryList}>
             {summaryItems.map((item, idx) => (
-              <li key={idx} className={item.isCleared ? styles.clearedItem : styles.pendingItem}>
+              <li
+                key={idx}
+                className={
+                  item.isCleared ? styles.clearedItem : styles.pendingItem
+                }
+              >
                 {item.isCleared ? (
                   <MdCheckCircle size={18} className={styles.listIcon} />
                 ) : (
@@ -73,38 +150,58 @@ export default function StudentClearance() {
 
       {/* ── Vertical Timeline Journey ── */}
       <div className={styles.timelineWrapper}>
-        
         {/* STOP 1: GRADE STATUS */}
         <div className={styles.timelineRow}>
           <div className={styles.timelineNodeBox}>
-            <div className={`${styles.timelineNode} ${styles.nodePending}`}>
-              <MdCancel size={24} />
+            <div
+              className={`${styles.timelineNode} ${pathway.gradeStatus.isCleared ? styles.nodeCleared : styles.nodePending}`}
+            >
+              {pathway.gradeStatus.isCleared ? (
+                <MdCheckCircle size={24} />
+              ) : (
+                <MdCancel size={24} />
+              )}
             </div>
             <div className={styles.timelineLine}></div>
           </div>
-          
+
           <div className={styles.timelineContent}>
             <div className={styles.widgetCard}>
               <div className={styles.widgetHeader}>
                 <div className={styles.widgetTitleWrap}>
-                  <div className={styles.widgetIcon}><FaPercent /></div>
+                  <div className={styles.widgetIcon}>
+                    <FaPercent />
+                  </div>
                   <span className={styles.widgetTitle}>Grade Status</span>
                 </div>
                 <div className={styles.departmentBadge}>CCS OFFICE</div>
               </div>
               <div className={styles.widgetBody}>
                 <div className={styles.bodyLeft}>
-                  <h4 className={styles.statusFailText}>NOT YET COMPLETE</h4>
-                  <p className={styles.subtext}>Grades for the current semester have not all been submitted.</p>
+                  <h4
+                    className={
+                      pathway.gradeStatus.isCleared
+                        ? styles.statusPassText
+                        : styles.statusFailText
+                    }
+                  >
+                    {pathway.gradeStatus.statusText}
+                  </h4>
+                  <p className={styles.subtext}>
+                    {pathway.gradeStatus.subtext}
+                  </p>
                 </div>
-                <div className={styles.missingItemsWrapper}>
-                  <div className={styles.missingItem}>
-                    <MdCancel size={16} /><span>ITP113 - IT Practicum (400 hours)</span>
-                  </div>
-                  <div className={styles.missingItem}>
-                    <MdCancel size={16} /><span>ITEW6 - Web Development Frameworks</span>
-                  </div>
-                </div>
+                {pathway.gradeStatus.missingItems &&
+                  pathway.gradeStatus.missingItems.length > 0 && (
+                    <div className={styles.missingItemsWrapper}>
+                      {pathway.gradeStatus.missingItems.map((item, idx) => (
+                        <div key={idx} className={styles.missingItem}>
+                          <MdCancel size={16} />
+                          <span>{item}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
               </div>
             </div>
           </div>
@@ -113,30 +210,70 @@ export default function StudentClearance() {
         {/* STOP 2: ACCOUNT STATUS */}
         <div className={styles.timelineRow}>
           <div className={styles.timelineNodeBox}>
-            <div className={`${styles.timelineNode} ${styles.nodeCleared}`}>
-              <MdCheckCircle size={24} />
+            <div
+              className={`${styles.timelineNode} ${pathway.accountStatus.isCleared ? styles.nodeCleared : styles.nodePending}`}
+            >
+              {pathway.accountStatus.isCleared ? (
+                <MdCheckCircle size={24} />
+              ) : (
+                <MdCancel size={24} />
+              )}
             </div>
             <div className={styles.timelineLine}></div>
           </div>
-          
+
           <div className={styles.timelineContent}>
             <div className={styles.widgetCard}>
               <div className={styles.widgetHeader}>
                 <div className={styles.widgetTitleWrap}>
-                  <div className={styles.widgetIcon}><FaPesoSign /></div>
+                  <div className={styles.widgetIcon}>
+                    <FaPesoSign />
+                  </div>
                   <span className={styles.widgetTitle}>Account Status</span>
                 </div>
                 <div className={styles.departmentBadge}>OUR</div>
               </div>
               <div className={styles.widgetBody}>
                 <div className={styles.bodyLeft}>
-                  <h4 className={styles.statusPassText}>REMAINING BALANCE: ₱0.00</h4>
-                  <p className={styles.subtext}>All financial obligations have been met for this semester.</p>
+                  <h4
+                    className={
+                      pathway.accountStatus.isCleared
+                        ? styles.statusPassText
+                        : styles.statusFailText
+                    }
+                  >
+                    {pathway.accountStatus.statusText}
+                  </h4>
+                  <p className={styles.subtext}>
+                    {pathway.accountStatus.subtext}
+                  </p>
                 </div>
-                <div className={styles.extraDetailsRow}>
-                  <span className={styles.successTag}>✓ Tuition Fee Settled</span>
-                  <span className={styles.successTag}>✓ Misc Fee Settled</span>
-                </div>
+                {pathway.accountStatus.tags &&
+                  pathway.accountStatus.tags.length > 0 && (
+                    <div className={styles.extraDetailsRow}>
+                      {pathway.accountStatus.tags.map((tag, idx) => {
+                        const isPending = tag.toLowerCase().includes("pending");
+                        return (
+                          <span
+                            key={idx}
+                            className={
+                              isPending ? styles.missingItem : styles.successTag
+                            }
+                          >
+                            {isPending ? (
+                              <MdCancel
+                                size={14}
+                                style={{ marginRight: "4px" }}
+                              />
+                            ) : (
+                              "✓"
+                            )}{" "}
+                            {tag}
+                          </span>
+                        );
+                      })}
+                    </div>
+                  )}
               </div>
             </div>
           </div>
@@ -145,63 +282,119 @@ export default function StudentClearance() {
         {/* STOP 3: LIBRARY */}
         <div className={styles.timelineRow}>
           <div className={styles.timelineNodeBox}>
-            <div className={`${styles.timelineNode} ${styles.nodeCleared}`}>
-              <MdCheckCircle size={24} />
+            <div
+              className={`${styles.timelineNode} ${pathway.libraryStatus.isCleared ? styles.nodeCleared : styles.nodePending}`}
+            >
+              {pathway.libraryStatus.isCleared ? (
+                <MdCheckCircle size={24} />
+              ) : (
+                <MdCancel size={24} />
+              )}
             </div>
             <div className={styles.timelineLine}></div>
           </div>
-          
+
           <div className={styles.timelineContent}>
             <div className={styles.widgetCard}>
               <div className={styles.widgetHeader}>
                 <div className={styles.widgetTitleWrap}>
-                  <div className={styles.widgetIcon}><FaBook /></div>
+                  <div className={styles.widgetIcon}>
+                    <FaBook />
+                  </div>
                   <span className={styles.widgetTitle}>Library Status</span>
                 </div>
                 <div className={styles.departmentBadge}>LIBRARY</div>
               </div>
               <div className={styles.widgetBody}>
                 <div className={styles.bodyLeft}>
-                  <h4 className={styles.statusPassText}>CLEARED</h4>
-                  <p className={styles.subtext}>No unreturned books or outstanding fines.</p>
+                  <h4
+                    className={
+                      pathway.libraryStatus.isCleared
+                        ? styles.statusPassText
+                        : styles.statusFailText
+                    }
+                  >
+                    {pathway.libraryStatus.statusText}
+                  </h4>
+                  <p className={styles.subtext}>
+                    {pathway.libraryStatus.subtext}
+                  </p>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* STOP 4: REQUIREMENTS (Last item, no trailing line) */}
+        {/* STOP 4: REQUIREMENTS */}
         <div className={styles.timelineRow}>
           <div className={styles.timelineNodeBox}>
-            <div className={`${styles.timelineNode} ${styles.nodeCleared}`}>
-              <MdCheckCircle size={24} />
+            <div
+              className={`${styles.timelineNode} ${pathway.requirements.isCleared ? styles.nodeCleared : styles.nodePending}`}
+            >
+              {pathway.requirements.isCleared ? (
+                <MdCheckCircle size={24} />
+              ) : (
+                <MdCancel size={24} />
+              )}
             </div>
           </div>
-          
+
           <div className={styles.timelineContent}>
             <div className={styles.widgetCard}>
               <div className={styles.widgetHeader}>
                 <div className={styles.widgetTitleWrap}>
-                  <div className={styles.widgetIcon}><FaFileLines /></div>
+                  <div className={styles.widgetIcon}>
+                    <FaFileLines />
+                  </div>
                   <span className={styles.widgetTitle}>Requirements</span>
                 </div>
                 <div className={styles.departmentBadge}>OUR</div>
               </div>
               <div className={styles.widgetBody}>
                 <div className={styles.bodyLeft}>
-                  <h4 className={styles.statusPassText}>ALL SUBMITTED</h4>
-                  <p className={styles.subtext}>All hardcopy documents have been submitted and verified.</p>
+                  <h4
+                    className={
+                      pathway.requirements.isCleared
+                        ? styles.statusPassText
+                        : styles.statusFailText
+                    }
+                  >
+                    {pathway.requirements.statusText}
+                  </h4>
+                  <p className={styles.subtext}>
+                    {pathway.requirements.subtext}
+                  </p>
                 </div>
-                <div className={styles.extraDetailsRow}>
-                  <span className={styles.successTag}>✓ Form 138</span>
-                  <span className={styles.successTag}>✓ PSA Birth Cert</span>
-                  <span className={styles.successTag}>✓ Good Moral</span>
-                </div>
+                {pathway.requirements.tags &&
+                  pathway.requirements.tags.length > 0 && (
+                    <div className={styles.extraDetailsRow}>
+                      {pathway.requirements.tags.map((tag, idx) => {
+                        const isMissing = tag.toLowerCase().includes("missing");
+                        return (
+                          <span
+                            key={idx}
+                            className={
+                              isMissing ? styles.missingItem : styles.successTag
+                            }
+                          >
+                            {isMissing ? (
+                              <MdCancel
+                                size={14}
+                                style={{ marginRight: "4px" }}
+                              />
+                            ) : (
+                              "✓"
+                            )}{" "}
+                            {tag}
+                          </span>
+                        );
+                      })}
+                    </div>
+                  )}
               </div>
             </div>
           </div>
         </div>
-
       </div>
     </main>
   );

@@ -80,6 +80,8 @@ const login = async (req, res) => {
             lastName: user.lastName,
             email: user.email,
             isDean: user.isDean || false,
+            isChair: user.isChair || false,
+            department: user.department || "",
           };
 
     res.json({ token, role, user: userProfile });
